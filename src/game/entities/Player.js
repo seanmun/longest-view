@@ -23,6 +23,7 @@ export class Player {
     this.invincible = false
     this.invincibleUntil = 0
     this.isDodging = false
+    this.isDucking = false
     this.walkFrame = 0
     this.walkTimer = 0
     this.onHealthChange = null
@@ -78,8 +79,9 @@ export class Player {
 
     // Movement
     let moving = false
-    const leftDown = this.cursors.left.isDown || this.wasd.left.isDown
-    const rightDown = this.cursors.right.isDown || this.wasd.right.isDown
+    const vi = window.__virtualInput
+    const leftDown = this.cursors.left.isDown || this.wasd.left.isDown || (vi && vi.left)
+    const rightDown = this.cursors.right.isDown || this.wasd.right.isDown || (vi && vi.right)
 
     // Double-tap dodge detection
     if (leftDown && !this.prevLeftDown) {
@@ -112,13 +114,28 @@ export class Player {
     }
 
     // Jump (Up / W only — space is reserved for charge/throw)
-    const jumpPressed = this.cursors.up.isDown || this.wasd.up.isDown
+    const jumpPressed = this.cursors.up.isDown || this.wasd.up.isDown || (vi && vi.actionB) || (vi && vi.up)
     if (jumpPressed && onGround) {
       this.sprite.setVelocityY(JUMP_VELOCITY)
     }
 
+    // Duck (Down / S / D-pad down)
+    const downDown = this.cursors.down.isDown || this.wasd.down.isDown || (vi && vi.down)
+    if (downDown && onGround && !this.isDodging) {
+      if (!this.isDucking) {
+        this.isDucking = true
+        this.sprite.setSize(PLAYER_WIDTH, 24)
+        this.sprite.setOffset(0, 16)
+      }
+      this.sprite.setVelocityX(0)
+    } else if (this.isDucking) {
+      this.isDucking = false
+      this.sprite.setSize(PLAYER_WIDTH, PLAYER_HEIGHT)
+      this.sprite.setOffset(0, 0)
+    }
+
     // Space key: hold = charge, release = fire, quick tap = small throw
-    const spaceDown = this.spaceKey.isDown
+    const spaceDown = this.spaceKey.isDown || (vi && vi.actionA)
 
     if (spaceDown && !this.spaceWasDown) {
       // Space just pressed — record time
@@ -245,60 +262,116 @@ export class Player {
     // Flicker when invincible
     if (this.invincible && Math.floor(time / 80) % 2 === 0) return
 
-    // Legs
-    const legOffset = this.walkFrame % 2 === 0 ? 2 : -2
-    this.graphics.fillStyle(0x1a1a3a) // dark suit pants
-    this.graphics.fillRect(x - 7, y + 6, 5, 14 + legOffset)
-    this.graphics.fillRect(x + 2, y + 6, 5, 14 - legOffset)
+    if (this.isDucking) {
+      // --- DUCKING POSE (compressed, knees bent) ---
+      // Legs (bent, shorter)
+      this.graphics.fillStyle(0x1a1a3a)
+      this.graphics.fillRect(x - 8, y + 10, 6, 6)
+      this.graphics.fillRect(x + 2, y + 10, 6, 6)
 
-    // Shoes
-    this.graphics.fillStyle(0x222222)
-    this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 3)
-    this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 3)
-    // White stripe on shoes
-    this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 1)
-    this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 1)
+      // Shoes
+      this.graphics.fillStyle(0x222222)
+      this.graphics.fillRect(x - 9, y + 15, 8, 3)
+      this.graphics.fillRect(x + 1, y + 15, 8, 3)
+      // White stripe on shoes
+      this.graphics.fillStyle(0xFFFFFF)
+      this.graphics.fillRect(x - 9, y + 15, 8, 1)
+      this.graphics.fillRect(x + 1, y + 15, 8, 1)
 
-    // Body (suit jacket)
-    this.graphics.fillStyle(0x1a1a4a) // navy suit
-    this.graphics.fillRect(x - 9, y - 10, 18, 18)
+      // Body (suit jacket — squished)
+      this.graphics.fillStyle(0x1a1a4a)
+      this.graphics.fillRect(x - 9, y - 2, 18, 14)
 
-    // Tie
-    this.graphics.fillStyle(COLORS.RED)
-    this.graphics.fillRect(x - 1, y - 8, 2, 12)
+      // Tie (shorter)
+      this.graphics.fillStyle(COLORS.RED)
+      this.graphics.fillRect(x - 1, y, 2, 8)
 
-    // Arms
-    const armSwing = this.walkFrame < 2 ? 3 : -3
-    this.graphics.fillStyle(0x1a1a4a)
-    this.graphics.fillRect(x - 13, y - 8 + armSwing, 5, 12)
-    this.graphics.fillRect(x + 8, y - 8 - armSwing, 5, 12)
+      // Arms (tucked)
+      this.graphics.fillStyle(0x1a1a4a)
+      this.graphics.fillRect(x - 13, y, 5, 8)
+      this.graphics.fillRect(x + 8, y, 5, 8)
 
-    // Hands (skin tone)
-    this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 13, y + 3 + armSwing, 5, 3)
-    this.graphics.fillRect(x + 8, y + 3 - armSwing, 5, 3)
+      // Hands
+      this.graphics.fillStyle(0xE8B090)
+      this.graphics.fillRect(x - 13, y + 7, 5, 3)
+      this.graphics.fillRect(x + 8, y + 7, 5, 3)
 
-    // Head
-    this.graphics.fillStyle(0xE8B090) // skin
-    this.graphics.fillRect(x - 7, y - 22, 14, 13)
+      // Head (lowered)
+      this.graphics.fillStyle(0xE8B090)
+      this.graphics.fillRect(x - 7, y - 14, 14, 13)
 
-    // Bald head — skin-colored top with a subtle shine
-    this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 7, y - 24, 14, 3)
-    this.graphics.fillStyle(0xF0C8A0, 0.5) // shine highlight
-    this.graphics.fillRect(x - 3, y - 24, 6, 1)
+      // Bald head
+      this.graphics.fillStyle(0xE8B090)
+      this.graphics.fillRect(x - 7, y - 16, 14, 3)
+      this.graphics.fillStyle(0xF0C8A0, 0.5)
+      this.graphics.fillRect(x - 3, y - 16, 6, 1)
 
-    // Glasses
-    this.graphics.fillStyle(0x333333)
-    const glassX = flip === 1 ? x - 5 : x - 5
-    this.graphics.fillRect(glassX, y - 18, 4, 3)
-    this.graphics.fillRect(glassX + 6, y - 18, 4, 3)
-    this.graphics.fillRect(glassX + 4, y - 17, 2, 1) // bridge
+      // Glasses
+      this.graphics.fillStyle(0x333333)
+      this.graphics.fillRect(x - 5, y - 10, 4, 3)
+      this.graphics.fillRect(x + 1, y - 10, 4, 3)
+      this.graphics.fillRect(x - 1, y - 9, 2, 1)
 
-    // Mouth (small line)
-    this.graphics.fillStyle(0x333333)
-    this.graphics.fillRect(x - 2, y - 12, 4, 1)
+      // Mouth
+      this.graphics.fillStyle(0x333333)
+      this.graphics.fillRect(x - 2, y - 4, 4, 1)
+    } else {
+      // --- NORMAL STANDING POSE ---
+      // Legs
+      const legOffset = this.walkFrame % 2 === 0 ? 2 : -2
+      this.graphics.fillStyle(0x1a1a3a) // dark suit pants
+      this.graphics.fillRect(x - 7, y + 6, 5, 14 + legOffset)
+      this.graphics.fillRect(x + 2, y + 6, 5, 14 - legOffset)
+
+      // Shoes
+      this.graphics.fillStyle(0x222222)
+      this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 3)
+      this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 3)
+      // White stripe on shoes
+      this.graphics.fillStyle(0xFFFFFF)
+      this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 1)
+      this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 1)
+
+      // Body (suit jacket)
+      this.graphics.fillStyle(0x1a1a4a) // navy suit
+      this.graphics.fillRect(x - 9, y - 10, 18, 18)
+
+      // Tie
+      this.graphics.fillStyle(COLORS.RED)
+      this.graphics.fillRect(x - 1, y - 8, 2, 12)
+
+      // Arms
+      const armSwing = this.walkFrame < 2 ? 3 : -3
+      this.graphics.fillStyle(0x1a1a4a)
+      this.graphics.fillRect(x - 13, y - 8 + armSwing, 5, 12)
+      this.graphics.fillRect(x + 8, y - 8 - armSwing, 5, 12)
+
+      // Hands (skin tone)
+      this.graphics.fillStyle(0xE8B090)
+      this.graphics.fillRect(x - 13, y + 3 + armSwing, 5, 3)
+      this.graphics.fillRect(x + 8, y + 3 - armSwing, 5, 3)
+
+      // Head
+      this.graphics.fillStyle(0xE8B090) // skin
+      this.graphics.fillRect(x - 7, y - 22, 14, 13)
+
+      // Bald head — skin-colored top with a subtle shine
+      this.graphics.fillStyle(0xE8B090)
+      this.graphics.fillRect(x - 7, y - 24, 14, 3)
+      this.graphics.fillStyle(0xF0C8A0, 0.5) // shine highlight
+      this.graphics.fillRect(x - 3, y - 24, 6, 1)
+
+      // Glasses
+      this.graphics.fillStyle(0x333333)
+      const glassX = flip === 1 ? x - 5 : x - 5
+      this.graphics.fillRect(glassX, y - 18, 4, 3)
+      this.graphics.fillRect(glassX + 6, y - 18, 4, 3)
+      this.graphics.fillRect(glassX + 4, y - 17, 2, 1) // bridge
+
+      // Mouth (small line)
+      this.graphics.fillStyle(0x333333)
+      this.graphics.fillRect(x - 2, y - 12, 4, 1)
+    }
 
     // Charge bar
     if (this.isCharging) {

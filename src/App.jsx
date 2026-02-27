@@ -5,12 +5,13 @@ import DialogueBox from './components/DialogueBox.jsx'
 import MNSPromo from './components/MNSPromo.jsx'
 import PauseMenu from './components/PauseMenu.jsx'
 import VolumeControl from './components/VolumeControl.jsx'
+import MobileControls from './components/MobileControls.jsx'
 
 export default function App() {
   const [game, setGame] = useState(null)
 
-  return (
-    <div className="relative w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
+  const gameContent = (
+    <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
       {/* Game canvas */}
       <GameCanvas onGameReady={setGame} />
 
@@ -24,11 +25,17 @@ export default function App() {
         </>
       )}
 
-      {/* Volume control */}
+      {/* Volume control (desktop only — mobile has shell buttons) */}
       <VolumeControl />
 
       {/* CRT Scanline overlay */}
       <div className="scanlines" />
     </div>
+  )
+
+  return (
+    <MobileControls>
+      {gameContent}
+    </MobileControls>
   )
 }
