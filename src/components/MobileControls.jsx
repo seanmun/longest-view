@@ -244,13 +244,10 @@ const releaseA = () => { VirtualInput.actionA = false }
 const pressB = () => { VirtualInput.actionB = true }
 const releaseB = () => { VirtualInput.actionB = false }
 const pressSelect = () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }))
+  window.dispatchEvent(new CustomEvent('game-select'))
 }
 const pressStart = () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true }))
-  setTimeout(() => {
-    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', bubbles: true }))
-  }, 100)
+  window.dispatchEvent(new CustomEvent('game-start'))
 }
 
 // ============================================

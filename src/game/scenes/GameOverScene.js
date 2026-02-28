@@ -66,20 +66,34 @@ export class GameOverScene extends Phaser.Scene {
       alpha: 0.5
     }).setOrigin(0.5)
 
-    this.input.keyboard.on('keydown-ENTER', () => {
-      AudioSystem.playMenuConfirm()
-      this.cameras.main.fadeOut(300)
-      this.time.delayedCall(300, () => {
-        this.scene.start('CutsceneScene', { cutscene: 'level1_intro' })
-      })
-    })
+    this.input.keyboard.on('keydown-ENTER', () => this.retry())
+    this.input.keyboard.on('keydown-ESC', () => this.goToMenu())
 
-    this.input.keyboard.on('keydown-ESC', () => {
-      AudioSystem.playMenuSelect()
-      this.cameras.main.fadeOut(300)
-      this.time.delayedCall(300, () => {
-        this.scene.start('MainMenuScene')
-      })
+    // Mobile custom events
+    this._onGameStart = () => this.retry()
+    this._onGameSelect = () => this.goToMenu()
+    window.addEventListener('game-start', this._onGameStart)
+    window.addEventListener('game-select', this._onGameSelect)
+
+    this.events.on('shutdown', () => {
+      window.removeEventListener('game-start', this._onGameStart)
+      window.removeEventListener('game-select', this._onGameSelect)
+    })
+  }
+
+  retry() {
+    AudioSystem.playMenuConfirm()
+    this.cameras.main.fadeOut(300)
+    this.time.delayedCall(300, () => {
+      this.scene.start('CutsceneScene', { cutscene: 'level1_intro' })
+    })
+  }
+
+  goToMenu() {
+    AudioSystem.playMenuSelect()
+    this.cameras.main.fadeOut(300)
+    this.time.delayedCall(300, () => {
+      this.scene.start('MainMenuScene')
     })
   }
 }

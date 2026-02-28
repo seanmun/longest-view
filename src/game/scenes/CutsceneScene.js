@@ -58,6 +58,17 @@ export class CutsceneScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ESC', () => this.skipCutscene())
     this.input.keyboard.on('keydown-ENTER', () => this.skipCutscene())
 
+    // Mobile custom events
+    this._onGameStart = () => this.skipCutscene()
+    this._onGameSelect = () => this.skipCutscene()
+    window.addEventListener('game-start', this._onGameStart)
+    window.addEventListener('game-select', this._onGameSelect)
+
+    this.events.on('shutdown', () => {
+      window.removeEventListener('game-start', this._onGameStart)
+      window.removeEventListener('game-select', this._onGameSelect)
+    })
+
     // Start showing lines
     this.showNextLine()
   }

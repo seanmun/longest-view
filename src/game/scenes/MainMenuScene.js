@@ -30,7 +30,8 @@ export class MainMenuScene extends Phaser.Scene {
     }).setOrigin(0.5)
 
     // Blinking "INSERT COIN" text
-    const insertCoin = this.add.text(GAME_WIDTH / 2, 200, 'PRESS ENTER TO START', {
+    const isMobile = 'ontouchstart' in window && window.innerWidth < 1024
+    const insertCoin = this.add.text(GAME_WIDTH / 2, 200, isMobile ? 'PRESS START' : 'PRESS ENTER TO START', {
       fontFamily: '"Press Start 2P"',
       fontSize: '12px',
       color: '#00D4FF'
@@ -82,6 +83,17 @@ export class MainMenuScene extends Phaser.Scene {
     // Also start on any click/tap
     this.input.on('pointerdown', () => {
       AudioSystem.resume()
+    })
+
+    // Mobile custom events
+    this._onGameStart = () => this.selectMenu()
+    this._onGameSelect = () => {} // no-op on menu
+    window.addEventListener('game-start', this._onGameStart)
+    window.addEventListener('game-select', this._onGameSelect)
+
+    this.events.on('shutdown', () => {
+      window.removeEventListener('game-start', this._onGameStart)
+      window.removeEventListener('game-select', this._onGameSelect)
     })
   }
 

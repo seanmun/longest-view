@@ -45,9 +45,13 @@ export default function PauseMenu({ game }) {
     // Store togglePause on the component so the button can call it
     window.__togglePause = togglePause
 
+    const handleSelect = () => togglePause()
+
     window.addEventListener('keydown', handleKey)
+    window.addEventListener('game-select', handleSelect)
     return () => {
       window.removeEventListener('keydown', handleKey)
+      window.removeEventListener('game-select', handleSelect)
       delete window.__togglePause
     }
   }, [game])
