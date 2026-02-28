@@ -46,6 +46,7 @@ export class Level1Scene extends Phaser.Scene {
     this.comboSystem = new ComboSystem(this)
     this.dialogueSystem = new DialogueSystem(this)
     this.balls = []
+    this.snowballs = []
     this.enemies = []
     this.waveIndex = 0
     this.sideQuestTriggered = false
@@ -344,6 +345,50 @@ export class Level1Scene extends Phaser.Scene {
           enemy.takeDamage(ball.damage, ball)
           if (!ball.isRicochet() || ball.tier < 2) {
             ball.destroy()
+          }
+        }
+      })
+    })
+
+    // Update snowballs
+    this.snowballs = this.snowballs.filter(snowball => {
+      if (!snowball.alive) return false
+      snowball.update()
+      return snowball.alive
+    })
+
+    // Snowball vs Player collisions — uses actual physics body bounds
+    this.snowballs.forEach(snowball => {
+      if (!snowball.alive) return
+      const sx = snowball.sprite.x
+      const sy = snowball.sprite.y
+      const body = this.player.sprite.body
+      const px = body.x
+      const py = body.y
+      const pw = body.width
+      const ph = body.height
+
+      // Check if snowball overlaps the player's actual physics body
+      if (sx > px - 6 && sx < px + pw + 6 &&
+          sy > py - 6 && sy < py + ph + 6) {
+        this.player.takeDamage(snowball.damage)
+        snowball.shatter()
+      }
+    })
+
+    // Player's ball vs Snowball collisions (player can destroy snowballs)
+    this.balls.forEach(ball => {
+      if (!ball.alive) return
+      this.snowballs.forEach(snowball => {
+        if (!snowball.alive) return
+        const dist = Phaser.Math.Distance.Between(
+          ball.sprite.x, ball.sprite.y,
+          snowball.sprite.x, snowball.sprite.y
+        )
+        if (dist < 15) {
+          snowball.shatter()
+          if (this.scoreSystem) {
+            this.scoreSystem.addPoints(50, snowball.sprite.x, snowball.sprite.y - 10, COLORS.CYAN)
           }
         }
       })

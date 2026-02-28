@@ -269,22 +269,22 @@ export class Player {
       this.graphics.fillRect(x - 8, y + 10, 6, 6)
       this.graphics.fillRect(x + 2, y + 10, 6, 6)
 
-      // Shoes
-      this.graphics.fillStyle(0x222222)
+      // Shoes (dark brown dress shoes)
+      this.graphics.fillStyle(0x3B2314)
       this.graphics.fillRect(x - 9, y + 15, 8, 3)
       this.graphics.fillRect(x + 1, y + 15, 8, 3)
-      // White stripe on shoes
-      this.graphics.fillStyle(0xFFFFFF)
-      this.graphics.fillRect(x - 9, y + 15, 8, 1)
-      this.graphics.fillRect(x + 1, y + 15, 8, 1)
 
       // Body (suit jacket — squished)
       this.graphics.fillStyle(0x1a1a4a)
       this.graphics.fillRect(x - 9, y - 2, 18, 14)
 
+      // White dress shirt collar
+      this.graphics.fillStyle(0xF0F0F0)
+      this.graphics.fillRect(x - 4, y - 2, 8, 3)
+
       // Tie (shorter)
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 1, y, 2, 8)
+      this.graphics.fillRect(x - 1, y - 2, 2, 10)
 
       // Arms (tucked)
       this.graphics.fillStyle(0x1a1a4a)
@@ -300,17 +300,23 @@ export class Player {
       this.graphics.fillStyle(0xE8B090)
       this.graphics.fillRect(x - 7, y - 14, 14, 13)
 
-      // Bald head
-      this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 7, y - 16, 14, 3)
-      this.graphics.fillStyle(0xF0C8A0, 0.5)
-      this.graphics.fillRect(x - 3, y - 16, 6, 1)
+      // Hair (receding hairline — sides fuller, top thinning at front)
+      this.graphics.fillStyle(0x3D2517)
+      this.graphics.fillRect(x - 8, y - 16, 2, 8)
+      this.graphics.fillRect(x + 6, y - 16, 2, 8)
+      this.graphics.fillRect(x - 6, y - 17, 12, 2)
+      this.graphics.fillRect(x - 3, y - 15, 6, 1)
 
-      // Glasses
-      this.graphics.fillStyle(0x333333)
+      // Glasses (regular frames with visible eyes)
+      this.graphics.fillStyle(0x666666)
       this.graphics.fillRect(x - 5, y - 10, 4, 3)
       this.graphics.fillRect(x + 1, y - 10, 4, 3)
-      this.graphics.fillRect(x - 1, y - 9, 2, 1)
+      this.graphics.fillStyle(0xFFFFFF)
+      this.graphics.fillRect(x - 4, y - 9, 2, 1)
+      this.graphics.fillRect(x + 2, y - 9, 2, 1)
+      this.graphics.fillStyle(0x111111)
+      this.graphics.fillRect(x - 3, y - 9, 1, 1)
+      this.graphics.fillRect(x + 3, y - 9, 1, 1)
 
       // Mouth
       this.graphics.fillStyle(0x333333)
@@ -323,22 +329,22 @@ export class Player {
       this.graphics.fillRect(x - 7, y + 6, 5, 14 + legOffset)
       this.graphics.fillRect(x + 2, y + 6, 5, 14 - legOffset)
 
-      // Shoes
-      this.graphics.fillStyle(0x222222)
+      // Shoes (dark brown dress shoes)
+      this.graphics.fillStyle(0x3B2314)
       this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 3)
       this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 3)
-      // White stripe on shoes
-      this.graphics.fillStyle(0xFFFFFF)
-      this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 1)
-      this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 1)
 
       // Body (suit jacket)
       this.graphics.fillStyle(0x1a1a4a) // navy suit
       this.graphics.fillRect(x - 9, y - 10, 18, 18)
 
+      // White dress shirt collar
+      this.graphics.fillStyle(0xF0F0F0)
+      this.graphics.fillRect(x - 4, y - 10, 8, 3)
+
       // Tie
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 1, y - 8, 2, 12)
+      this.graphics.fillRect(x - 1, y - 10, 2, 14)
 
       // Arms
       const armSwing = this.walkFrame < 2 ? 3 : -3
@@ -355,18 +361,23 @@ export class Player {
       this.graphics.fillStyle(0xE8B090) // skin
       this.graphics.fillRect(x - 7, y - 22, 14, 13)
 
-      // Bald head — skin-colored top with a subtle shine
-      this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 7, y - 24, 14, 3)
-      this.graphics.fillStyle(0xF0C8A0, 0.5) // shine highlight
-      this.graphics.fillRect(x - 3, y - 24, 6, 1)
+      // Hair (receding hairline — sides fuller, top thinning at front)
+      this.graphics.fillStyle(0x3D2517)
+      this.graphics.fillRect(x - 8, y - 24, 2, 8)
+      this.graphics.fillRect(x + 6, y - 24, 2, 8)
+      this.graphics.fillRect(x - 6, y - 25, 12, 2)
+      this.graphics.fillRect(x - 3, y - 23, 6, 1)
 
-      // Glasses
-      this.graphics.fillStyle(0x333333)
-      const glassX = flip === 1 ? x - 5 : x - 5
-      this.graphics.fillRect(glassX, y - 18, 4, 3)
-      this.graphics.fillRect(glassX + 6, y - 18, 4, 3)
-      this.graphics.fillRect(glassX + 4, y - 17, 2, 1) // bridge
+      // Glasses (regular frames with visible eyes)
+      this.graphics.fillStyle(0x666666)
+      this.graphics.fillRect(x - 5, y - 18, 4, 3)
+      this.graphics.fillRect(x + 1, y - 18, 4, 3)
+      this.graphics.fillStyle(0xFFFFFF)
+      this.graphics.fillRect(x - 4, y - 17, 2, 1)
+      this.graphics.fillRect(x + 2, y - 17, 2, 1)
+      this.graphics.fillStyle(0x111111)
+      this.graphics.fillRect(x - 3, y - 17, 1, 1)
+      this.graphics.fillRect(x + 3, y - 17, 1, 1)
 
       // Mouth (small line)
       this.graphics.fillStyle(0x333333)

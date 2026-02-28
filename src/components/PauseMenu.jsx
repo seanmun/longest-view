@@ -64,13 +64,13 @@ export default function PauseMenu({ game }) {
 
         <button
           onClick={() => window.__togglePause?.()}
-          className="block mx-auto text-[10px] mb-4 px-4 py-2 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-colors cursor-pointer"
+          className="block mx-auto text-[14px] mb-4 px-6 py-3 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-colors cursor-pointer"
           style={{ fontFamily: '"Press Start 2P", monospace' }}
         >
           RESUME
         </button>
 
-        <div className="text-[6px] text-gray-500 mt-6">
+        <div className="text-[10px] text-gray-500 mt-6">
           PRESS ESC OR P TO RESUME
         </div>
       </div>

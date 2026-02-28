@@ -23,14 +23,14 @@ export default function VolumeControl() {
   }
 
   return (
-    <div className="absolute bottom-2 right-2 z-50 pointer-events-auto"
+    <div className="absolute bottom-3 right-3 z-50 pointer-events-auto"
       style={{ fontFamily: '"Press Start 2P", monospace' }}>
 
       {open ? (
-        <div className="bg-black/90 border border-gray-600 rounded p-3 flex flex-col gap-2 items-center">
+        <div className="bg-black/90 border border-gray-600 rounded p-4 flex flex-col gap-3 items-center">
           <button
             onClick={toggleMute}
-            className="text-[8px] cursor-pointer hover:text-yellow-400 transition-colors"
+            className="text-[14px] cursor-pointer hover:text-yellow-400 transition-colors"
             style={{ color: muted ? '#CC2200' : '#E8B800' }}
           >
             {muted ? 'MUTED' : 'SOUND'}
@@ -42,17 +42,17 @@ export default function VolumeControl() {
             max="100"
             value={muted ? 0 : volume}
             onChange={(e) => handleVolumeChange(Number(e.target.value))}
-            className="w-20 h-1 accent-yellow-500 cursor-pointer"
+            className="w-28 h-2 accent-yellow-500 cursor-pointer"
             style={{ WebkitAppearance: 'none', appearance: 'none' }}
           />
 
-          <div className="text-[6px] text-gray-500">
+          <div className="text-[10px] text-gray-400">
             {muted ? 0 : volume}%
           </div>
 
           <button
             onClick={() => setOpen(false)}
-            className="text-[6px] text-gray-500 hover:text-white cursor-pointer transition-colors"
+            className="text-[10px] text-gray-400 hover:text-white cursor-pointer transition-colors"
           >
             CLOSE
           </button>
@@ -60,7 +60,7 @@ export default function VolumeControl() {
       ) : (
         <button
           onClick={() => setOpen(true)}
-          className="text-[10px] cursor-pointer hover:text-yellow-400 transition-colors bg-black/50 px-2 py-1 rounded"
+          className="text-[18px] cursor-pointer hover:text-yellow-400 transition-colors bg-black/50 px-3 py-2 rounded"
           style={{ color: muted ? '#CC2200' : '#888888' }}
         >
           {muted ? '🔇' : '🔊'}

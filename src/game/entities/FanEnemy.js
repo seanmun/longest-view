@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { AudioSystem } from '../systems/AudioSystem.js'
+import { Snowball } from './Snowball.js'
 import { COLORS } from '../constants.js'
 
 const ENEMY_WIDTH = 20
@@ -49,6 +50,11 @@ export class FanEnemy {
 
     // Random speech interval
     this.nextSpeechTime = scene.time.now + 2000 + Math.random() * 3000
+
+    // Snowball throwing
+    this.throwCooldown = variant === 'fast' ? 2000 : 3000
+    this.nextThrowTime = scene.time.now + 1500 + Math.random() * 2000
+    this.isThrowing = false
   }
 
   update(time, playerX) {
@@ -86,6 +92,13 @@ export class FanEnemy {
     if (this.walkTimer > 200) {
       this.walkFrame = (this.walkFrame + 1) % 4
       this.walkTimer = 0
+    }
+
+    // Snowball throwing — only when in range and facing player
+    const distToPlayer = Math.abs(playerX - this.sprite.x)
+    if (time > this.nextThrowTime && distToPlayer < 300 && distToPlayer > 60 && !this.isThrowing) {
+      this.throwSnowball(playerX)
+      this.nextThrowTime = time + this.throwCooldown + Math.random() * 1000
     }
 
     // Speech bubbles
@@ -126,6 +139,29 @@ export class FanEnemy {
           this.speechText = null
         }
       }
+    })
+  }
+
+  throwSnowball(playerX) {
+    this.isThrowing = true
+    this.sprite.setVelocityX(0)
+
+    // Brief wind-up pause, then throw
+    this.scene.time.delayedCall(200, () => {
+      if (!this.alive || !this.sprite.active) return
+
+      const dir = playerX < this.sprite.x ? -1 : 1
+      // Throw at Hinkie's standing head height — above ducking range
+      const headHeight = this.sprite.y - 18
+      const snowball = new Snowball(this.scene, this.sprite.x + dir * 10, headHeight, dir)
+
+      // Add to scene's snowball tracking array
+      if (this.scene.snowballs) {
+        this.scene.snowballs.push(snowball)
+      }
+
+      AudioSystem.playThrow()
+      this.isThrowing = false
     })
   }
 
@@ -295,6 +331,13 @@ export class FanEnemy {
     // Angry mouth
     this.graphics.fillStyle(0x000000)
     this.graphics.fillRect(x - 3, y - 12, 6, 2)
+
+    // Snowball in hand during wind-up
+    if (this.isThrowing) {
+      const throwDir = this.facing || 1
+      this.graphics.fillStyle(COLORS.WHITE)
+      this.graphics.fillCircle(x + throwDir * 14, y - 6, 3)
+    }
 
     // HP bar
     if (this.hp < this.maxHp) {

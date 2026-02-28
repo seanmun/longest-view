@@ -27,5 +27,10 @@ export const createGameConfig = (parent) => ({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
+  input: {
+    touch: {
+      capture: false
+    }
+  },
   scene: [BootScene, MainMenuScene, CutsceneScene, Level1Scene, GameOverScene]
 })
