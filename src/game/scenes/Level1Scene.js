@@ -93,7 +93,7 @@ export class Level1Scene extends Phaser.Scene {
     this.createEnvironment()
 
     // Create player
-    this.player = new Player(this, 100, GROUND_Y - 30)
+    this.player = new Player(this, 100, GROUND_Y - 45)
     this.physics.add.collider(this.player.sprite, this.ground)
     this.physics.add.collider(this.player.sprite, this.envObjects)
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0)
@@ -261,57 +261,57 @@ export class Level1Scene extends Phaser.Scene {
     const trashPositions = [400, 1100, 1900, 2600, 3400, 4200, 4800]
     trashPositions.forEach(tx => {
       // Visual: trash body
-      this.add.rectangle(tx, GROUND_Y - 15, 16, 20, 0x555555).setDepth(4)
+      this.add.rectangle(tx, GROUND_Y - 22, 24, 30, 0x555555).setDepth(4)
       // Visual: lid
-      this.add.rectangle(tx, GROUND_Y - 26, 20, 4, 0x666666).setDepth(4)
+      this.add.rectangle(tx, GROUND_Y - 39, 30, 6, 0x666666).setDepth(4)
 
       // Physics: solid hitbox for the trash can
-      const hitbox = this.add.rectangle(tx, GROUND_Y - 15, 16, 20)
+      const hitbox = this.add.rectangle(tx, GROUND_Y - 22, 24, 30)
       this.physics.add.existing(hitbox, true) // true = static
       this.envObjects.add(hitbox)
     })
 
     // Hot dog cart at x=1600 — solid obstacle
     const cartX = 1600
-    this.add.rectangle(cartX, GROUND_Y - 12, 40, 24, 0xCC4400).setDepth(4)
-    this.add.rectangle(cartX, GROUND_Y - 26, 44, 4, 0xDD5500).setDepth(4)
-    this.add.text(cartX, GROUND_Y - 18, 'DOGS', {
+    this.add.rectangle(cartX, GROUND_Y - 18, 60, 36, 0xCC4400).setDepth(4)
+    this.add.rectangle(cartX, GROUND_Y - 39, 66, 6, 0xDD5500).setDepth(4)
+    this.add.text(cartX, GROUND_Y - 27, 'DOGS', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '4px',
+      fontSize: '6px',
       color: '#FFFFFF'
     }).setOrigin(0.5).setDepth(5)
 
     // Physics: solid hitbox for the cart
-    const cartHitbox = this.add.rectangle(cartX, GROUND_Y - 12, 40, 24)
+    const cartHitbox = this.add.rectangle(cartX, GROUND_Y - 18, 60, 36)
     this.physics.add.existing(cartHitbox, true)
     this.envObjects.add(cartHitbox)
 
     // Second hot dog cart at x=3800
     const cart2X = 3800
-    this.add.rectangle(cart2X, GROUND_Y - 12, 40, 24, 0xCC4400).setDepth(4)
-    this.add.rectangle(cart2X, GROUND_Y - 26, 44, 4, 0xDD5500).setDepth(4)
-    this.add.text(cart2X, GROUND_Y - 18, 'DOGS', {
+    this.add.rectangle(cart2X, GROUND_Y - 18, 60, 36, 0xCC4400).setDepth(4)
+    this.add.rectangle(cart2X, GROUND_Y - 39, 66, 6, 0xDD5500).setDepth(4)
+    this.add.text(cart2X, GROUND_Y - 27, 'DOGS', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '4px',
+      fontSize: '6px',
       color: '#FFFFFF'
     }).setOrigin(0.5).setDepth(5)
-    const cart2Hitbox = this.add.rectangle(cart2X, GROUND_Y - 12, 40, 24)
+    const cart2Hitbox = this.add.rectangle(cart2X, GROUND_Y - 18, 60, 36)
     this.physics.add.existing(cart2Hitbox, true)
     this.envObjects.add(cart2Hitbox)
 
     // "IN TANK WE TRUST" sign
-    this.add.text(2200, GROUND_Y - 60, 'IN TANK WE TRUST', {
+    this.add.text(2200, GROUND_Y - 90, 'IN TANK WE TRUST', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '5px',
+      fontSize: '7px',
       color: '#FFFFFF',
       backgroundColor: '#444444',
       padding: { x: 4, y: 3 }
     }).setDepth(4)
 
     // Second sign deeper in level
-    this.add.text(4000, GROUND_Y - 60, 'HINKIE DID NOTHING WRONG', {
+    this.add.text(4000, GROUND_Y - 90, 'HINKIE DID NOTHING WRONG', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '5px',
+      fontSize: '7px',
       color: '#00D4FF',
       backgroundColor: '#333344',
       padding: { x: 4, y: 3 }
@@ -354,7 +354,7 @@ export class Level1Scene extends Phaser.Scene {
 
   spawnWave(waveData) {
     waveData.enemies.forEach(e => {
-      const enemy = new FanEnemy(this, e.x, GROUND_Y - 25, e.variant)
+      const enemy = new FanEnemy(this, e.x, GROUND_Y - 40, e.variant)
       this.physics.add.collider(enemy.sprite, this.ground)
       this.physics.add.collider(enemy.sprite, this.envObjects)
       this.enemies.push(enemy)
@@ -408,7 +408,7 @@ export class Level1Scene extends Phaser.Scene {
           ball.sprite.x, ball.sprite.y,
           enemy.sprite.x, enemy.sprite.y
         )
-        if (dist < 25) {
+        if (dist < 38) {
           const result = enemy.takeDamage(ball.damage, ball)
           if (result && result.defeated) {
             this.enemiesDefeated++
@@ -471,13 +471,13 @@ export class Level1Scene extends Phaser.Scene {
         this.player.sprite.x, this.player.sprite.y,
         enemy.sprite.x, enemy.sprite.y
       )
-      if (dist < 25) {
+      if (dist < 38) {
         this.player.takeDamage(enemy.contactDamage)
       }
     })
 
     // Level complete check — all waves done and all enemies defeated
-    if (this.waveIndex >= WAVES.length && this.enemies.length === 0 && playerX > 4800) {
+    if (this.waveIndex >= WAVES.length && playerX > 4800) {
       this.completeLevel()
     }
   }

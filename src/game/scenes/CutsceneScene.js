@@ -155,47 +155,47 @@ export class CutsceneScene extends Phaser.Scene {
     if (!this.hinkieVisible) return
 
     const x = this.hinkieX
-    const y = GAME_HEIGHT - 80
+    const y = GAME_HEIGHT - 120
 
-    // Draw Hinkie (larger version for cutscene)
+    // Draw Hinkie (larger version for cutscene — 1.5x scale)
     // Legs
     this.hinkieGraphics.fillStyle(0x1a1a3a)
-    this.hinkieGraphics.fillRect(x - 8, y + 8, 6, 18)
-    this.hinkieGraphics.fillRect(x + 2, y + 8, 6, 18)
+    this.hinkieGraphics.fillRect(x - 12, y + 12, 9, 27)
+    this.hinkieGraphics.fillRect(x + 3, y + 12, 9, 27)
     // Shoes
     this.hinkieGraphics.fillStyle(0x222222)
-    this.hinkieGraphics.fillRect(x - 9, y + 24, 8, 4)
-    this.hinkieGraphics.fillRect(x + 1, y + 24, 8, 4)
+    this.hinkieGraphics.fillRect(x - 14, y + 36, 12, 6)
+    this.hinkieGraphics.fillRect(x + 2, y + 36, 12, 6)
     // White stripe on shoes
     this.hinkieGraphics.fillStyle(0xFFFFFF)
-    this.hinkieGraphics.fillRect(x - 9, y + 24, 8, 1)
-    this.hinkieGraphics.fillRect(x + 1, y + 24, 8, 1)
+    this.hinkieGraphics.fillRect(x - 14, y + 36, 12, 2)
+    this.hinkieGraphics.fillRect(x + 2, y + 36, 12, 2)
     // Body
     this.hinkieGraphics.fillStyle(0x1a1a4a)
-    this.hinkieGraphics.fillRect(x - 11, y - 14, 22, 24)
+    this.hinkieGraphics.fillRect(x - 17, y - 21, 33, 36)
     // Tie
     this.hinkieGraphics.fillStyle(COLORS.RED)
-    this.hinkieGraphics.fillRect(x - 1, y - 10, 3, 16)
+    this.hinkieGraphics.fillRect(x - 2, y - 15, 5, 24)
     // Arms
     this.hinkieGraphics.fillStyle(0x1a1a4a)
-    this.hinkieGraphics.fillRect(x - 16, y - 12, 6, 16)
-    this.hinkieGraphics.fillRect(x + 10, y - 12, 6, 16)
+    this.hinkieGraphics.fillRect(x - 24, y - 18, 9, 24)
+    this.hinkieGraphics.fillRect(x + 15, y - 18, 9, 24)
     // Hands
     this.hinkieGraphics.fillStyle(0xE8B090)
-    this.hinkieGraphics.fillRect(x - 16, y + 3, 6, 4)
-    this.hinkieGraphics.fillRect(x + 10, y + 3, 6, 4)
+    this.hinkieGraphics.fillRect(x - 24, y + 5, 9, 6)
+    this.hinkieGraphics.fillRect(x + 15, y + 5, 9, 6)
     // Head
     this.hinkieGraphics.fillStyle(0xE8B090)
-    this.hinkieGraphics.fillRect(x - 9, y - 30, 18, 17)
+    this.hinkieGraphics.fillRect(x - 14, y - 45, 27, 26)
     // Bald head — skin top with shine
     this.hinkieGraphics.fillStyle(0xE8B090)
-    this.hinkieGraphics.fillRect(x - 9, y - 33, 18, 4)
+    this.hinkieGraphics.fillRect(x - 14, y - 50, 27, 6)
     this.hinkieGraphics.fillStyle(0xF0C8A0, 0.5)
-    this.hinkieGraphics.fillRect(x - 4, y - 33, 8, 1)
+    this.hinkieGraphics.fillRect(x - 6, y - 50, 12, 2)
     // Glasses
     this.hinkieGraphics.fillStyle(0x333333)
-    this.hinkieGraphics.fillRect(x - 7, y - 25, 5, 4)
-    this.hinkieGraphics.fillRect(x + 2, y - 25, 5, 4)
-    this.hinkieGraphics.fillRect(x - 2, y - 24, 4, 1)
+    this.hinkieGraphics.fillRect(x - 10, y - 38, 8, 6)
+    this.hinkieGraphics.fillRect(x + 3, y - 38, 8, 6)
+    this.hinkieGraphics.fillRect(x - 3, y - 36, 6, 2)
   }
 }

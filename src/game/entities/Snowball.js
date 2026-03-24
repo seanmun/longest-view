@@ -13,7 +13,7 @@ export class Snowball {
 
     // Create physics body — no gravity, straight line
     this.sprite = scene.physics.add.sprite(x, y, null)
-    this.sprite.setCircle(4)
+    this.sprite.setCircle(6)
     this.sprite.setVisible(false)
     this.sprite.setDepth(9)
     this.sprite.body.setAllowGravity(false)
@@ -47,12 +47,12 @@ export class Snowball {
 
     // Snowball body (white)
     this.graphics.fillStyle(COLORS.WHITE)
-    this.graphics.fillCircle(x, y, 4)
+    this.graphics.fillCircle(x, y, 6)
 
     // Snow texture specks
     this.graphics.fillStyle(0xDDEEFF, 0.6)
-    this.graphics.fillCircle(x - 1, y - 1, 1)
-    this.graphics.fillCircle(x + 2, y + 1, 1)
+    this.graphics.fillCircle(x - 2, y - 2, 2)
+    this.graphics.fillCircle(x + 3, y + 1, 2)
   }
 
   // Shatter into white particles

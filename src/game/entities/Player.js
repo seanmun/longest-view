@@ -3,8 +3,8 @@ import { Ball } from './Ball.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { COLORS, GAME_HEIGHT } from '../constants.js'
 
-const PLAYER_WIDTH = 24
-const PLAYER_HEIGHT = 40
+const PLAYER_WIDTH = 36
+const PLAYER_HEIGHT = 60
 const MOVE_SPEED = 160
 const JUMP_VELOCITY = -350
 const INVINCIBILITY_FRAMES = 750 // ms
@@ -126,8 +126,8 @@ export class Player {
     if (downDown && onGround && !this.isDodging) {
       if (!this.isDucking) {
         this.isDucking = true
-        this.sprite.setSize(PLAYER_WIDTH, 24)
-        this.sprite.setOffset(0, 16)
+        this.sprite.setSize(PLAYER_WIDTH, 36)
+        this.sprite.setOffset(0, 24)
       }
       this.sprite.setVelocityX(0)
     } else if (this.isDucking) {
@@ -203,8 +203,8 @@ export class Player {
 
   fire() {
     AudioSystem.playThrow()
-    const x = this.sprite.x + (this.facing * 20)
-    const y = this.sprite.y - 5
+    const x = this.sprite.x + (this.facing * 30)
+    const y = this.sprite.y - 8
     const ball = new Ball(this.scene, x, y, this.facing, this.chargeLevel)
     this.scene.balls.push(ball)
   }
@@ -269,130 +269,130 @@ export class Player {
       // --- DUCKING POSE (compressed, knees bent) ---
       // Legs (bent, shorter)
       this.graphics.fillStyle(0x1a1a3a)
-      this.graphics.fillRect(x - 8, y + 10, 6, 6)
-      this.graphics.fillRect(x + 2, y + 10, 6, 6)
+      this.graphics.fillRect(x - 12, y + 15, 9, 9)
+      this.graphics.fillRect(x + 3, y + 15, 9, 9)
 
       // Shoes (dark brown dress shoes)
       this.graphics.fillStyle(0x3B2314)
-      this.graphics.fillRect(x - 9, y + 15, 8, 3)
-      this.graphics.fillRect(x + 1, y + 15, 8, 3)
+      this.graphics.fillRect(x - 14, y + 23, 12, 5)
+      this.graphics.fillRect(x + 2, y + 23, 12, 5)
 
       // Body (suit jacket — squished)
       this.graphics.fillStyle(0x1a1a4a)
-      this.graphics.fillRect(x - 9, y - 2, 18, 14)
+      this.graphics.fillRect(x - 14, y - 3, 27, 21)
 
       // White dress shirt collar
       this.graphics.fillStyle(0xF0F0F0)
-      this.graphics.fillRect(x - 4, y - 2, 8, 3)
+      this.graphics.fillRect(x - 6, y - 3, 12, 5)
 
       // Tie (shorter)
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 1, y - 2, 2, 10)
+      this.graphics.fillRect(x - 2, y - 3, 3, 15)
 
       // Arms (tucked)
       this.graphics.fillStyle(0x1a1a4a)
-      this.graphics.fillRect(x - 13, y, 5, 8)
-      this.graphics.fillRect(x + 8, y, 5, 8)
+      this.graphics.fillRect(x - 20, y, 8, 12)
+      this.graphics.fillRect(x + 12, y, 8, 12)
 
       // Hands
       this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 13, y + 7, 5, 3)
-      this.graphics.fillRect(x + 8, y + 7, 5, 3)
+      this.graphics.fillRect(x - 20, y + 11, 8, 5)
+      this.graphics.fillRect(x + 12, y + 11, 8, 5)
 
       // Head (lowered)
       this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 7, y - 14, 14, 13)
+      this.graphics.fillRect(x - 10, y - 21, 21, 20)
 
       // Hair (receding hairline — sides fuller, top thinning at front)
       this.graphics.fillStyle(0x3D2517)
-      this.graphics.fillRect(x - 8, y - 16, 2, 8)
-      this.graphics.fillRect(x + 6, y - 16, 2, 8)
-      this.graphics.fillRect(x - 6, y - 17, 12, 2)
-      this.graphics.fillRect(x - 3, y - 15, 6, 1)
+      this.graphics.fillRect(x - 12, y - 24, 3, 12)
+      this.graphics.fillRect(x + 9, y - 24, 3, 12)
+      this.graphics.fillRect(x - 9, y - 26, 18, 3)
+      this.graphics.fillRect(x - 5, y - 23, 9, 2)
 
       // Glasses (regular frames with visible eyes)
       this.graphics.fillStyle(0x666666)
-      this.graphics.fillRect(x - 5, y - 10, 4, 3)
-      this.graphics.fillRect(x + 1, y - 10, 4, 3)
+      this.graphics.fillRect(x - 8, y - 15, 6, 5)
+      this.graphics.fillRect(x + 2, y - 15, 6, 5)
       this.graphics.fillStyle(0xFFFFFF)
-      this.graphics.fillRect(x - 4, y - 9, 2, 1)
-      this.graphics.fillRect(x + 2, y - 9, 2, 1)
+      this.graphics.fillRect(x - 6, y - 14, 3, 2)
+      this.graphics.fillRect(x + 3, y - 14, 3, 2)
       this.graphics.fillStyle(0x111111)
-      this.graphics.fillRect(x - 3, y - 9, 1, 1)
-      this.graphics.fillRect(x + 3, y - 9, 1, 1)
+      this.graphics.fillRect(x - 5, y - 14, 2, 2)
+      this.graphics.fillRect(x + 4, y - 14, 2, 2)
 
       // Mouth
       this.graphics.fillStyle(0x333333)
-      this.graphics.fillRect(x - 2, y - 4, 4, 1)
+      this.graphics.fillRect(x - 3, y - 6, 6, 2)
     } else {
       // --- NORMAL STANDING POSE ---
       // Legs
-      const legOffset = this.walkFrame % 2 === 0 ? 2 : -2
+      const legOffset = this.walkFrame % 2 === 0 ? 3 : -3
       this.graphics.fillStyle(0x1a1a3a) // dark suit pants
-      this.graphics.fillRect(x - 7, y + 6, 5, 14 + legOffset)
-      this.graphics.fillRect(x + 2, y + 6, 5, 14 - legOffset)
+      this.graphics.fillRect(x - 10, y + 9, 8, 21 + legOffset)
+      this.graphics.fillRect(x + 3, y + 9, 8, 21 - legOffset)
 
       // Shoes (dark brown dress shoes)
       this.graphics.fillStyle(0x3B2314)
-      this.graphics.fillRect(x - 8, y + 18 + legOffset, 7, 3)
-      this.graphics.fillRect(x + 1, y + 18 - legOffset, 7, 3)
+      this.graphics.fillRect(x - 12, y + 27 + legOffset, 10, 5)
+      this.graphics.fillRect(x + 2, y + 27 - legOffset, 10, 5)
 
       // Body (suit jacket)
       this.graphics.fillStyle(0x1a1a4a) // navy suit
-      this.graphics.fillRect(x - 9, y - 10, 18, 18)
+      this.graphics.fillRect(x - 14, y - 15, 27, 27)
 
       // White dress shirt collar
       this.graphics.fillStyle(0xF0F0F0)
-      this.graphics.fillRect(x - 4, y - 10, 8, 3)
+      this.graphics.fillRect(x - 6, y - 15, 12, 5)
 
       // Tie
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 1, y - 10, 2, 14)
+      this.graphics.fillRect(x - 2, y - 15, 3, 21)
 
       // Arms
-      const armSwing = this.walkFrame < 2 ? 3 : -3
+      const armSwing = this.walkFrame < 2 ? 5 : -5
       this.graphics.fillStyle(0x1a1a4a)
-      this.graphics.fillRect(x - 13, y - 8 + armSwing, 5, 12)
-      this.graphics.fillRect(x + 8, y - 8 - armSwing, 5, 12)
+      this.graphics.fillRect(x - 20, y - 12 + armSwing, 8, 18)
+      this.graphics.fillRect(x + 12, y - 12 - armSwing, 8, 18)
 
       // Hands (skin tone)
       this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 13, y + 3 + armSwing, 5, 3)
-      this.graphics.fillRect(x + 8, y + 3 - armSwing, 5, 3)
+      this.graphics.fillRect(x - 20, y + 5 + armSwing, 8, 5)
+      this.graphics.fillRect(x + 12, y + 5 - armSwing, 8, 5)
 
       // Head
       this.graphics.fillStyle(0xE8B090) // skin
-      this.graphics.fillRect(x - 7, y - 22, 14, 13)
+      this.graphics.fillRect(x - 10, y - 33, 21, 20)
 
       // Hair (receding hairline — sides fuller, top thinning at front)
       this.graphics.fillStyle(0x3D2517)
-      this.graphics.fillRect(x - 8, y - 24, 2, 8)
-      this.graphics.fillRect(x + 6, y - 24, 2, 8)
-      this.graphics.fillRect(x - 6, y - 25, 12, 2)
-      this.graphics.fillRect(x - 3, y - 23, 6, 1)
+      this.graphics.fillRect(x - 12, y - 36, 3, 12)
+      this.graphics.fillRect(x + 9, y - 36, 3, 12)
+      this.graphics.fillRect(x - 9, y - 38, 18, 3)
+      this.graphics.fillRect(x - 5, y - 35, 9, 2)
 
       // Glasses (regular frames with visible eyes)
       this.graphics.fillStyle(0x666666)
-      this.graphics.fillRect(x - 5, y - 18, 4, 3)
-      this.graphics.fillRect(x + 1, y - 18, 4, 3)
+      this.graphics.fillRect(x - 8, y - 27, 6, 5)
+      this.graphics.fillRect(x + 2, y - 27, 6, 5)
       this.graphics.fillStyle(0xFFFFFF)
-      this.graphics.fillRect(x - 4, y - 17, 2, 1)
-      this.graphics.fillRect(x + 2, y - 17, 2, 1)
+      this.graphics.fillRect(x - 6, y - 25, 3, 2)
+      this.graphics.fillRect(x + 3, y - 25, 3, 2)
       this.graphics.fillStyle(0x111111)
-      this.graphics.fillRect(x - 3, y - 17, 1, 1)
-      this.graphics.fillRect(x + 3, y - 17, 1, 1)
+      this.graphics.fillRect(x - 5, y - 25, 2, 2)
+      this.graphics.fillRect(x + 4, y - 25, 2, 2)
 
       // Mouth (small line)
       this.graphics.fillStyle(0x333333)
-      this.graphics.fillRect(x - 2, y - 12, 4, 1)
+      this.graphics.fillRect(x - 3, y - 18, 6, 2)
     }
 
     // Charge bar
     if (this.isCharging) {
-      const barWidth = 30
-      const barHeight = 4
+      const barWidth = 45
+      const barHeight = 6
       const barX = x - barWidth / 2
-      const barY = y - 30
+      const barY = y - 45
 
       // Background
       this.chargeBar.fillStyle(0x333333)

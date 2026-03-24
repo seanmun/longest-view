@@ -31,7 +31,7 @@ export class Ball {
     if (this.tier === 2) this.damage *= DAMAGE_MULTIPLIER_FULL
 
     // Size based on charge
-    this.radius = this.tier === 2 ? 6 : this.tier === 1 ? 5 : 4
+    this.radius = this.tier === 2 ? 10 : this.tier === 1 ? 8 : 6
 
     // Create physics body
     this.sprite = scene.physics.add.sprite(x, y, null)
@@ -129,7 +129,7 @@ export class Ball {
     if (this.tier >= 1) {
       const glowColor = this.tier === 2 ? COLORS.GOLD : COLORS.CYAN
       this.graphics.fillStyle(glowColor, 0.3)
-      this.graphics.fillCircle(x, y, this.radius + 3)
+      this.graphics.fillCircle(x, y, this.radius + 5)
     }
 
     // Ball body

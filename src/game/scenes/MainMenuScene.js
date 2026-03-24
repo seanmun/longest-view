@@ -134,31 +134,31 @@ export class MainMenuScene extends Phaser.Scene {
 
     this.demoGraphics.clear()
     const x = this.demoHinkieX
-    const y = GAME_HEIGHT - 40
-    const legOffset = this.demoWalkFrame % 2 === 0 ? 2 : -2
+    const y = GAME_HEIGHT - 60
+    const legOffset = this.demoWalkFrame % 2 === 0 ? 3 : -3
 
-    // Small walking Hinkie
+    // Small walking Hinkie (1.5x scale)
     // Legs
     this.demoGraphics.fillStyle(0x1a1a3a)
-    this.demoGraphics.fillRect(x - 4, y + 4, 3, 10 + legOffset)
-    this.demoGraphics.fillRect(x + 1, y + 4, 3, 10 - legOffset)
+    this.demoGraphics.fillRect(x - 6, y + 6, 5, 15 + legOffset)
+    this.demoGraphics.fillRect(x + 2, y + 6, 5, 15 - legOffset)
     // Body
     this.demoGraphics.fillStyle(0x1a1a4a)
-    this.demoGraphics.fillRect(x - 5, y - 6, 10, 12)
+    this.demoGraphics.fillRect(x - 8, y - 9, 15, 18)
     // Tie
     this.demoGraphics.fillStyle(COLORS.RED)
-    this.demoGraphics.fillRect(x - 1, y - 4, 2, 7)
+    this.demoGraphics.fillRect(x - 2, y - 6, 3, 11)
     // Head
     this.demoGraphics.fillStyle(0xE8B090)
-    this.demoGraphics.fillRect(x - 4, y - 14, 8, 9)
+    this.demoGraphics.fillRect(x - 6, y - 21, 12, 14)
     // Bald head — skin top with shine
     this.demoGraphics.fillStyle(0xE8B090)
-    this.demoGraphics.fillRect(x - 4, y - 16, 8, 2)
+    this.demoGraphics.fillRect(x - 6, y - 24, 12, 3)
     this.demoGraphics.fillStyle(0xF0C8A0, 0.5)
-    this.demoGraphics.fillRect(x - 2, y - 16, 4, 1)
+    this.demoGraphics.fillRect(x - 3, y - 24, 6, 2)
     // Glasses
     this.demoGraphics.fillStyle(0x333333)
-    this.demoGraphics.fillRect(x - 3, y - 12, 3, 2)
-    this.demoGraphics.fillRect(x + 1, y - 12, 3, 2)
+    this.demoGraphics.fillRect(x - 5, y - 18, 5, 3)
+    this.demoGraphics.fillRect(x + 1, y - 18, 5, 3)
   }
 }
