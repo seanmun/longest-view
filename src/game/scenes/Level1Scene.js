@@ -153,8 +153,10 @@ export class Level1Scene extends Phaser.Scene {
     this.game.registry.set('comboMultiplier', 1)
     this.game.registry.set('chargeLevel', 0)
     this.game.registry.set('dialogueActive', false)
+    this.game.registry.set('dialogueData', null)
     this.game.registry.set('elapsedTime', 0)
     this.game.registry.set('showLevelComplete', false)
+    this.game.registry.set('levelCompleteData', null)
     this.game.registry.set('currentLevel', 'THE WELLS FARGO CENTER')
 
     // Level subtitle

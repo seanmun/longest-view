@@ -94,15 +94,19 @@ body {
 
 @media (max-width: 768px) {
   .crt-bezel {
-    padding: 8px;
-    border-radius: 14px;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 100% !important;
   }
   .crt-screen {
-    border-radius: 8px;
+    border-radius: 0;
+    aspect-ratio: auto !important;
   }
   .crt-glass,
   .crt-vignette {
-    border-radius: 8px;
+    border-radius: 0;
   }
 }
 
