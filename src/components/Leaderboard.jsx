@@ -28,7 +28,7 @@ export default function Leaderboard({ game }) {
       game.registry.set('showLeaderboard', false)
       game.registry.set('showMNSPromo', true)
       game.registry.set('mnsPromoMessage',
-        'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMNS.COM — The smartest fantasy basketball platform on the internet.')
+        'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMoneyNeverSleeps.app — The smartest fantasy basketball platform on the internet.')
     }
 
     const handleKey = (e) => {

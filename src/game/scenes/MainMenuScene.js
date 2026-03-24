@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { CRTBarrelPipeline } from '../pipelines/CRTBarrelPipeline.js'
 
 export class MainMenuScene extends Phaser.Scene {
   constructor() {
@@ -9,6 +10,7 @@ export class MainMenuScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBackgroundColor('#0a0a1a')
+    this.cameras.main.setPostPipeline(CRTBarrelPipeline)
 
     // Start menu music
     AudioSystem.resume()
@@ -59,8 +61,8 @@ export class MainMenuScene extends Phaser.Scene {
       this.menuTexts.push(text)
     })
 
-    // MNS.COM at bottom
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 20, 'MNS.COM', {
+    // MNS at bottom
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 20, 'MONEYNEVERSLEEPS.APP', {
       fontFamily: '"Press Start 2P"',
       fontSize: '8px',
       color: '#E8B800',

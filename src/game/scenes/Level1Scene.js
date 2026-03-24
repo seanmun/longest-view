@@ -1,11 +1,15 @@
 import Phaser from 'phaser'
 import { Player } from '../entities/Player.js'
 import { FanEnemy } from '../entities/FanEnemy.js'
+import { AngeloEskin } from '../entities/AngeloEskin.js'
+import { BossBrian } from '../entities/BossBrian.js'
+import { EmbiidAlly } from '../entities/EmbiidAlly.js'
 import { ScoreSystem } from '../systems/ScoreSystem.js'
 import { ComboSystem } from '../systems/ComboSystem.js'
 import { DialogueSystem } from '../systems/DialogueSystem.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { CRTBarrelPipeline } from '../pipelines/CRTBarrelPipeline.js'
 
 const LEVEL_WIDTH = 5400
 const GROUND_Y = GAME_HEIGHT - 30
@@ -24,11 +28,11 @@ const WAVES = [
     { x: 2000, variant: 'normal' }, { x: 2100, variant: 'normal' },
     { x: 2200, variant: 'normal' }, { x: 2300, variant: 'fast' }
   ]},
-  // Wave 4: Mixed assault (5 enemies)
+  // Wave 4: Mixed assault + mini-boss (5 enemies)
   { trigger: 2500, enemies: [
     { x: 2900, variant: 'normal' }, { x: 3000, variant: 'fast' },
     { x: 3100, variant: 'normal' }, { x: 3200, variant: 'normal' },
-    { x: 3300, variant: 'fast' }
+    { x: 3300, variant: 'angeloeskin' }
   ]},
   // Wave 5: Fast-heavy (5 enemies)
   { trigger: 3400, enemies: [
@@ -36,10 +40,10 @@ const WAVES = [
     { x: 4000, variant: 'fast' }, { x: 4100, variant: 'fast' },
     { x: 4200, variant: 'normal' }
   ]},
-  // Wave 6: Final push (4 enemies)
+  // Wave 6: Final push + mini-boss (4 enemies)
   { trigger: 4200, enemies: [
     { x: 4600, variant: 'fast' }, { x: 4700, variant: 'normal' },
-    { x: 4800, variant: 'fast' }, { x: 4900, variant: 'fast' }
+    { x: 4800, variant: 'angeloeskin' }, { x: 4900, variant: 'fast' }
   ]}
 ]
 
@@ -60,6 +64,7 @@ export class Level1Scene extends Phaser.Scene {
 
   create() {
     this.cameras.main.fadeIn(500)
+    this.cameras.main.setPostPipeline(CRTBarrelPipeline)
 
     // Set world bounds
     this.physics.world.setBounds(0, 0, LEVEL_WIDTH, GAME_HEIGHT)
@@ -71,9 +76,15 @@ export class Level1Scene extends Phaser.Scene {
     this.dialogueSystem = new DialogueSystem(this)
     this.balls = []
     this.snowballs = []
+    this.megaphones = []
+    this.collarBoomerangs = []
     this.enemies = []
     this.waveIndex = 0
     this.sideQuestTriggered = false
+    this.embiidTriggered = false
+    this.embiid = null
+    this.bossTriggered = false
+    this.boss = null
     this.levelComplete = false
     this.startTime = this.time.now
     this.enemiesDefeated = 0
@@ -360,7 +371,12 @@ export class Level1Scene extends Phaser.Scene {
 
   spawnWave(waveData) {
     waveData.enemies.forEach(e => {
-      const enemy = new FanEnemy(this, e.x, GROUND_Y - 40, e.variant)
+      let enemy
+      if (e.variant === 'angeloeskin') {
+        enemy = new AngeloEskin(this, e.x, GROUND_Y - 50)
+      } else {
+        enemy = new FanEnemy(this, e.x, GROUND_Y - 40, e.variant)
+      }
       this.physics.add.collider(enemy.sprite, this.ground)
       this.physics.add.collider(enemy.sprite, this.envObjects)
       this.enemies.push(enemy)
@@ -391,6 +407,21 @@ export class Level1Scene extends Phaser.Scene {
       this.dialogueSystem.showDialogue(SIDE_QUEST)
     }
 
+    // Embiid ally trigger — after wave 4, player reaches x=3000
+    if (!this.embiidTriggered && this.waveIndex >= 4 && playerX > 3000) {
+      this.embiidTriggered = true
+      this.embiid = new EmbiidAlly(this, playerX - 200, GROUND_Y - 70)
+      this.physics.add.collider(this.embiid.sprite, this.ground)
+    }
+
+    // Boss trigger — all waves spawned, all regular enemies dead, player past x=4600
+    if (!this.bossTriggered && this.waveIndex >= WAVES.length &&
+        this.enemies.length === 0 && playerX > 4600) {
+      this.bossTriggered = true
+      this.boss = new BossBrian(this, playerX + 300, GROUND_Y - 55)
+      this.physics.add.collider(this.boss.sprite, this.ground)
+    }
+
     // Update balls
     this.balls = this.balls.filter(ball => {
       if (!ball.alive) return false
@@ -404,6 +435,16 @@ export class Level1Scene extends Phaser.Scene {
       enemy.update(time, this.player.sprite.x)
       return enemy.alive
     })
+
+    // Update boss
+    if (this.boss && this.boss.alive) {
+      this.boss.update(time, this.player.sprite.x)
+    }
+
+    // Update Embiid ally
+    if (this.embiid && this.embiid.alive) {
+      this.embiid.update(time, [...this.enemies, ...(this.boss && this.boss.alive ? [this.boss] : [])])
+    }
 
     // Ball vs Enemy collisions
     this.balls.forEach(ball => {
@@ -426,6 +467,26 @@ export class Level1Scene extends Phaser.Scene {
       })
     })
 
+    // Ball vs Boss collisions
+    if (this.boss && this.boss.alive) {
+      this.balls.forEach(ball => {
+        if (!ball.alive) return
+        const dist = Phaser.Math.Distance.Between(
+          ball.sprite.x, ball.sprite.y,
+          this.boss.sprite.x, this.boss.sprite.y
+        )
+        if (dist < 40) {
+          const result = this.boss.takeDamage(ball.damage, ball)
+          if (result && result.defeated) {
+            this.enemiesDefeated++
+          }
+          if (!ball.isRicochet() || ball.tier < 2) {
+            ball.destroy()
+          }
+        }
+      })
+    }
+
     // Update snowballs
     this.snowballs = this.snowballs.filter(snowball => {
       if (!snowball.alive) return false
@@ -433,7 +494,21 @@ export class Level1Scene extends Phaser.Scene {
       return snowball.alive
     })
 
-    // Snowball vs Player collisions — uses actual physics body bounds
+    // Update megaphones
+    this.megaphones = this.megaphones.filter(m => {
+      if (!m.alive) return false
+      m.update()
+      return m.alive
+    })
+
+    // Update collar boomerangs
+    this.collarBoomerangs = this.collarBoomerangs.filter(c => {
+      if (!c.alive) return false
+      c.update()
+      return c.alive
+    })
+
+    // Snowball vs Player collisions
     this.snowballs.forEach(snowball => {
       if (!snowball.alive) return
       const sx = snowball.sprite.x
@@ -444,7 +519,6 @@ export class Level1Scene extends Phaser.Scene {
       const pw = body.width
       const ph = body.height
 
-      // Check if snowball overlaps the player's actual physics body
       if (sx > px - 6 && sx < px + pw + 6 &&
           sy > py - 6 && sy < py + ph + 6) {
         this.player.takeDamage(snowball.damage)
@@ -452,20 +526,83 @@ export class Level1Scene extends Phaser.Scene {
       }
     })
 
-    // Player's ball vs Snowball collisions (player can destroy snowballs)
+    // Megaphone vs Player collisions
+    this.megaphones.forEach(mega => {
+      if (!mega.alive) return
+      const body = this.player.sprite.body
+      const mx = mega.sprite.x
+      const my = mega.sprite.y
+      if (mx > body.x - 8 && mx < body.x + body.width + 8 &&
+          my > body.y - 8 && my < body.y + body.height + 8) {
+        this.player.takeDamage(mega.damage)
+        mega.shatter()
+      }
+    })
+
+    // CollarBoomerang vs Player collisions
+    this.collarBoomerangs.forEach(collar => {
+      if (!collar.alive) return
+      const body = this.player.sprite.body
+      const cx = collar.sprite.x
+      const cy = collar.sprite.y
+      if (cx > body.x - 8 && cx < body.x + body.width + 8 &&
+          cy > body.y - 8 && cy < body.y + body.height + 8) {
+        this.player.takeDamage(collar.damage)
+        collar.shatter()
+      }
+    })
+
+    // Embiid blocks projectiles (snowballs, megaphones, collars)
+    if (this.embiid && this.embiid.alive) {
+      const ex = this.embiid.sprite.x
+      const ey = this.embiid.sprite.y
+      const blockRange = 35
+
+      this.snowballs.forEach(s => {
+        if (!s.alive) return
+        if (Phaser.Math.Distance.Between(s.sprite.x, s.sprite.y, ex, ey) < blockRange) {
+          this.embiid.blockProjectile(s)
+        }
+      })
+      this.megaphones.forEach(m => {
+        if (!m.alive) return
+        if (Phaser.Math.Distance.Between(m.sprite.x, m.sprite.y, ex, ey) < blockRange) {
+          this.embiid.blockProjectile(m)
+        }
+      })
+      this.collarBoomerangs.forEach(c => {
+        if (!c.alive) return
+        if (Phaser.Math.Distance.Between(c.sprite.x, c.sprite.y, ex, ey) < blockRange) {
+          this.embiid.blockProjectile(c)
+        }
+      })
+    }
+
+    // Player's ball vs projectile collisions (player can destroy incoming projectiles)
     this.balls.forEach(ball => {
       if (!ball.alive) return
+
       this.snowballs.forEach(snowball => {
         if (!snowball.alive) return
-        const dist = Phaser.Math.Distance.Between(
-          ball.sprite.x, ball.sprite.y,
-          snowball.sprite.x, snowball.sprite.y
-        )
-        if (dist < 15) {
+        if (Phaser.Math.Distance.Between(ball.sprite.x, ball.sprite.y, snowball.sprite.x, snowball.sprite.y) < 15) {
           snowball.shatter()
-          if (this.scoreSystem) {
-            this.scoreSystem.addPoints(50, snowball.sprite.x, snowball.sprite.y - 10, COLORS.CYAN)
-          }
+          if (this.scoreSystem) this.scoreSystem.addPoints(50, snowball.sprite.x, snowball.sprite.y - 10, COLORS.CYAN)
+        }
+      })
+
+      this.megaphones.forEach(mega => {
+        if (!mega.alive) return
+        if (Phaser.Math.Distance.Between(ball.sprite.x, ball.sprite.y, mega.sprite.x, mega.sprite.y) < 18) {
+          mega.shatter()
+          if (this.scoreSystem) this.scoreSystem.addPoints(75, mega.sprite.x, mega.sprite.y - 10, COLORS.CYAN)
+        }
+      })
+
+      this.collarBoomerangs.forEach(collar => {
+        if (!collar.alive) return
+        if (Phaser.Math.Distance.Between(ball.sprite.x, ball.sprite.y, collar.sprite.x, collar.sprite.y) < 18) {
+          collar.shatter()
+          if (this.scoreSystem) this.scoreSystem.addPoints(75, collar.sprite.x, collar.sprite.y - 10, COLORS.CYAN)
         }
       })
     })
@@ -482,8 +619,19 @@ export class Level1Scene extends Phaser.Scene {
       }
     })
 
-    // Level complete check — all waves done and all enemies defeated
-    if (this.waveIndex >= WAVES.length && playerX > 4800) {
+    // Player vs Boss contact damage
+    if (this.boss && this.boss.alive && !this.boss.stunned) {
+      const dist = Phaser.Math.Distance.Between(
+        this.player.sprite.x, this.player.sprite.y,
+        this.boss.sprite.x, this.boss.sprite.y
+      )
+      if (dist < 40) {
+        this.player.takeDamage(this.boss.contactDamage)
+      }
+    }
+
+    // Level complete check — boss defeated
+    if (this.boss && !this.boss.alive) {
       this.completeLevel()
     }
   }
@@ -538,7 +686,7 @@ export class Level1Scene extends Phaser.Scene {
     if (noDamageBonus > 0) this.scoreSystem.score += noDamageBonus
     if (this.scoreSystem.onScoreChange) this.scoreSystem.onScoreChange(this.scoreSystem.score)
 
-    const totalEnemies = WAVES.reduce((sum, w) => sum + w.enemies.length, 0)
+    const totalEnemies = WAVES.reduce((sum, w) => sum + w.enemies.length, 0) + 1 // +1 for boss
     const finalScore = this.scoreSystem.getScore()
 
     // Send breakdown data to React
@@ -569,6 +717,9 @@ export class Level1Scene extends Phaser.Scene {
   }
 
   dismissLevelComplete() {
+    if (this.levelCompleteDismissed) return
+    this.levelCompleteDismissed = true
+
     const data = this.game.registry.get('levelCompleteData')
     this.game.registry.set('showLevelComplete', false)
     this.game.registry.set('initialsEntryData', {

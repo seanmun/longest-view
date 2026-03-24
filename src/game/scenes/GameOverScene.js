@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { CRTBarrelPipeline } from '../pipelines/CRTBarrelPipeline.js'
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -13,6 +14,7 @@ export class GameOverScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBackgroundColor('#0a0a0a')
+    this.cameras.main.setPostPipeline(CRTBarrelPipeline)
     this.cameras.main.fadeIn(500)
 
     AudioSystem.playGameOver()
@@ -59,7 +61,7 @@ export class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5)
 
     // MNS tagline
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 25, 'Rebuild at MNS.COM', {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 25, 'Rebuild at MoneyNeverSleeps.app', {
       fontFamily: '"Press Start 2P"',
       fontSize: '7px',
       color: '#E8B800',

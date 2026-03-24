@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { CRTBarrelPipeline } from '../pipelines/CRTBarrelPipeline.js'
 
 const CUTSCENES = {
   level1_intro: {
@@ -29,6 +30,7 @@ export class CutsceneScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBackgroundColor('#000000')
+    this.cameras.main.setPostPipeline(CRTBarrelPipeline)
     this.cameras.main.fadeIn(500)
 
     const cutscene = CUTSCENES[this.cutsceneKey]

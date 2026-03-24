@@ -42,8 +42,7 @@ export default function App() {
         {/* Volume control */}
         <VolumeControl />
 
-        {/* CRT effects stack (scanlines + flicker via ::before/::after on .crt-screen) */}
-        <div className="crt-vignette" />
+        {/* CRT effects stack (scanlines + flicker via ::before/::after, barrel distortion via Phaser shader) */}
         <div className="crt-glass" />
       </div>
     </div>

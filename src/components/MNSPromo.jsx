@@ -28,12 +28,12 @@ export default function MNSPromo({ game }) {
         </div>
 
         <a
-          href="https://mns.com"
+          href="https://MoneyNeverSleeps.app"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block text-[8px] px-4 py-2 border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black transition-colors"
         >
-          VISIT MNS.COM
+          VISIT MONEYNEVERSLEEPS.APP
         </a>
 
         <button

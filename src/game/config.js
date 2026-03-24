@@ -5,6 +5,7 @@ import { Level1Scene } from './scenes/Level1Scene.js'
 import { CutsceneScene } from './scenes/CutsceneScene.js'
 import { GameOverScene } from './scenes/GameOverScene.js'
 import { GAME_WIDTH, GAME_HEIGHT } from './constants.js'
+import { CRTBarrelPipeline } from './pipelines/CRTBarrelPipeline.js'
 
 // Re-export for convenience
 export { GAME_WIDTH, GAME_HEIGHT, COLORS } from './constants.js'
@@ -32,5 +33,6 @@ export const createGameConfig = (parent) => ({
       capture: false
     }
   },
+  pipeline: [CRTBarrelPipeline],
   scene: [BootScene, MainMenuScene, CutsceneScene, Level1Scene, GameOverScene]
 })
