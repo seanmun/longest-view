@@ -5,6 +5,8 @@ import DialogueBox from './components/DialogueBox.jsx'
 import MNSPromo from './components/MNSPromo.jsx'
 import PauseMenu from './components/PauseMenu.jsx'
 import LevelCompleteScreen from './components/LevelCompleteScreen.jsx'
+import InitialsEntry from './components/InitialsEntry.jsx'
+import Leaderboard from './components/Leaderboard.jsx'
 import VolumeControl from './components/VolumeControl.jsx'
 import MobileControls from './components/MobileControls.jsx'
 import CharacterDesignPage from './components/CharacterDesignPage.jsx'
@@ -32,16 +34,17 @@ export default function App() {
             <MNSPromo game={game} />
             <PauseMenu game={game} />
             <LevelCompleteScreen game={game} />
+            <InitialsEntry game={game} />
+            <Leaderboard game={game} />
           </>
         )}
 
         {/* Volume control */}
         <VolumeControl />
 
-        {/* CRT effects stack */}
+        {/* CRT effects stack (scanlines + flicker via ::before/::after on .crt-screen) */}
         <div className="crt-vignette" />
         <div className="crt-glass" />
-        <div className="scanlines" />
       </div>
     </div>
   )

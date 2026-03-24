@@ -157,6 +157,10 @@ export class Level1Scene extends Phaser.Scene {
     this.game.registry.set('elapsedTime', 0)
     this.game.registry.set('showLevelComplete', false)
     this.game.registry.set('levelCompleteData', null)
+    this.game.registry.set('showInitialsEntry', false)
+    this.game.registry.set('initialsEntryData', null)
+    this.game.registry.set('showLeaderboard', false)
+    this.game.registry.set('leaderboardHighlight', null)
     this.game.registry.set('currentLevel', 'THE WELLS FARGO CENTER')
 
     // Level subtitle
@@ -565,9 +569,12 @@ export class Level1Scene extends Phaser.Scene {
   }
 
   dismissLevelComplete() {
+    const data = this.game.registry.get('levelCompleteData')
     this.game.registry.set('showLevelComplete', false)
-    this.game.registry.set('showMNSPromo', true)
-    this.game.registry.set('mnsPromoMessage',
-      'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMNS.COM — The smartest fantasy basketball platform on the internet.')
+    this.game.registry.set('initialsEntryData', {
+      score: data ? data.finalScore : 0,
+      time: data ? data.elapsed : 0
+    })
+    this.game.registry.set('showInitialsEntry', true)
   }
 }

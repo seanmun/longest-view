@@ -23,28 +23,35 @@ body {
   align-items: center;
 }
 
-/* CRT Scanline Overlay */
-.scanlines {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15) 0px,
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 3px
-  );
+/* CRT Flicker Animation */
+@keyframes crt-flicker {
+  0% { opacity: 0.03; }
+  5% { opacity: 0.01; }
+  10% { opacity: 0.04; }
+  15% { opacity: 0.02; }
+  20% { opacity: 0.05; }
+  25% { opacity: 0.01; }
+  30% { opacity: 0.03; }
+  35% { opacity: 0.04; }
+  40% { opacity: 0.01; }
+  45% { opacity: 0.05; }
+  50% { opacity: 0.02; }
+  55% { opacity: 0.04; }
+  60% { opacity: 0.01; }
+  65% { opacity: 0.03; }
+  70% { opacity: 0.05; }
+  75% { opacity: 0.02; }
+  80% { opacity: 0.04; }
+  85% { opacity: 0.01; }
+  90% { opacity: 0.03; }
+  95% { opacity: 0.05; }
+  100% { opacity: 0.02; }
 }
 
 /* CRT TV Bezel Frame */
 .crt-bezel {
   background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #111111 100%);
-  border-radius: 24px;
+  border-radius: 28px;
   padding: 20px;
   box-shadow:
     0 0 0 3px #333,
@@ -53,11 +60,46 @@ body {
     inset 0 2px 4px rgba(255, 255, 255, 0.05);
 }
 
-/* CRT Screen (inner container) */
+/* CRT Screen (inner container) — rounded like real CRT glass */
 .crt-screen {
-  border-radius: 14px;
+  border-radius: 20px;
   overflow: hidden;
   position: relative;
+}
+
+/* Scanlines + RGB sub-pixel columns (replaces old .scanlines div) */
+.crt-screen::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background:
+    linear-gradient(transparent 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  z-index: 1000;
+  pointer-events: none;
+  border-radius: 20px;
+}
+
+/* Subtle screen flicker */
+.crt-screen::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 1000;
+  pointer-events: none;
+  border-radius: 20px;
+  animation: crt-flicker 0.15s infinite;
 }
 
 /* CRT Glass reflection effect */
@@ -69,7 +111,7 @@ body {
   width: 100%;
   height: 100%;
   z-index: 1001;
-  border-radius: 14px;
+  border-radius: 20px;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.08) 0%,
@@ -88,7 +130,7 @@ body {
   width: 100%;
   height: 100%;
   z-index: 999;
-  border-radius: 14px;
+  border-radius: 20px;
   box-shadow: inset 0 0 100px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -104,6 +146,8 @@ body {
     border-radius: 0;
     aspect-ratio: auto !important;
   }
+  .crt-screen::before,
+  .crt-screen::after,
   .crt-glass,
   .crt-vignette {
     border-radius: 0;
