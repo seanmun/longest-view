@@ -17,7 +17,7 @@ export class GameOverScene extends Phaser.Scene {
 
     AudioSystem.playGameOver()
 
-    this.add.text(GAME_WIDTH / 2, 100, 'GAME OVER', {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.2, 'GAME OVER', {
       fontFamily: '"Press Start 2P"',
       fontSize: '28px',
       color: '#CC2200',
@@ -25,20 +25,20 @@ export class GameOverScene extends Phaser.Scene {
       strokeThickness: 4
     }).setOrigin(0.5)
 
-    this.add.text(GAME_WIDTH / 2, 160, `SCORE: ${this.finalScore}`, {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.3, `SCORE: ${this.finalScore}`, {
       fontFamily: '"Press Start 2P"',
       fontSize: '14px',
       color: '#E8B800'
     }).setOrigin(0.5)
 
-    this.add.text(GAME_WIDTH / 2, 200, 'The Process requires patience.', {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.37, 'The Process requires patience.', {
       fontFamily: '"Press Start 2P"',
       fontSize: '8px',
       color: '#888888'
     }).setOrigin(0.5)
 
     // Retry prompt
-    const retry = this.add.text(GAME_WIDTH / 2, 280, 'PRESS ENTER TO RETRY', {
+    const retry = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.52, 'PRESS ENTER TO RETRY', {
       fontFamily: '"Press Start 2P"',
       fontSize: '10px',
       color: '#00D4FF'
@@ -52,7 +52,7 @@ export class GameOverScene extends Phaser.Scene {
       repeat: -1
     })
 
-    const menu = this.add.text(GAME_WIDTH / 2, 320, 'ESC FOR MENU', {
+    const menu = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.58, 'ESC FOR MENU', {
       fontFamily: '"Press Start 2P"',
       fontSize: '8px',
       color: '#666666'

@@ -38,6 +38,7 @@ export class FanEnemy {
     this.sprite = scene.physics.add.sprite(x, y, null)
     this.sprite.setSize(ENEMY_WIDTH, ENEMY_HEIGHT)
     this.sprite.setCollideWorldBounds(false)
+    this.sprite.setVisible(false)
     this.sprite.setDepth(8)
     this.sprite.body.setMaxVelocityY(600)
 

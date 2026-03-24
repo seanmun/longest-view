@@ -4,6 +4,14 @@ Master Build Prompt for Claude Code
 You are building a complete browser-based 2D arcade beat-em-up video game called Longest View: Sam Hinkie's Revenge. This is a full production game — not a prototype. Build it properly, with clean code, modular file structure, and everything working end to end.
 Read this entire document before writing a single line of code. This is your north star.
 
+CRITICAL RULES — DO NOT BREAK THESE
+1. NEVER change multiple systems at once. One change at a time. Test before moving on.
+2. NEVER touch game canvas size, entity physics, hitbox sizes, movement speeds, or gravity without explicit user request and approval of the exact values.
+3. NEVER use Phaser Graphics setScale/setPosition hacks to resize characters. If characters need to be bigger, redraw them with larger pixel art coordinates.
+4. The game resolution is 900x400. Do not change this without explicit discussion and approval.
+5. If a change could break gameplay, say what you plan to do FIRST and wait for approval before writing code.
+6. When reverting a bad change, do a clean revert — don't leave artifacts behind.
+
 WHAT THIS GAME IS
 A side-scrolling beat-em-up in the spirit of Double Dragon and Streets of Rage. The player controls Sam Hinkie — the analytically brilliant but ousted Philadelphia 76ers GM — as he fights through 5 levels of enemies, boss battles, side quest conversations, and cinematic cutscene moments. His weapon of choice is explosive ping pong balls (a nod to the NBA draft lottery). The game is both a love letter to "The Process" era of 76ers basketball and a sneaky advertisement for Money Never Sleeps (MNS), a fantasy basketball platform at MNS.COM.
 The tone is: satirical, funny, nostalgic, self-aware. Think Adult Swim meets 1990s arcade cabinet.

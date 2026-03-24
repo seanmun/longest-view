@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { AudioSystem } from '../systems/AudioSystem.js'
-import { COLORS, GAME_HEIGHT } from '../constants.js'
+import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
 
 const BALL_BASE_SPEED = 300
 const GRAVITY = 300
@@ -36,6 +36,7 @@ export class Ball {
     // Create physics body
     this.sprite = scene.physics.add.sprite(x, y, null)
     this.sprite.setCircle(this.radius)
+    this.sprite.setVisible(false)
     this.sprite.setDepth(9)
     this.sprite.body.setAllowGravity(true)
     this.sprite.body.gravity.y = GRAVITY
@@ -95,7 +96,7 @@ export class Ball {
 
     // Off screen check
     if (y > GAME_HEIGHT + 50 || x < this.scene.cameras.main.scrollX - 50 ||
-      x > this.scene.cameras.main.scrollX + 950) {
+      x > this.scene.cameras.main.scrollX + GAME_WIDTH + 50) {
       this.destroy()
       return
     }

@@ -41,6 +41,71 @@ body {
   );
 }
 
+/* CRT TV Bezel Frame */
+.crt-bezel {
+  background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #111111 100%);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow:
+    0 0 0 3px #333,
+    0 0 0 6px #1a1a1a,
+    0 8px 30px rgba(0, 0, 0, 0.8),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+/* CRT Screen (inner container) */
+.crt-screen {
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* CRT Glass reflection effect */
+.crt-glass {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1001;
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 25%,
+    transparent 50%,
+    transparent 100%
+  );
+}
+
+/* CRT Vignette (darker at edges) */
+.crt-vignette {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  border-radius: 14px;
+  box-shadow: inset 0 0 100px 30px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .crt-bezel {
+    padding: 8px;
+    border-radius: 14px;
+  }
+  .crt-screen {
+    border-radius: 8px;
+  }
+  .crt-glass,
+  .crt-vignette {
+    border-radius: 8px;
+  }
+}
+
 /* Press Start 2P font utility */
 .font-pixel {
   font-family: 'Press Start 2P', monospace;

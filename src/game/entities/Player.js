@@ -30,12 +30,14 @@ export class Player {
     this.onLivesChange = null
     this.onChargeChange = null
     this.onDeath = null
+    this.onDamageTaken = null
 
     // Create physics body
     this.sprite = scene.physics.add.sprite(x, y, null)
     this.sprite.setSize(PLAYER_WIDTH, PLAYER_HEIGHT)
     this.sprite.setOffset(0, 0)
     this.sprite.setCollideWorldBounds(false)
+    this.sprite.setVisible(false)
     this.sprite.setDepth(10)
     this.sprite.body.setMaxVelocityY(600)
 
@@ -226,6 +228,7 @@ export class Player {
     this.invincible = true
     this.invincibleUntil = this.scene.time.now + INVINCIBILITY_FRAMES
     AudioSystem.playHealthLost()
+    if (this.onDamageTaken) this.onDamageTaken(amount)
 
     if (this.scene.comboSystem) {
       this.scene.comboSystem.breakCombo()

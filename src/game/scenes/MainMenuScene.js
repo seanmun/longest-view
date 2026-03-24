@@ -15,7 +15,7 @@ export class MainMenuScene extends Phaser.Scene {
     AudioSystem.playMenuMusic()
 
     // Title
-    this.add.text(GAME_WIDTH / 2, 80, 'LONGEST VIEW', {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.15, 'LONGEST VIEW', {
       fontFamily: '"Press Start 2P"',
       fontSize: '32px',
       color: '#E8B800',
@@ -23,7 +23,7 @@ export class MainMenuScene extends Phaser.Scene {
       strokeThickness: 4
     }).setOrigin(0.5)
 
-    this.add.text(GAME_WIDTH / 2, 120, "SAM HINKIE'S REVENGE", {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.22, "SAM HINKIE'S REVENGE", {
       fontFamily: '"Press Start 2P"',
       fontSize: '14px',
       color: '#FFFFFF'
@@ -31,7 +31,7 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Blinking "INSERT COIN" text
     const isMobile = 'ontouchstart' in window && window.innerWidth < 1024
-    const insertCoin = this.add.text(GAME_WIDTH / 2, 200, isMobile ? 'PRESS START' : 'PRESS ENTER TO START', {
+    const insertCoin = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.38, isMobile ? 'PRESS START' : 'PRESS ENTER TO START', {
       fontFamily: '"Press Start 2P"',
       fontSize: '12px',
       color: '#00D4FF'
@@ -51,7 +51,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.menuTexts = []
 
     menuItems.forEach((item, i) => {
-      const text = this.add.text(GAME_WIDTH / 2, 250 + i * 30, item, {
+      const text = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT * 0.48 + i * 35, item, {
         fontFamily: '"Press Start 2P"',
         fontSize: '10px',
         color: i === 0 ? '#E8B800' : '#666666'

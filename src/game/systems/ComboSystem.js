@@ -1,5 +1,5 @@
 import { AudioSystem } from './AudioSystem.js'
-import { COLORS } from '../constants.js'
+import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
 
 export class ComboSystem {
   constructor(scene) {
@@ -38,7 +38,7 @@ export class ComboSystem {
 
     // Show "TRUST THE PROCESS" text
     const text = this.scene.add.text(
-      this.scene.cameras.main.scrollX + 450, 200,
+      this.scene.cameras.main.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2,
       'TRUST THE PROCESS',
       {
         fontFamily: '"Press Start 2P"',
@@ -63,7 +63,7 @@ export class ComboSystem {
 
     // Gold screen pulse
     const flash = this.scene.add.rectangle(
-      this.scene.cameras.main.scrollX + 450, 200, 900, 400, COLORS.GOLD, 0.2
+      this.scene.cameras.main.scrollX + GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.GOLD, 0.2
     )
     flash.setDepth(150)
     this.scene.tweens.add({

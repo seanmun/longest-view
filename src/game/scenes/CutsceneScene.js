@@ -96,7 +96,7 @@ export class CutsceneScene extends Phaser.Scene {
   }
 
   typewriterText(text, delay) {
-    const yPos = 120 + this.textObjects.length * 35
+    const yPos = GAME_HEIGHT * 0.22 + this.textObjects.length * 35
     const textObj = this.add.text(GAME_WIDTH / 2, yPos, '', {
       fontFamily: '"Press Start 2P"',
       fontSize: '12px',

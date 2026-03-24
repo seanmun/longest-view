@@ -7,20 +7,44 @@ import { DialogueSystem } from '../systems/DialogueSystem.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
 
-const LEVEL_WIDTH = 3600
+const LEVEL_WIDTH = 5400
 const GROUND_Y = GAME_HEIGHT - 30
 
 const WAVES = [
-  { trigger: 200, enemies: [{ x: 600, variant: 'normal' }, { x: 700, variant: 'normal' }] },
-  { trigger: 900, enemies: [{ x: 1400, variant: 'normal' }, { x: 1500, variant: 'normal' }, { x: 1600, variant: 'normal' }] },
-  { trigger: 2000, enemies: [
-    { x: 2500, variant: 'normal' }, { x: 2600, variant: 'normal' },
-    { x: 2700, variant: 'normal' }, { x: 2800, variant: 'fast' }
+  // Wave 1: Warmup (2 enemies)
+  { trigger: 200, enemies: [
+    { x: 600, variant: 'normal' }, { x: 700, variant: 'normal' }
+  ]},
+  // Wave 2: Ramp up (3 enemies)
+  { trigger: 800, enemies: [
+    { x: 1200, variant: 'normal' }, { x: 1300, variant: 'normal' }, { x: 1400, variant: 'normal' }
+  ]},
+  // Wave 3: Introduce fast variant (4 enemies)
+  { trigger: 1600, enemies: [
+    { x: 2000, variant: 'normal' }, { x: 2100, variant: 'normal' },
+    { x: 2200, variant: 'normal' }, { x: 2300, variant: 'fast' }
+  ]},
+  // Wave 4: Mixed assault (5 enemies)
+  { trigger: 2500, enemies: [
+    { x: 2900, variant: 'normal' }, { x: 3000, variant: 'fast' },
+    { x: 3100, variant: 'normal' }, { x: 3200, variant: 'normal' },
+    { x: 3300, variant: 'fast' }
+  ]},
+  // Wave 5: Fast-heavy (5 enemies)
+  { trigger: 3400, enemies: [
+    { x: 3800, variant: 'fast' }, { x: 3900, variant: 'normal' },
+    { x: 4000, variant: 'fast' }, { x: 4100, variant: 'fast' },
+    { x: 4200, variant: 'normal' }
+  ]},
+  // Wave 6: Final push (4 enemies)
+  { trigger: 4200, enemies: [
+    { x: 4600, variant: 'fast' }, { x: 4700, variant: 'normal' },
+    { x: 4800, variant: 'fast' }, { x: 4900, variant: 'fast' }
   ]}
 ]
 
 const SIDE_QUEST = {
-  trigger: 1400,
+  trigger: 2200,
   speaker: 'ANALYST',
   text: '"Sam, the owner wants us to sign a 32-year-old point guard for $18M a year. He can still play."',
   options: [
@@ -52,6 +76,8 @@ export class Level1Scene extends Phaser.Scene {
     this.sideQuestTriggered = false
     this.levelComplete = false
     this.startTime = this.time.now
+    this.enemiesDefeated = 0
+    this.totalDamageTaken = 0
 
     // Draw background layers
     this.drawBackground()
@@ -83,6 +109,13 @@ export class Level1Scene extends Phaser.Scene {
     }
     this.player.onChargeChange = (charge) => {
       this.game.registry.set('chargeLevel', charge)
+    }
+    this.player.onDamageTaken = (amount) => {
+      this.totalDamageTaken += amount
+      const penalty = amount * 5
+      if (this.scoreSystem) {
+        this.scoreSystem.deductPoints(penalty, this.player.sprite.x, this.player.sprite.y - 10)
+      }
     }
     this.player.onDeath = () => {
       AudioSystem.stopMusic()
@@ -120,6 +153,8 @@ export class Level1Scene extends Phaser.Scene {
     this.game.registry.set('comboMultiplier', 1)
     this.game.registry.set('chargeLevel', 0)
     this.game.registry.set('dialogueActive', false)
+    this.game.registry.set('elapsedTime', 0)
+    this.game.registry.set('showLevelComplete', false)
     this.game.registry.set('currentLevel', 'THE WELLS FARGO CENTER')
 
     // Level subtitle
@@ -165,7 +200,10 @@ export class Level1Scene extends Phaser.Scene {
       { x: 1000, text: 'MNS.COM\nMONEY NEVER SLEEPS', color: COLORS.GOLD },
       { x: 1600, text: 'ALLEN IVERSON #3', color: COLORS.RED },
       { x: 2200, text: 'TRUST\nTHE\nPROCESS', color: COLORS.CYAN },
-      { x: 2800, text: 'MNS.COM', color: COLORS.GOLD }
+      { x: 2800, text: 'MNS.COM', color: COLORS.GOLD },
+      { x: 3400, text: 'DR. J\nFOREVER', color: COLORS.RED },
+      { x: 4000, text: 'MNS.COM\nTRUST THE DATA', color: COLORS.GOLD },
+      { x: 4600, text: 'PROCESS>>>', color: COLORS.CYAN }
     ]
 
     banners.forEach(b => {
@@ -202,7 +240,10 @@ export class Level1Scene extends Phaser.Scene {
       { x: 1200, text: 'MNS.COM', color: '#E8B800' },
       { x: 1800, text: 'PROCESS>>', color: '#00D4FF' },
       { x: 2400, text: 'HINKIE WAS RIGHT × MNS.COM', color: '#E8B800' },
-      { x: 3000, text: 'TTP', color: '#FFFFFF' }
+      { x: 3000, text: 'TTP', color: '#FFFFFF' },
+      { x: 3600, text: 'TRUST HINKIE', color: '#00D4FF' },
+      { x: 4400, text: 'MNS.COM KNOWS', color: '#E8B800' },
+      { x: 5000, text: 'PROCESS FOREVER', color: '#FFFFFF' }
     ]
 
     graffitiTags.forEach(g => {
@@ -217,7 +258,7 @@ export class Level1Scene extends Phaser.Scene {
 
   createEnvironment() {
     // Trash cans — solid obstacles
-    const trashPositions = [400, 1100, 1900, 2600]
+    const trashPositions = [400, 1100, 1900, 2600, 3400, 4200, 4800]
     trashPositions.forEach(tx => {
       // Visual: trash body
       this.add.rectangle(tx, GROUND_Y - 15, 16, 20, 0x555555).setDepth(4)
@@ -245,12 +286,34 @@ export class Level1Scene extends Phaser.Scene {
     this.physics.add.existing(cartHitbox, true)
     this.envObjects.add(cartHitbox)
 
-    // "IN TANK WE TRUST" sign (carried by enemy, but also on wall)
+    // Second hot dog cart at x=3800
+    const cart2X = 3800
+    this.add.rectangle(cart2X, GROUND_Y - 12, 40, 24, 0xCC4400).setDepth(4)
+    this.add.rectangle(cart2X, GROUND_Y - 26, 44, 4, 0xDD5500).setDepth(4)
+    this.add.text(cart2X, GROUND_Y - 18, 'DOGS', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '4px',
+      color: '#FFFFFF'
+    }).setOrigin(0.5).setDepth(5)
+    const cart2Hitbox = this.add.rectangle(cart2X, GROUND_Y - 12, 40, 24)
+    this.physics.add.existing(cart2Hitbox, true)
+    this.envObjects.add(cart2Hitbox)
+
+    // "IN TANK WE TRUST" sign
     this.add.text(2200, GROUND_Y - 60, 'IN TANK WE TRUST', {
       fontFamily: '"Press Start 2P"',
       fontSize: '5px',
       color: '#FFFFFF',
       backgroundColor: '#444444',
+      padding: { x: 4, y: 3 }
+    }).setDepth(4)
+
+    // Second sign deeper in level
+    this.add.text(4000, GROUND_Y - 60, 'HINKIE DID NOTHING WRONG', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#00D4FF',
+      backgroundColor: '#333344',
       padding: { x: 4, y: 3 }
     }).setDepth(4)
   }
@@ -302,6 +365,10 @@ export class Level1Scene extends Phaser.Scene {
     if (this.dialogueSystem.isActive()) return
     if (this.levelComplete) return
 
+    // Update timer
+    const elapsed = Math.floor((time - this.startTime) / 1000)
+    this.game.registry.set('elapsedTime', elapsed)
+
     // Update player
     this.player.update(time)
 
@@ -342,7 +409,10 @@ export class Level1Scene extends Phaser.Scene {
           enemy.sprite.x, enemy.sprite.y
         )
         if (dist < 25) {
-          enemy.takeDamage(ball.damage, ball)
+          const result = enemy.takeDamage(ball.damage, ball)
+          if (result && result.defeated) {
+            this.enemiesDefeated++
+          }
           if (!ball.isRicochet() || ball.tier < 2) {
             ball.destroy()
           }
@@ -407,7 +477,7 @@ export class Level1Scene extends Phaser.Scene {
     })
 
     // Level complete check — all waves done and all enemies defeated
-    if (this.waveIndex >= WAVES.length && this.enemies.length === 0 && playerX > 2500) {
+    if (this.waveIndex >= WAVES.length && this.enemies.length === 0 && playerX > 4800) {
       this.completeLevel()
     }
   }
@@ -441,48 +511,61 @@ export class Level1Scene extends Phaser.Scene {
     AudioSystem.stopMusic()
     AudioSystem.playLevelComplete()
 
-    // Level complete text
-    const complete = this.add.text(
-      this.cameras.main.scrollX + GAME_WIDTH / 2,
-      GAME_HEIGHT / 2 - 20,
-      'LEVEL COMPLETE!',
-      {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '20px',
-        color: '#E8B800',
-        stroke: '#000000',
-        strokeThickness: 4
-      }
-    ).setOrigin(0.5).setDepth(200)
+    const elapsed = Math.floor((this.time.now - this.startTime) / 1000)
+    const baseScore = this.scoreSystem.getScore()
 
-    const scoreText = this.add.text(
-      this.cameras.main.scrollX + GAME_WIDTH / 2,
-      GAME_HEIGHT / 2 + 15,
-      `SCORE: ${this.scoreSystem.getScore()}`,
-      {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '12px',
-        color: '#FFFFFF'
-      }
-    ).setOrigin(0.5).setDepth(200)
+    // Calculate time bonus
+    let timeBonus = 0
+    if (elapsed < 60) timeBonus = 2000
+    else if (elapsed < 90) timeBonus = 1500
+    else if (elapsed < 120) timeBonus = 1000
+    else if (elapsed < 150) timeBonus = 500
 
     // No damage bonus
-    if (this.player.hp === this.player.maxHp) {
-      this.time.delayedCall(1000, () => {
-        this.scoreSystem.addPoints(1000,
-          this.cameras.main.scrollX + GAME_WIDTH / 2,
-          GAME_HEIGHT / 2 + 40, COLORS.GOLD)
-        this.scoreSystem.showLabelText('NO DAMAGE BONUS!',
-          this.cameras.main.scrollX + GAME_WIDTH / 2,
-          GAME_HEIGHT / 2 + 50, COLORS.GOLD)
-      })
-    }
+    const noDamageBonus = this.totalDamageTaken === 0 ? 1000 : 0
 
-    // MNS promo screen after delay
-    this.time.delayedCall(3000, () => {
-      this.game.registry.set('showMNSPromo', true)
-      this.game.registry.set('mnsPromoMessage',
-        'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMNS.COM — The smartest fantasy basketball platform on the internet.')
+    // Damage penalty total (already applied in real-time, just display it)
+    const damagePenalty = this.totalDamageTaken * 5
+
+    // Apply bonuses to score (silently, no floating text)
+    if (timeBonus > 0) this.scoreSystem.score += timeBonus
+    if (noDamageBonus > 0) this.scoreSystem.score += noDamageBonus
+    if (this.scoreSystem.onScoreChange) this.scoreSystem.onScoreChange(this.scoreSystem.score)
+
+    const totalEnemies = WAVES.reduce((sum, w) => sum + w.enemies.length, 0)
+    const finalScore = this.scoreSystem.getScore()
+
+    // Send breakdown data to React
+    this.game.registry.set('levelCompleteData', {
+      enemiesDefeated: this.enemiesDefeated,
+      totalEnemies: totalEnemies,
+      damageTaken: this.totalDamageTaken,
+      damagePenalty: damagePenalty,
+      elapsed: elapsed,
+      timeBonus: timeBonus,
+      noDamageBonus: noDamageBonus,
+      baseScore: baseScore,
+      finalScore: finalScore
     })
+    this.game.registry.set('showLevelComplete', true)
+
+    // Handle continue input
+    this.input.keyboard.on('keydown-ENTER', () => {
+      if (this.levelComplete) this.dismissLevelComplete()
+    })
+    this._onGameStartComplete = () => {
+      if (this.levelComplete) this.dismissLevelComplete()
+    }
+    window.addEventListener('game-start', this._onGameStartComplete)
+    this.events.on('shutdown', () => {
+      window.removeEventListener('game-start', this._onGameStartComplete)
+    })
+  }
+
+  dismissLevelComplete() {
+    this.game.registry.set('showLevelComplete', false)
+    this.game.registry.set('showMNSPromo', true)
+    this.game.registry.set('mnsPromoMessage',
+      'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMNS.COM — The smartest fantasy basketball platform on the internet.')
   }
 }

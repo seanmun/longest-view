@@ -4,6 +4,7 @@ import HUD from './components/HUD.jsx'
 import DialogueBox from './components/DialogueBox.jsx'
 import MNSPromo from './components/MNSPromo.jsx'
 import PauseMenu from './components/PauseMenu.jsx'
+import LevelCompleteScreen from './components/LevelCompleteScreen.jsx'
 import VolumeControl from './components/VolumeControl.jsx'
 import MobileControls from './components/MobileControls.jsx'
 import CharacterDesignPage from './components/CharacterDesignPage.jsx'
@@ -17,26 +18,31 @@ export default function App() {
   if (window.location.pathname === '/editor') return <PixelEditor />
 
   const gameContent = (
-    <div className="relative bg-black overflow-hidden"
-      style={{ width: '100%', maxWidth: '1200px', aspectRatio: '9 / 4' }}>
-      {/* Game canvas */}
-      <GameCanvas onGameReady={setGame} />
+    <div className="crt-bezel" style={{ width: '100%', maxWidth: '1200px' }}>
+      <div className="crt-screen relative bg-black overflow-hidden"
+        style={{ width: '100%', aspectRatio: '4 / 3' }}>
+        {/* Game canvas */}
+        <GameCanvas onGameReady={setGame} />
 
-      {/* React overlays — positioned relative to game area */}
-      {game && (
-        <>
-          <HUD game={game} />
-          <DialogueBox game={game} />
-          <MNSPromo game={game} />
-          <PauseMenu game={game} />
-        </>
-      )}
+        {/* React overlays — positioned relative to game area */}
+        {game && (
+          <>
+            <HUD game={game} />
+            <DialogueBox game={game} />
+            <MNSPromo game={game} />
+            <PauseMenu game={game} />
+            <LevelCompleteScreen game={game} />
+          </>
+        )}
 
-      {/* Volume control */}
-      <VolumeControl />
+        {/* Volume control */}
+        <VolumeControl />
 
-      {/* CRT Scanline overlay */}
-      <div className="scanlines" />
+        {/* CRT effects stack */}
+        <div className="crt-vignette" />
+        <div className="crt-glass" />
+        <div className="scanlines" />
+      </div>
     </div>
   )
 

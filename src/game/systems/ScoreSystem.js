@@ -52,6 +52,26 @@ export class ScoreSystem {
     })
   }
 
+  deductPoints(points, x, y) {
+    this.score = Math.max(0, this.score - points)
+    const text = this.scene.add.text(x, y, `-${points}`, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '10px',
+      color: '#CC2200'
+    })
+    text.setOrigin(0.5)
+    text.setDepth(100)
+    this.scene.tweens.add({
+      targets: text,
+      y: y - 40,
+      alpha: 0,
+      duration: 1000,
+      ease: 'Power2',
+      onComplete: () => text.destroy()
+    })
+    if (this.onScoreChange) this.onScoreChange(this.score)
+  }
+
   getScore() {
     return this.score
   }

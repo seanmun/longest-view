@@ -9,6 +9,7 @@ export default function HUD({ game }) {
   const [comboMultiplier, setComboMultiplier] = useState(1)
   const [chargeLevel, setChargeLevel] = useState(0)
   const [level, setLevel] = useState('')
+  const [elapsedTime, setElapsedTime] = useState(0)
 
   useEffect(() => {
     if (!game) return
@@ -25,6 +26,7 @@ export default function HUD({ game }) {
         case 'comboMultiplier': setComboMultiplier(value); break
         case 'chargeLevel': setChargeLevel(value); break
         case 'currentLevel': setLevel(value); break
+        case 'elapsedTime': setElapsedTime(value); break
       }
     }
 
@@ -34,6 +36,12 @@ export default function HUD({ game }) {
 
   const hpPercent = (hp / maxHp) * 100
   const hpColor = hpPercent > 60 ? '#00CC44' : hpPercent > 30 ? '#E8B800' : '#CC2200'
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
 
   return (
     <div className="absolute top-0 left-0 w-full pointer-events-none z-10 p-3"
@@ -73,12 +81,15 @@ export default function HUD({ game }) {
           </div>
         )}
 
-        {/* Right side — Score */}
+        {/* Right side — Score + Timer */}
         <div className="text-right">
           <div className="text-[16px]" style={{ color: '#E8B800' }}>
             {score.toLocaleString()}
           </div>
           <div className="text-[10px] text-gray-400">SCORE</div>
+          <div className="text-[12px] mt-1" style={{ color: '#00D4FF' }}>
+            {formatTime(elapsedTime)}
+          </div>
         </div>
       </div>
 

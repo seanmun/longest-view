@@ -1,5 +1,5 @@
 import { AudioSystem } from '../systems/AudioSystem.js'
-import { COLORS, GAME_HEIGHT } from '../constants.js'
+import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
 
 const SNOWBALL_SPEED = 200
 const SNOWBALL_DAMAGE = 15
@@ -14,6 +14,7 @@ export class Snowball {
     // Create physics body — no gravity, straight line
     this.sprite = scene.physics.add.sprite(x, y, null)
     this.sprite.setCircle(4)
+    this.sprite.setVisible(false)
     this.sprite.setDepth(9)
     this.sprite.body.setAllowGravity(false)
     this.sprite.setVelocity(direction * SNOWBALL_SPEED, 0)
@@ -31,7 +32,7 @@ export class Snowball {
 
     // Off screen check
     if (x < this.scene.cameras.main.scrollX - 50 ||
-      x > this.scene.cameras.main.scrollX + 950) {
+      x > this.scene.cameras.main.scrollX + GAME_WIDTH + 50) {
       this.destroy()
       return
     }

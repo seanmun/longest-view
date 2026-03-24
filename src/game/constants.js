@@ -1,5 +1,5 @@
 export const GAME_WIDTH = 900
-export const GAME_HEIGHT = 400
+export const GAME_HEIGHT = 675
 
 export const COLORS = {
   GOLD: 0xE8B800,
