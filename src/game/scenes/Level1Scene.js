@@ -97,11 +97,12 @@ export class Level1Scene extends Phaser.Scene {
     // Draw background layers
     this.drawBackground()
 
-    // Create ground platform
-    this.ground = this.physics.add.staticGroup()
-    const groundRect = this.add.rectangle(LEVEL_WIDTH / 2, GROUND_Y + 15, LEVEL_WIDTH, 30, 0x2a2a3a)
-    this.physics.add.existing(groundRect, true)
-    this.ground.add(groundRect)
+    // Create ground platform — dynamic immovable (handles initial overlaps better than static)
+    this.ground = this.add.rectangle(LEVEL_WIDTH / 2, GROUND_Y + 15, LEVEL_WIDTH, 30, 0x2a2a3a)
+    this.physics.add.existing(this.ground, false)
+    this.ground.body.setImmovable(true)
+    this.ground.body.setAllowGravity(false)
+    this.ground.body.moves = false
 
     // Environmental objects (trash cans, hot dog carts)
     this.envObjects = this.physics.add.staticGroup()

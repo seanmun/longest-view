@@ -21,7 +21,7 @@ export class EmbiidAlly {
     // Create physics body (Embiid is big)
     this.sprite = scene.physics.add.sprite(x, y, null)
     this.sprite.setSize(EMBIID_WIDTH, EMBIID_HEIGHT)
-    this.sprite.setCollideWorldBounds(false)
+    this.sprite.setCollideWorldBounds(true)
     this.sprite.setVisible(false)
     this.sprite.setDepth(7) // Behind player slightly
     this.sprite.body.setMaxVelocityY(600)

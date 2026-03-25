@@ -41,7 +41,7 @@ export class BossBrian {
     // Create physics body
     this.sprite = scene.physics.add.sprite(x, y, null)
     this.sprite.setSize(BOSS_WIDTH, BOSS_HEIGHT)
-    this.sprite.setCollideWorldBounds(false)
+    this.sprite.setCollideWorldBounds(true)
     this.sprite.setVisible(false)
     this.sprite.setDepth(8)
     this.sprite.body.setMaxVelocityY(600)

@@ -108,6 +108,14 @@ export class WeaponSelectScene extends Phaser.Scene {
       })
     })
 
+    // Hinkie character graphics (drawn below weapon cards)
+    this.hinkieGraphics = this.add.graphics()
+    this.hinkieGraphics.setDepth(8)
+    this.hinkieWalkFrame = 0
+    this.hinkieWalkTimer = 0
+    this.hinkieX = this.cardPositions[0].x
+    this.hinkieTargetX = this.cardPositions[0].x
+
     // Controls hint
     const isMobile = 'ontouchstart' in window && window.innerWidth < 1024
     const controlText = isMobile ? 'TAP TO SELECT  •  START TO CONFIRM' : '← → SELECT  •  ENTER TO CONFIRM'
@@ -152,6 +160,7 @@ export class WeaponSelectScene extends Phaser.Scene {
     this.selectedIndex = Phaser.Math.Clamp(this.selectedIndex + dir, 0, WEAPONS.length - 1)
     if (this.selectedIndex !== prev) {
       AudioSystem.playMenuSelect()
+      this.hinkieTargetX = this.cardPositions[this.selectedIndex].x
     }
   }
 
@@ -186,6 +195,25 @@ export class WeaponSelectScene extends Phaser.Scene {
 
   update(time) {
     this.weaponGraphics.clear()
+    this.hinkieGraphics.clear()
+
+    // Animate Hinkie walking toward selected weapon
+    const hinkieSpeed = 2.5
+    if (Math.abs(this.hinkieTargetX - this.hinkieX) > 3) {
+      this.hinkieX += (this.hinkieTargetX > this.hinkieX ? 1 : -1) * hinkieSpeed
+      this.hinkieWalkTimer += 16
+      if (this.hinkieWalkTimer > 150) {
+        this.hinkieWalkFrame = (this.hinkieWalkFrame + 1) % 4
+        this.hinkieWalkTimer = 0
+      }
+    } else {
+      this.hinkieX = this.hinkieTargetX
+      this.hinkieWalkFrame = 0
+      this.hinkieWalkTimer = 0
+    }
+
+    // Draw Hinkie below weapon cards
+    this.drawHinkie(time)
 
     WEAPONS.forEach((weapon, i) => {
       const cx = this.cardPositions[i].x
@@ -242,6 +270,80 @@ export class WeaponSelectScene extends Phaser.Scene {
         )
       }
     })
+  }
+
+  drawHinkie(time) {
+    const g = this.hinkieGraphics
+    const x = this.hinkieX
+    const y = GAME_HEIGHT * 0.85
+    const facing = this.hinkieTargetX > this.hinkieX + 3 ? 1 :
+                   this.hinkieTargetX < this.hinkieX - 3 ? -1 : 1
+    const isWalking = Math.abs(this.hinkieTargetX - this.hinkieX) > 3
+
+    const legOffset = isWalking ? (this.hinkieWalkFrame % 2 === 0 ? 5 : -5) : 0
+    const armSwing = isWalking ? (this.hinkieWalkFrame < 2 ? 8 : -8) : 0
+
+    // Subtle glow beneath Hinkie
+    g.fillStyle(COLORS.GOLD, 0.06)
+    g.fillCircle(x, y + 30, 35)
+
+    // Legs
+    g.fillStyle(0x1a1a3a)
+    g.fillRect(x - 15, y + 14, 12, 32 + legOffset)
+    g.fillRect(x + 5, y + 14, 12, 32 - legOffset)
+
+    // Shoes
+    g.fillStyle(0x3B2314)
+    g.fillRect(x - 18, y + 41 + legOffset, 15, 8)
+    g.fillRect(x + 3, y + 41 - legOffset, 15, 8)
+
+    // Body (suit jacket)
+    g.fillStyle(0x1a1a4a)
+    g.fillRect(x - 21, y - 23, 41, 41)
+
+    // White dress shirt collar
+    g.fillStyle(0xF0F0F0)
+    g.fillRect(x - 9, y - 23, 18, 8)
+
+    // Tie
+    g.fillStyle(COLORS.RED)
+    g.fillRect(x - 3, y - 23, 5, 32)
+
+    // Arms
+    g.fillStyle(0x1a1a4a)
+    g.fillRect(x - 30, y - 18 + armSwing, 12, 27)
+    g.fillRect(x + 18, y - 18 - armSwing, 12, 27)
+
+    // Hands
+    g.fillStyle(0xE8B090)
+    g.fillRect(x - 30, y + 8 + armSwing, 12, 8)
+    g.fillRect(x + 18, y + 8 - armSwing, 12, 8)
+
+    // Head
+    g.fillStyle(0xE8B090)
+    g.fillRect(x - 15, y - 50, 32, 30)
+
+    // Hair
+    g.fillStyle(0x3D2517)
+    g.fillRect(x - 18, y - 54, 5, 18)
+    g.fillRect(x + 14, y - 54, 5, 18)
+    g.fillRect(x - 14, y - 57, 27, 5)
+    g.fillRect(x - 8, y - 53, 14, 3)
+
+    // Glasses
+    g.fillStyle(0x666666)
+    g.fillRect(x - 12, y - 41, 9, 8)
+    g.fillRect(x + 3, y - 41, 9, 8)
+    g.fillStyle(0xFFFFFF)
+    g.fillRect(x - 9, y - 38, 5, 3)
+    g.fillRect(x + 5, y - 38, 5, 3)
+    g.fillStyle(0x111111)
+    g.fillRect(x - 8, y - 38, 3, 3)
+    g.fillRect(x + 6, y - 38, 3, 3)
+
+    // Mouth
+    g.fillStyle(0x333333)
+    g.fillRect(x - 5, y - 27, 9, 3)
   }
 
   drawWeaponPreview(weaponId, x, y, isSelected, time) {

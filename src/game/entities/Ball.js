@@ -51,6 +51,11 @@ export class Ball {
     this.sprite.body.setBounce(0.7)
     this.sprite.body.setCollideWorldBounds(false)
 
+    // Collide with ground so balls bounce properly
+    if (scene.ground) {
+      scene.physics.add.collider(this.sprite, scene.ground)
+    }
+
     // Graphics
     this.graphics = scene.add.graphics()
     this.graphics.setDepth(9)
