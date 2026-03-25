@@ -1,10 +1,10 @@
 import Phaser from 'phaser'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { Snowball } from './Snowball.js'
-import { COLORS } from '../constants.js'
+import { COLORS, fontSize } from '../constants.js'
 
-const ENEMY_WIDTH = 30
-const ENEMY_HEIGHT = 54
+const ENEMY_WIDTH = 45
+const ENEMY_HEIGHT = 81
 const MOVE_SPEED = 60
 const CONTACT_DAMAGE = 10
 
@@ -120,7 +120,7 @@ export class FanEnemy {
       this.sprite.x, this.sprite.y - 52, text,
       {
         fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
+        fontSize: fontSize(6),
         color: '#FFFFFF',
         backgroundColor: '#000000',
         padding: { x: 3, y: 2 }
@@ -153,8 +153,8 @@ export class FanEnemy {
 
       const dir = playerX < this.sprite.x ? -1 : 1
       // Throw at Hinkie's standing head height — above ducking range
-      const headHeight = this.sprite.y - 27
-      const snowball = new Snowball(this.scene, this.sprite.x + dir * 15, headHeight, dir)
+      const headHeight = this.sprite.y - 41
+      const snowball = new Snowball(this.scene, this.sprite.x + dir * 23, headHeight, dir)
 
       // Add to scene's snowball tracking array
       if (this.scene.snowballs) {
@@ -270,82 +270,82 @@ export class FanEnemy {
 
     if (this.hitFlash) {
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 15, y - 27, 30, 54)
+      this.graphics.fillRect(x - 23, y - 41, 45, 81)
       return
     }
 
     if (this.stunned) {
       const starPhase = Math.floor(time / 200) % 3
       this.graphics.fillStyle(COLORS.GOLD)
-      this.graphics.fillRect(x - 12 + starPhase * 6, y - 42, 5, 5)
-      this.graphics.fillRect(x + 3 - starPhase * 3, y - 45, 5, 5)
+      this.graphics.fillRect(x - 18 + starPhase * 9, y - 63, 8, 8)
+      this.graphics.fillRect(x + 5 - starPhase * 5, y - 68, 8, 8)
     }
 
-    const legOffset = this.walkFrame % 2 === 0 ? 3 : -3
+    const legOffset = this.walkFrame % 2 === 0 ? 5 : -5
 
     // Legs (jeans)
     this.graphics.fillStyle(0x3344AA)
-    this.graphics.fillRect(x - 9, y + 6, 8, 18 + legOffset)
-    this.graphics.fillRect(x + 2, y + 6, 8, 18 - legOffset)
+    this.graphics.fillRect(x - 14, y + 9, 12, 27 + legOffset)
+    this.graphics.fillRect(x + 3, y + 9, 12, 27 - legOffset)
 
     // Shoes
     this.graphics.fillStyle(0x888888)
-    this.graphics.fillRect(x - 10, y + 21 + legOffset, 10, 5)
-    this.graphics.fillRect(x, y + 21 - legOffset, 10, 5)
+    this.graphics.fillRect(x - 15, y + 32 + legOffset, 15, 8)
+    this.graphics.fillRect(x, y + 32 - legOffset, 15, 8)
 
     // Body (jersey)
     const jerseyColor = this.variant === 'fast' ? COLORS.RED : 0x003DA5 // 76ers blue
     this.graphics.fillStyle(jerseyColor)
-    this.graphics.fillRect(x - 12, y - 15, 24, 24)
+    this.graphics.fillRect(x - 18, y - 23, 36, 36)
 
     // Jersey number
     this.graphics.fillStyle(COLORS.WHITE)
-    this.graphics.fillRect(x - 3, y - 9, 6, 8)
+    this.graphics.fillRect(x - 5, y - 14, 9, 12)
 
     // Arms
-    const armSwing = this.walkFrame < 2 ? 3 : -3
+    const armSwing = this.walkFrame < 2 ? 5 : -5
     this.graphics.fillStyle(jerseyColor)
-    this.graphics.fillRect(x - 18, y - 12 + armSwing, 8, 15)
-    this.graphics.fillRect(x + 10, y - 12 - armSwing, 8, 15)
+    this.graphics.fillRect(x - 27, y - 18 + armSwing, 12, 23)
+    this.graphics.fillRect(x + 15, y - 18 - armSwing, 12, 23)
 
     // Hands
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 18, y + 2 + armSwing, 8, 5)
-    this.graphics.fillRect(x + 10, y + 2 - armSwing, 8, 5)
+    this.graphics.fillRect(x - 27, y + 3 + armSwing, 12, 8)
+    this.graphics.fillRect(x + 15, y + 3 - armSwing, 12, 8)
 
     // Head
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 9, y - 30, 18, 17)
+    this.graphics.fillRect(x - 14, y - 45, 27, 26)
 
     // Hat (backwards cap)
     this.graphics.fillStyle(COLORS.RED)
-    this.graphics.fillRect(x - 10, y - 35, 21, 8)
+    this.graphics.fillRect(x - 15, y - 53, 32, 12)
 
     // Angry eyes
     this.graphics.fillStyle(0x000000)
-    this.graphics.fillRect(x - 6, y - 24, 5, 3)
-    this.graphics.fillRect(x + 2, y - 24, 5, 3)
+    this.graphics.fillRect(x - 9, y - 36, 8, 5)
+    this.graphics.fillRect(x + 3, y - 36, 8, 5)
 
     // Angry mouth
     this.graphics.fillStyle(0x000000)
-    this.graphics.fillRect(x - 5, y - 18, 9, 3)
+    this.graphics.fillRect(x - 8, y - 27, 14, 5)
 
     // Snowball in hand during wind-up
     if (this.isThrowing) {
       const throwDir = this.facing || 1
       this.graphics.fillStyle(COLORS.WHITE)
-      this.graphics.fillCircle(x + throwDir * 21, y - 9, 5)
+      this.graphics.fillCircle(x + throwDir * 32, y - 14, 8)
     }
 
     // HP bar
     if (this.hp < this.maxHp) {
-      const barWidth = 30
+      const barWidth = 45
       const barX = x - barWidth / 2
-      const barY = y - 39
+      const barY = y - 59
       this.graphics.fillStyle(0x333333)
-      this.graphics.fillRect(barX, barY, barWidth, 3)
+      this.graphics.fillRect(barX, barY, barWidth, 5)
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(barX, barY, barWidth * (this.hp / this.maxHp), 3)
+      this.graphics.fillRect(barX, barY, barWidth * (this.hp / this.maxHp), 5)
     }
   }
 

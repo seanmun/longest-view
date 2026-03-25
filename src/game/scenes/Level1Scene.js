@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { Player } from '../entities/Player.js'
+import { Ball } from '../entities/Ball.js'
 import { FanEnemy } from '../entities/FanEnemy.js'
 import { AngeloEskin } from '../entities/AngeloEskin.js'
 import { BossBrian } from '../entities/BossBrian.js'
@@ -8,7 +9,7 @@ import { ScoreSystem } from '../systems/ScoreSystem.js'
 import { ComboSystem } from '../systems/ComboSystem.js'
 import { DialogueSystem } from '../systems/DialogueSystem.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
-import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { COLORS, GAME_WIDTH, GAME_HEIGHT, fontSize } from '../constants.js'
 import { CRTBarrelPipeline } from '../pipelines/CRTBarrelPipeline.js'
 
 const LEVEL_WIDTH = 5400
@@ -236,7 +237,7 @@ export class Level1Scene extends Phaser.Scene {
       // Banner text
       this.add.text(b.x, 95, b.text, {
         fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
+        fontSize: fontSize(6),
         color: '#' + b.color.toString(16).padStart(6, '0'),
         align: 'center'
       }).setOrigin(0.5).setScrollFactor(0.5).setDepth(2)
@@ -269,7 +270,7 @@ export class Level1Scene extends Phaser.Scene {
     graffitiTags.forEach(g => {
       this.add.text(g.x, GROUND_Y - 50, g.text, {
         fontFamily: '"Press Start 2P"',
-        fontSize: '5px',
+        fontSize: fontSize(5),
         color: g.color,
         alpha: 0.4
       }).setScrollFactor(0.8).setDepth(3)
@@ -297,7 +298,7 @@ export class Level1Scene extends Phaser.Scene {
     this.add.rectangle(cartX, GROUND_Y - 39, 66, 6, 0xDD5500).setDepth(4)
     this.add.text(cartX, GROUND_Y - 27, 'DOGS', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '6px',
+      fontSize: fontSize(6),
       color: '#FFFFFF'
     }).setOrigin(0.5).setDepth(5)
 
@@ -312,7 +313,7 @@ export class Level1Scene extends Phaser.Scene {
     this.add.rectangle(cart2X, GROUND_Y - 39, 66, 6, 0xDD5500).setDepth(4)
     this.add.text(cart2X, GROUND_Y - 27, 'DOGS', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '6px',
+      fontSize: fontSize(6),
       color: '#FFFFFF'
     }).setOrigin(0.5).setDepth(5)
     const cart2Hitbox = this.add.rectangle(cart2X, GROUND_Y - 18, 60, 36)
@@ -322,7 +323,7 @@ export class Level1Scene extends Phaser.Scene {
     // "IN TANK WE TRUST" sign
     this.add.text(2200, GROUND_Y - 90, 'IN TANK WE TRUST', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '7px',
+      fontSize: fontSize(7),
       color: '#FFFFFF',
       backgroundColor: '#444444',
       padding: { x: 4, y: 3 }
@@ -331,7 +332,7 @@ export class Level1Scene extends Phaser.Scene {
     // Second sign deeper in level
     this.add.text(4000, GROUND_Y - 90, 'HINKIE DID NOTHING WRONG', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '7px',
+      fontSize: fontSize(7),
       color: '#00D4FF',
       backgroundColor: '#333344',
       padding: { x: 4, y: 3 }
@@ -341,7 +342,7 @@ export class Level1Scene extends Phaser.Scene {
   showLevelTitle() {
     const title = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30, 'LEVEL 1', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '20px',
+      fontSize: fontSize(20),
       color: '#E8B800',
       stroke: '#000000',
       strokeThickness: 4
@@ -349,13 +350,13 @@ export class Level1Scene extends Phaser.Scene {
 
     const subtitle = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 5, 'THE WELLS FARGO CENTER', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '10px',
+      fontSize: fontSize(10),
       color: '#FFFFFF'
     }).setOrigin(0.5).setScrollFactor(0).setDepth(200)
 
     const tagline = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30, '"The Fans Don\'t Understand Yet"', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '7px',
+      fontSize: fontSize(7),
       color: '#888888'
     }).setOrigin(0.5).setScrollFactor(0).setDepth(200)
 
@@ -426,7 +427,7 @@ export class Level1Scene extends Phaser.Scene {
     // Big villain name
     const nameText = this.add.text(GAME_WIDTH / 2, centerY - 15, name, {
       fontFamily: '"Press Start 2P"',
-      fontSize: '24px',
+      fontSize: fontSize(24),
       color: '#' + color.toString(16).padStart(6, '0'),
       stroke: '#000000',
       strokeThickness: 4
@@ -435,7 +436,7 @@ export class Level1Scene extends Phaser.Scene {
     // Subtitle
     const subText = this.add.text(GAME_WIDTH / 2, centerY + 20, subtitle, {
       fontFamily: '"Press Start 2P"',
-      fontSize: '8px',
+      fontSize: fontSize(8),
       color: '#FFFFFF'
     }).setOrigin(0.5).setScrollFactor(0).setDepth(200)
 
@@ -539,9 +540,10 @@ export class Level1Scene extends Phaser.Scene {
       this.embiid.update(time, [...this.enemies, ...(this.boss && this.boss.alive ? [this.boss] : [])])
     }
 
-    // Ball vs Enemy collisions
+    // Ball vs Enemy collisions (only for Ball type — PoisonPill and Tank handle their own)
     this.balls.forEach(ball => {
       if (!ball.alive) return
+      if (!(ball instanceof Ball)) return // PoisonPill/Tank handle own damage
       this.enemies.forEach(enemy => {
         if (!enemy.alive) return
         const dist = Phaser.Math.Distance.Between(
@@ -560,10 +562,11 @@ export class Level1Scene extends Phaser.Scene {
       })
     })
 
-    // Ball vs Boss collisions
+    // Ball vs Boss collisions (only for Ball type)
     if (this.boss && this.boss.alive) {
       this.balls.forEach(ball => {
         if (!ball.alive) return
+        if (!(ball instanceof Ball)) return
         const dist = Phaser.Math.Distance.Between(
           ball.sprite.x, ball.sprite.y,
           this.boss.sprite.x, this.boss.sprite.y
@@ -649,7 +652,7 @@ export class Level1Scene extends Phaser.Scene {
     if (this.embiid && this.embiid.alive) {
       const ex = this.embiid.sprite.x
       const ey = this.embiid.sprite.y
-      const blockRange = 35
+      const blockRange = 53
 
       this.snowballs.forEach(s => {
         if (!s.alive) return
@@ -744,7 +747,7 @@ export class Level1Scene extends Phaser.Scene {
       // Daryl Morey thumbs up on wall
       const moreyText = this.add.text(
         this.player.sprite.x + 100, GROUND_Y - 80, '👍',
-        { fontSize: '20px' }
+        { fontSize: fontSize(20) }
       ).setDepth(50)
 
       this.tweens.add({
@@ -779,7 +782,7 @@ export class Level1Scene extends Phaser.Scene {
     // Arrow pointing right
     const arrowText = this.add.text(this.finishLineX + 40, GROUND_Y - 50, '>>>', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '10px',
+      fontSize: fontSize(10),
       color: '#E8B800'
     }).setDepth(50)
 
@@ -794,7 +797,7 @@ export class Level1Scene extends Phaser.Scene {
     // "NBA DRAFT AWAITS" text
     const draftText = this.add.text(this.finishLineX + 30, GROUND_Y - 90, 'NBA DRAFT AWAITS', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '8px',
+      fontSize: fontSize(8),
       color: '#00D4FF',
       stroke: '#000000',
       strokeThickness: 3

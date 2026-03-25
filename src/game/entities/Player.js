@@ -1,10 +1,12 @@
 import Phaser from 'phaser'
 import { Ball } from './Ball.js'
+import { PoisonPill } from './PoisonPill.js'
+import { TankProjectile } from './TankProjectile.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { COLORS, GAME_HEIGHT } from '../constants.js'
 
-const PLAYER_WIDTH = 36
-const PLAYER_HEIGHT = 60
+const PLAYER_WIDTH = 54
+const PLAYER_HEIGHT = 90
 const MOVE_SPEED = 160
 const JUMP_VELOCITY = -350
 const INVINCIBILITY_FRAMES = 750 // ms
@@ -72,6 +74,14 @@ export class Player {
     this.spaceDownTime = 0
     this.spaceWasDown = false
     this.HOLD_THRESHOLD = 120 // ms — hold longer than this = charge
+
+    // Weapon selection — read from registry or default to lotto_ball
+    this.weapon = (scene.game && scene.game.registry) ?
+      (scene.game.registry.get('selectedWeapon') || 'lotto_ball') : 'lotto_ball'
+
+    // Tank cooldown
+    this.tankCooldown = 0
+    this.TANK_COOLDOWN_TIME = 3500 // ms between tank deploys
   }
 
   update(time) {
@@ -126,8 +136,8 @@ export class Player {
     if (downDown && onGround && !this.isDodging) {
       if (!this.isDucking) {
         this.isDucking = true
-        this.sprite.setSize(PLAYER_WIDTH, 36)
-        this.sprite.setOffset(0, 24)
+        this.sprite.setSize(PLAYER_WIDTH, 54)
+        this.sprite.setOffset(0, 36)
       }
       this.sprite.setVelocityX(0)
     } else if (this.isDucking) {
@@ -202,11 +212,27 @@ export class Player {
   }
 
   fire() {
-    AudioSystem.playThrow()
-    const x = this.sprite.x + (this.facing * 30)
-    const y = this.sprite.y - 8
-    const ball = new Ball(this.scene, x, y, this.facing, this.chargeLevel)
-    this.scene.balls.push(ball)
+    const x = this.sprite.x + (this.facing * 45)
+    const y = this.sprite.y - 12
+
+    if (this.weapon === 'poison_pill') {
+      AudioSystem.playThrow()
+      const pill = new PoisonPill(this.scene, x, y, this.facing, this.chargeLevel)
+      this.scene.balls.push(pill)
+    } else if (this.weapon === 'tank') {
+      // Tank has a cooldown
+      const now = this.scene.time.now
+      if (now < this.tankCooldown) return // still on cooldown
+      this.tankCooldown = now + this.TANK_COOLDOWN_TIME
+      AudioSystem.playThrow()
+      const tank = new TankProjectile(this.scene, x, y + 20, this.facing, this.chargeLevel)
+      this.scene.balls.push(tank)
+    } else {
+      // Default: lotto ball
+      AudioSystem.playThrow()
+      const ball = new Ball(this.scene, x, y, this.facing, this.chargeLevel)
+      this.scene.balls.push(ball)
+    }
   }
 
   dodge(direction) {
@@ -269,130 +295,130 @@ export class Player {
       // --- DUCKING POSE (compressed, knees bent) ---
       // Legs (bent, shorter)
       this.graphics.fillStyle(0x1a1a3a)
-      this.graphics.fillRect(x - 12, y + 15, 9, 9)
-      this.graphics.fillRect(x + 3, y + 15, 9, 9)
+      this.graphics.fillRect(x - 18, y + 23, 14, 14)
+      this.graphics.fillRect(x + 5, y + 23, 14, 14)
 
       // Shoes (dark brown dress shoes)
       this.graphics.fillStyle(0x3B2314)
-      this.graphics.fillRect(x - 14, y + 23, 12, 5)
-      this.graphics.fillRect(x + 2, y + 23, 12, 5)
+      this.graphics.fillRect(x - 21, y + 35, 18, 8)
+      this.graphics.fillRect(x + 3, y + 35, 18, 8)
 
       // Body (suit jacket — squished)
       this.graphics.fillStyle(0x1a1a4a)
-      this.graphics.fillRect(x - 14, y - 3, 27, 21)
+      this.graphics.fillRect(x - 21, y - 5, 41, 32)
 
       // White dress shirt collar
       this.graphics.fillStyle(0xF0F0F0)
-      this.graphics.fillRect(x - 6, y - 3, 12, 5)
+      this.graphics.fillRect(x - 9, y - 5, 18, 8)
 
       // Tie (shorter)
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 2, y - 3, 3, 15)
+      this.graphics.fillRect(x - 3, y - 5, 5, 23)
 
       // Arms (tucked)
       this.graphics.fillStyle(0x1a1a4a)
-      this.graphics.fillRect(x - 20, y, 8, 12)
-      this.graphics.fillRect(x + 12, y, 8, 12)
+      this.graphics.fillRect(x - 30, y, 12, 18)
+      this.graphics.fillRect(x + 18, y, 12, 18)
 
       // Hands
       this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 20, y + 11, 8, 5)
-      this.graphics.fillRect(x + 12, y + 11, 8, 5)
+      this.graphics.fillRect(x - 30, y + 17, 12, 8)
+      this.graphics.fillRect(x + 18, y + 17, 12, 8)
 
       // Head (lowered)
       this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 10, y - 21, 21, 20)
+      this.graphics.fillRect(x - 15, y - 32, 32, 30)
 
       // Hair (receding hairline — sides fuller, top thinning at front)
       this.graphics.fillStyle(0x3D2517)
-      this.graphics.fillRect(x - 12, y - 24, 3, 12)
-      this.graphics.fillRect(x + 9, y - 24, 3, 12)
-      this.graphics.fillRect(x - 9, y - 26, 18, 3)
-      this.graphics.fillRect(x - 5, y - 23, 9, 2)
+      this.graphics.fillRect(x - 18, y - 36, 5, 18)
+      this.graphics.fillRect(x + 14, y - 36, 5, 18)
+      this.graphics.fillRect(x - 14, y - 39, 27, 5)
+      this.graphics.fillRect(x - 8, y - 35, 14, 3)
 
       // Glasses (regular frames with visible eyes)
       this.graphics.fillStyle(0x666666)
-      this.graphics.fillRect(x - 8, y - 15, 6, 5)
-      this.graphics.fillRect(x + 2, y - 15, 6, 5)
+      this.graphics.fillRect(x - 12, y - 23, 9, 8)
+      this.graphics.fillRect(x + 3, y - 23, 9, 8)
       this.graphics.fillStyle(0xFFFFFF)
-      this.graphics.fillRect(x - 6, y - 14, 3, 2)
-      this.graphics.fillRect(x + 3, y - 14, 3, 2)
+      this.graphics.fillRect(x - 9, y - 21, 5, 3)
+      this.graphics.fillRect(x + 5, y - 21, 5, 3)
       this.graphics.fillStyle(0x111111)
-      this.graphics.fillRect(x - 5, y - 14, 2, 2)
-      this.graphics.fillRect(x + 4, y - 14, 2, 2)
+      this.graphics.fillRect(x - 8, y - 21, 3, 3)
+      this.graphics.fillRect(x + 6, y - 21, 3, 3)
 
       // Mouth
       this.graphics.fillStyle(0x333333)
-      this.graphics.fillRect(x - 3, y - 6, 6, 2)
+      this.graphics.fillRect(x - 5, y - 9, 9, 3)
     } else {
       // --- NORMAL STANDING POSE ---
       // Legs
-      const legOffset = this.walkFrame % 2 === 0 ? 3 : -3
+      const legOffset = this.walkFrame % 2 === 0 ? 5 : -5
       this.graphics.fillStyle(0x1a1a3a) // dark suit pants
-      this.graphics.fillRect(x - 10, y + 9, 8, 21 + legOffset)
-      this.graphics.fillRect(x + 3, y + 9, 8, 21 - legOffset)
+      this.graphics.fillRect(x - 15, y + 14, 12, 32 + legOffset)
+      this.graphics.fillRect(x + 5, y + 14, 12, 32 - legOffset)
 
       // Shoes (dark brown dress shoes)
       this.graphics.fillStyle(0x3B2314)
-      this.graphics.fillRect(x - 12, y + 27 + legOffset, 10, 5)
-      this.graphics.fillRect(x + 2, y + 27 - legOffset, 10, 5)
+      this.graphics.fillRect(x - 18, y + 41 + legOffset, 15, 8)
+      this.graphics.fillRect(x + 3, y + 41 - legOffset, 15, 8)
 
       // Body (suit jacket)
       this.graphics.fillStyle(0x1a1a4a) // navy suit
-      this.graphics.fillRect(x - 14, y - 15, 27, 27)
+      this.graphics.fillRect(x - 21, y - 23, 41, 41)
 
       // White dress shirt collar
       this.graphics.fillStyle(0xF0F0F0)
-      this.graphics.fillRect(x - 6, y - 15, 12, 5)
+      this.graphics.fillRect(x - 9, y - 23, 18, 8)
 
       // Tie
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 2, y - 15, 3, 21)
+      this.graphics.fillRect(x - 3, y - 23, 5, 32)
 
       // Arms
-      const armSwing = this.walkFrame < 2 ? 5 : -5
+      const armSwing = this.walkFrame < 2 ? 8 : -8
       this.graphics.fillStyle(0x1a1a4a)
-      this.graphics.fillRect(x - 20, y - 12 + armSwing, 8, 18)
-      this.graphics.fillRect(x + 12, y - 12 - armSwing, 8, 18)
+      this.graphics.fillRect(x - 30, y - 18 + armSwing, 12, 27)
+      this.graphics.fillRect(x + 18, y - 18 - armSwing, 12, 27)
 
       // Hands (skin tone)
       this.graphics.fillStyle(0xE8B090)
-      this.graphics.fillRect(x - 20, y + 5 + armSwing, 8, 5)
-      this.graphics.fillRect(x + 12, y + 5 - armSwing, 8, 5)
+      this.graphics.fillRect(x - 30, y + 8 + armSwing, 12, 8)
+      this.graphics.fillRect(x + 18, y + 8 - armSwing, 12, 8)
 
       // Head
       this.graphics.fillStyle(0xE8B090) // skin
-      this.graphics.fillRect(x - 10, y - 33, 21, 20)
+      this.graphics.fillRect(x - 15, y - 50, 32, 30)
 
       // Hair (receding hairline — sides fuller, top thinning at front)
       this.graphics.fillStyle(0x3D2517)
-      this.graphics.fillRect(x - 12, y - 36, 3, 12)
-      this.graphics.fillRect(x + 9, y - 36, 3, 12)
-      this.graphics.fillRect(x - 9, y - 38, 18, 3)
-      this.graphics.fillRect(x - 5, y - 35, 9, 2)
+      this.graphics.fillRect(x - 18, y - 54, 5, 18)
+      this.graphics.fillRect(x + 14, y - 54, 5, 18)
+      this.graphics.fillRect(x - 14, y - 57, 27, 5)
+      this.graphics.fillRect(x - 8, y - 53, 14, 3)
 
       // Glasses (regular frames with visible eyes)
       this.graphics.fillStyle(0x666666)
-      this.graphics.fillRect(x - 8, y - 27, 6, 5)
-      this.graphics.fillRect(x + 2, y - 27, 6, 5)
+      this.graphics.fillRect(x - 12, y - 41, 9, 8)
+      this.graphics.fillRect(x + 3, y - 41, 9, 8)
       this.graphics.fillStyle(0xFFFFFF)
-      this.graphics.fillRect(x - 6, y - 25, 3, 2)
-      this.graphics.fillRect(x + 3, y - 25, 3, 2)
+      this.graphics.fillRect(x - 9, y - 38, 5, 3)
+      this.graphics.fillRect(x + 5, y - 38, 5, 3)
       this.graphics.fillStyle(0x111111)
-      this.graphics.fillRect(x - 5, y - 25, 2, 2)
-      this.graphics.fillRect(x + 4, y - 25, 2, 2)
+      this.graphics.fillRect(x - 8, y - 38, 3, 3)
+      this.graphics.fillRect(x + 6, y - 38, 3, 3)
 
       // Mouth (small line)
       this.graphics.fillStyle(0x333333)
-      this.graphics.fillRect(x - 3, y - 18, 6, 2)
+      this.graphics.fillRect(x - 5, y - 27, 9, 3)
     }
 
     // Charge bar
     if (this.isCharging) {
-      const barWidth = 45
+      const barWidth = 68
       const barHeight = 6
       const barX = x - barWidth / 2
-      const barY = y - 45
+      const barY = y - 68
 
       // Background
       this.chargeBar.fillStyle(0x333333)

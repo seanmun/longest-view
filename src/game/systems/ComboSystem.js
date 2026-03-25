@@ -1,5 +1,5 @@
 import { AudioSystem } from './AudioSystem.js'
-import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { COLORS, GAME_WIDTH, GAME_HEIGHT, fontSize } from '../constants.js'
 
 export class ComboSystem {
   constructor(scene) {
@@ -42,7 +42,7 @@ export class ComboSystem {
       'TRUST THE PROCESS',
       {
         fontFamily: '"Press Start 2P"',
-        fontSize: '24px',
+        fontSize: fontSize(24),
         color: '#E8B800',
         stroke: '#000000',
         strokeThickness: 4

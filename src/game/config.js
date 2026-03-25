@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { BootScene } from './scenes/BootScene.js'
 import { MainMenuScene } from './scenes/MainMenuScene.js'
+import { WeaponSelectScene } from './scenes/WeaponSelectScene.js'
 import { Level1Scene } from './scenes/Level1Scene.js'
 import { CutsceneScene } from './scenes/CutsceneScene.js'
 import { GameOverScene } from './scenes/GameOverScene.js'
@@ -34,5 +35,5 @@ export const createGameConfig = (parent) => ({
     }
   },
   pipeline: [CRTBarrelPipeline],
-  scene: [BootScene, MainMenuScene, CutsceneScene, Level1Scene, GameOverScene]
+  scene: [BootScene, MainMenuScene, WeaponSelectScene, CutsceneScene, Level1Scene, GameOverScene]
 })

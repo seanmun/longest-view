@@ -9,10 +9,13 @@ export default function Leaderboard({ game }) {
 
   useEffect(() => {
     if (!game) return
-    const onChange = (_, key, value) => {
+    const onChange = async (_, key, value) => {
       if (key === 'showLeaderboard') {
         setShow(value)
-        if (value) setScores(getTopScores(10))
+        if (value) {
+          const topScores = await getTopScores(10)
+          setScores(topScores)
+        }
       }
       if (key === 'leaderboardHighlight') setHighlight(value)
     }

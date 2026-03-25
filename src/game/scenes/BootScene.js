@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { AudioSystem } from '../systems/AudioSystem.js'
+import { fontSize } from '../constants.js'
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -13,7 +14,7 @@ export class BootScene extends Phaser.Scene {
     // Show loading text
     const text = this.add.text(450, 200, 'LOADING...', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '16px',
+      fontSize: fontSize(16),
       color: '#E8B800'
     })
     text.setOrigin(0.5)

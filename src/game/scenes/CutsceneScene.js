@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants.js'
+import { COLORS, GAME_WIDTH, GAME_HEIGHT, fontSize } from '../constants.js'
 import { CRTBarrelPipeline } from '../pipelines/CRTBarrelPipeline.js'
 
 const CUTSCENES = {
@@ -52,7 +52,7 @@ export class CutsceneScene extends Phaser.Scene {
     // Skip instruction
     this.add.text(GAME_WIDTH - 20, GAME_HEIGHT - 15, 'ESC TO SKIP', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '6px',
+      fontSize: fontSize(6),
       color: '#444444'
     }).setOrigin(1, 0.5)
 
@@ -101,7 +101,7 @@ export class CutsceneScene extends Phaser.Scene {
     const yPos = GAME_HEIGHT * 0.22 + this.textObjects.length * 35
     const textObj = this.add.text(GAME_WIDTH / 2, yPos, '', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '12px',
+      fontSize: fontSize(12),
       color: '#FFFFFF',
       wordWrap: { width: 700 }
     }).setOrigin(0.5)
@@ -157,67 +157,67 @@ export class CutsceneScene extends Phaser.Scene {
     if (!this.hinkieVisible) return
 
     const x = this.hinkieX
-    const y = GAME_HEIGHT - 120
+    const y = GAME_HEIGHT - 150
 
-    // Draw Hinkie (same as Player.js standing pose)
+    // Draw Hinkie (1.5x scale, same as Player.js standing pose)
     const g = this.hinkieGraphics
 
     // Legs
     g.fillStyle(0x1a1a3a)
-    g.fillRect(x - 10, y + 9, 8, 21)
-    g.fillRect(x + 3, y + 9, 8, 21)
+    g.fillRect(x - 15, y + 14, 12, 32)
+    g.fillRect(x + 5, y + 14, 12, 32)
 
     // Shoes (dark brown dress shoes)
     g.fillStyle(0x3B2314)
-    g.fillRect(x - 12, y + 27, 10, 5)
-    g.fillRect(x + 2, y + 27, 10, 5)
+    g.fillRect(x - 18, y + 41, 15, 8)
+    g.fillRect(x + 3, y + 41, 15, 8)
 
     // Body (suit jacket)
     g.fillStyle(0x1a1a4a)
-    g.fillRect(x - 14, y - 15, 27, 27)
+    g.fillRect(x - 21, y - 23, 41, 41)
 
     // White dress shirt collar
     g.fillStyle(0xF0F0F0)
-    g.fillRect(x - 6, y - 15, 12, 5)
+    g.fillRect(x - 9, y - 23, 18, 8)
 
     // Tie
     g.fillStyle(COLORS.RED)
-    g.fillRect(x - 2, y - 15, 3, 21)
+    g.fillRect(x - 3, y - 23, 5, 32)
 
     // Arms
     g.fillStyle(0x1a1a4a)
-    g.fillRect(x - 20, y - 12, 8, 18)
-    g.fillRect(x + 12, y - 12, 8, 18)
+    g.fillRect(x - 30, y - 18, 12, 27)
+    g.fillRect(x + 18, y - 18, 12, 27)
 
     // Hands
     g.fillStyle(0xE8B090)
-    g.fillRect(x - 20, y + 5, 8, 5)
-    g.fillRect(x + 12, y + 5, 8, 5)
+    g.fillRect(x - 30, y + 8, 12, 8)
+    g.fillRect(x + 18, y + 8, 12, 8)
 
     // Head
     g.fillStyle(0xE8B090)
-    g.fillRect(x - 10, y - 33, 21, 20)
+    g.fillRect(x - 15, y - 50, 32, 30)
 
     // Hair (receding hairline — sides fuller, top thinning at front)
     g.fillStyle(0x3D2517)
-    g.fillRect(x - 12, y - 36, 3, 12)
-    g.fillRect(x + 9, y - 36, 3, 12)
-    g.fillRect(x - 9, y - 38, 18, 3)
-    g.fillRect(x - 5, y - 35, 9, 2)
+    g.fillRect(x - 18, y - 54, 5, 18)
+    g.fillRect(x + 14, y - 54, 5, 18)
+    g.fillRect(x - 14, y - 57, 27, 5)
+    g.fillRect(x - 8, y - 53, 14, 3)
 
     // Glasses (regular frames with visible eyes)
     g.fillStyle(0x666666)
-    g.fillRect(x - 8, y - 27, 6, 5)
-    g.fillRect(x + 2, y - 27, 6, 5)
+    g.fillRect(x - 12, y - 41, 9, 8)
+    g.fillRect(x + 3, y - 41, 9, 8)
     g.fillStyle(0xFFFFFF)
-    g.fillRect(x - 6, y - 25, 3, 2)
-    g.fillRect(x + 3, y - 25, 3, 2)
+    g.fillRect(x - 9, y - 38, 5, 3)
+    g.fillRect(x + 5, y - 38, 5, 3)
     g.fillStyle(0x111111)
-    g.fillRect(x - 5, y - 25, 2, 2)
-    g.fillRect(x + 4, y - 25, 2, 2)
+    g.fillRect(x - 8, y - 38, 3, 3)
+    g.fillRect(x + 6, y - 38, 3, 3)
 
     // Mouth
     g.fillStyle(0x333333)
-    g.fillRect(x - 3, y - 18, 6, 2)
+    g.fillRect(x - 5, y - 27, 9, 3)
   }
 }

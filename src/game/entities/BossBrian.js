@@ -1,9 +1,9 @@
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { CollarBoomerang } from './CollarBoomerang.js'
-import { COLORS, GAME_WIDTH } from '../constants.js'
+import { COLORS, GAME_WIDTH, fontSize } from '../constants.js'
 
-const BOSS_WIDTH = 36
-const BOSS_HEIGHT = 80
+const BOSS_WIDTH = 54
+const BOSS_HEIGHT = 120
 const MAX_HP = 50
 
 const PHASE_THRESHOLDS = { phase2: 0.5, phase3: 0.25 }
@@ -34,8 +34,8 @@ export class BossBrian {
     this.hitFlash = false
 
     // Pacing boundaries — boss paces within a zone
-    this.paceLeft = x - 150
-    this.paceRight = x + 150
+    this.paceLeft = x - 225
+    this.paceRight = x + 225
     this.paceDir = -1
 
     // Create physics body
@@ -51,9 +51,9 @@ export class BossBrian {
     this.graphics.setDepth(8)
 
     // Name label
-    this.nameText = scene.add.text(x, y - 65, 'BRIAN COLANGELO', {
+    this.nameText = scene.add.text(x, y - 98, 'BRIAN COLANGELO', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '6px',
+      fontSize: fontSize(6),
       color: '#E8B800'
     })
     this.nameText.setOrigin(0.5)
@@ -75,9 +75,9 @@ export class BossBrian {
     })
 
     // Show boss intro text
-    const introText = scene.add.text(x, y - 100, 'BOSS: BRIAN COLANGELO', {
+    const introText = scene.add.text(x, y - 150, 'BOSS: BRIAN COLANGELO', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '10px',
+      fontSize: fontSize(10),
       color: '#E8B800'
     })
     introText.setOrigin(0.5)
@@ -85,7 +85,7 @@ export class BossBrian {
     scene.tweens.add({
       targets: introText,
       alpha: 0,
-      y: y - 140,
+      y: y - 210,
       duration: 2500,
       onComplete: () => introText.destroy()
     })
@@ -98,7 +98,7 @@ export class BossBrian {
     if (!this.alive || !this.sprite.active) return
 
     // Update name position
-    this.nameText.setPosition(this.sprite.x, this.sprite.y - 65)
+    this.nameText.setPosition(this.sprite.x, this.sprite.y - 98)
 
     if (this.introActive) {
       this.sprite.setVelocityX(0)
@@ -182,7 +182,7 @@ export class BossBrian {
       // Show burner phone text
       const txt = this.scene.add.text(this.sprite.x, this.sprite.y - 90,
         '@Philly_Hoops_Truth HAS ENTERED THE CHAT', {
-          fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#00D4FF'
+          fontFamily: '"Press Start 2P"', fontSize: fontSize(7), color: '#00D4FF'
         })
       txt.setOrigin(0.5).setDepth(100)
       this.scene.tweens.add({
@@ -204,8 +204,8 @@ export class BossBrian {
     const dir = playerX < this.sprite.x ? -1 : 1
     const collar = new CollarBoomerang(
       this.scene,
-      this.sprite.x + dir * 20,
-      this.sprite.y - 10,
+      this.sprite.x + dir * 30,
+      this.sprite.y - 15,
       dir
     )
     if (this.scene.collarBoomerangs) {
@@ -216,7 +216,7 @@ export class BossBrian {
 
   launchTweet() {
     const tweet = TWEETS[Math.floor(Math.random() * TWEETS.length)]
-    const yPos = this.sprite.y - 60 - Math.random() * 40
+    const yPos = this.sprite.y - 90 - Math.random() * 60
     const fromLeft = Math.random() > 0.5
 
     const tweetText = this.scene.add.text(
@@ -225,7 +225,7 @@ export class BossBrian {
       tweet,
       {
         fontFamily: '"Press Start 2P"',
-        fontSize: '5px',
+        fontSize: fontSize(5),
         color: '#00D4FF',
         backgroundColor: '#111133',
         padding: { x: 3, y: 2 }
@@ -373,176 +373,176 @@ export class BossBrian {
 
     if (this.hitFlash) {
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 18, y - 40, 36, 80)
+      this.graphics.fillRect(x - 27, y - 60, 54, 120)
       return
     }
 
     if (this.stunned) {
       const starPhase = Math.floor(time / 200) % 3
       this.graphics.fillStyle(COLORS.GOLD)
-      this.graphics.fillRect(x - 12 + starPhase * 6, y - 55, 6, 6)
-      this.graphics.fillRect(x + 5 - starPhase * 3, y - 58, 6, 6)
+      this.graphics.fillRect(x - 18 + starPhase * 9, y - 83, 9, 9)
+      this.graphics.fillRect(x + 8 - starPhase * 5, y - 87, 9, 9)
     }
 
-    const legOffset = this.walkFrame % 2 === 0 ? 3 : -3
-    const armSwing = this.walkFrame < 2 ? 4 : -4
+    const legOffset = this.walkFrame % 2 === 0 ? 5 : -5
+    const armSwing = this.walkFrame < 2 ? 6 : -6
 
     // Phase 3: disheveled — offset some parts
-    const dishevel = this.phase === 3 ? 2 : 0
+    const dishevel = this.phase === 3 ? 3 : 0
 
     // Legs
     this.graphics.fillStyle(0x2A2A3A)
-    this.graphics.fillRect(x - 10, y + 12, 8, 15 + legOffset)
-    this.graphics.fillRect(x + 3, y + 12, 8, 15 - legOffset)
+    this.graphics.fillRect(x - 15, y + 18, 12, 23 + legOffset)
+    this.graphics.fillRect(x + 5, y + 18, 12, 23 - legOffset)
 
     // Shoes
     this.graphics.fillStyle(0x1A1A1A)
-    this.graphics.fillRect(x - 12, y + 27 + legOffset, 10, 4)
-    this.graphics.fillRect(x + 2, y + 27 - legOffset, 10, 4)
+    this.graphics.fillRect(x - 18, y + 41 + legOffset, 15, 6)
+    this.graphics.fillRect(x + 3, y + 41 - legOffset, 15, 6)
 
     // Body suit
     this.graphics.fillStyle(0x2A2A3A)
-    this.graphics.fillRect(x - 10, y - 14, 5, 20)
-    this.graphics.fillRect(x + 6, y - 14, 5, 20)
-    this.graphics.fillRect(x - 10, y + 6, 21, 3)
-    this.graphics.fillRect(x - 12, y + 9, 25, 3)
+    this.graphics.fillRect(x - 15, y - 21, 8, 30)
+    this.graphics.fillRect(x + 9, y - 21, 8, 30)
+    this.graphics.fillRect(x - 15, y + 9, 32, 5)
+    this.graphics.fillRect(x - 18, y + 14, 38, 5)
 
     // Lapels
     this.graphics.fillStyle(0x1E1E2E)
-    this.graphics.fillRect(x - 13, y - 15, 3, 8)
-    this.graphics.fillRect(x + 10, y - 15, 2, 21)
-    this.graphics.fillRect(x - 12, y - 8, 2, 17)
+    this.graphics.fillRect(x - 20, y - 23, 5, 12)
+    this.graphics.fillRect(x + 15, y - 23, 3, 32)
+    this.graphics.fillRect(x - 18, y - 12, 3, 26)
 
     // Shirt (white)
     this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x - 6, y - 12, 5, 6)
-    this.graphics.fillRect(x + 1, y - 12, 5, 9)
-    this.graphics.fillRect(x - 6, y - 6, 6, 3)
-    this.graphics.fillRect(x - 6, y - 3, 5, 3)
-    this.graphics.fillRect(x + 0, y - 3, 6, 2)
-    this.graphics.fillRect(x + 1, y - 1, 5, 4)
-    this.graphics.fillRect(x - 6, y + 0, 6, 2)
-    this.graphics.fillRect(x - 6, y + 2, 5, 4)
+    this.graphics.fillRect(x - 9, y - 18, 8, 9)
+    this.graphics.fillRect(x + 2, y - 18, 8, 14)
+    this.graphics.fillRect(x - 9, y - 9, 9, 5)
+    this.graphics.fillRect(x - 9, y - 5, 8, 5)
+    this.graphics.fillRect(x + 0, y - 5, 9, 3)
+    this.graphics.fillRect(x + 2, y - 2, 8, 6)
+    this.graphics.fillRect(x - 9, y + 0, 9, 3)
+    this.graphics.fillRect(x - 9, y + 3, 8, 6)
 
     // Buttons
     this.graphics.fillStyle(0xE8E0E0)
-    this.graphics.fillRect(x - 2, y - 8, 3, 1)
-    this.graphics.fillRect(x - 1, y - 5, 2, 1)
-    this.graphics.fillRect(x - 2, y - 2, 3, 1)
-    this.graphics.fillRect(x - 1, y + 1, 2, 1)
-    this.graphics.fillRect(x - 2, y + 4, 3, 1)
+    this.graphics.fillRect(x - 3, y - 12, 5, 2)
+    this.graphics.fillRect(x - 2, y - 8, 3, 2)
+    this.graphics.fillRect(x - 3, y - 3, 5, 2)
+    this.graphics.fillRect(x - 2, y + 2, 3, 2)
+    this.graphics.fillRect(x - 3, y + 6, 5, 2)
 
     // Neck skin
     this.graphics.fillStyle(0xD8A080)
-    this.graphics.fillRect(x - 2, y - 15, 3, 8)
+    this.graphics.fillRect(x - 3, y - 23, 5, 12)
 
     // Arms
     this.graphics.fillStyle(0x2A2A3A)
-    this.graphics.fillRect(x - 20, y - 12 + armSwing, 8, 17)
-    this.graphics.fillRect(x + 12, y - 12 - armSwing, 8, 17)
+    this.graphics.fillRect(x - 30, y - 18 + armSwing, 12, 26)
+    this.graphics.fillRect(x + 18, y - 18 - armSwing, 12, 26)
 
     // Hands
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 20, y + 4 + armSwing, 8, 6)
-    this.graphics.fillRect(x + 12, y + 4 - armSwing, 8, 6)
+    this.graphics.fillRect(x - 30, y + 6 + armSwing, 12, 9)
+    this.graphics.fillRect(x + 18, y + 6 - armSwing, 12, 9)
 
     // Phase 2+: Burner phone in left hand
     if (this.phase >= 2) {
       this.graphics.fillStyle(0x222222)
-      this.graphics.fillRect(x - 22, y + 2 + armSwing, 5, 8)
+      this.graphics.fillRect(x - 33, y + 3 + armSwing, 8, 12)
       this.graphics.fillStyle(0x44AA66)
-      this.graphics.fillRect(x - 21, y + 3 + armSwing, 3, 3)
+      this.graphics.fillRect(x - 32, y + 5 + armSwing, 5, 5)
     }
 
     // Head/face
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 9, y - 35, 18, 6)
-    this.graphics.fillRect(x - 10, y - 27, 5, 3)
-    this.graphics.fillRect(x + 6, y - 27, 5, 3)
-    this.graphics.fillRect(x - 9, y - 24, 8, 2)
-    this.graphics.fillRect(x + 1, y - 24, 8, 2)
-    this.graphics.fillRect(x - 8, y - 22, 5, 1)
-    this.graphics.fillRect(x + 1, y - 22, 5, 1)
-    this.graphics.fillRect(x - 6, y - 21, 12, 2)
-    this.graphics.fillRect(x - 5, y - 19, 1, 1)
-    this.graphics.fillRect(x + 3, y - 19, 1, 1)
-    this.graphics.fillRect(x - 3, y - 18, 5, 1)
-    this.graphics.fillRect(x - 2, y - 17, 3, 1)
+    this.graphics.fillRect(x - 14, y - 53, 27, 9)
+    this.graphics.fillRect(x - 15, y - 41, 8, 5)
+    this.graphics.fillRect(x + 9, y - 41, 8, 5)
+    this.graphics.fillRect(x - 14, y - 36, 12, 3)
+    this.graphics.fillRect(x + 2, y - 36, 12, 3)
+    this.graphics.fillRect(x - 12, y - 33, 8, 2)
+    this.graphics.fillRect(x + 2, y - 33, 8, 2)
+    this.graphics.fillRect(x - 9, y - 32, 18, 3)
+    this.graphics.fillRect(x - 8, y - 29, 2, 2)
+    this.graphics.fillRect(x + 5, y - 29, 2, 2)
+    this.graphics.fillRect(x - 5, y - 27, 8, 2)
+    this.graphics.fillRect(x - 3, y - 26, 5, 2)
 
     // Hair
     this.graphics.fillStyle(0x5C4633)
-    this.graphics.fillRect(x - 6, y - 39 + dishevel, 12, 2)
-    this.graphics.fillRect(x - 9, y - 37 + dishevel, 18, 1)
-    this.graphics.fillRect(x - 10, y - 36 + dishevel, 21, 1)
-    this.graphics.fillRect(x - 10, y - 35, 2, 8)
-    this.graphics.fillRect(x + 9, y - 35, 2, 8)
+    this.graphics.fillRect(x - 9, y - 59 + dishevel, 18, 3)
+    this.graphics.fillRect(x - 14, y - 56 + dishevel, 27, 2)
+    this.graphics.fillRect(x - 15, y - 54 + dishevel, 32, 2)
+    this.graphics.fillRect(x - 15, y - 53, 3, 12)
+    this.graphics.fillRect(x + 14, y - 53, 3, 12)
 
     // Eyebrows + mouth
     this.graphics.fillStyle(0x996655)
-    this.graphics.fillRect(x - 6, y - 29, 5, 1)
-    this.graphics.fillRect(x + 1, y - 29, 5, 1)
+    this.graphics.fillRect(x - 9, y - 44, 8, 2)
+    this.graphics.fillRect(x + 2, y - 44, 8, 2)
     // Mouth (angry in phase 3)
     if (this.phase === 3) {
       this.graphics.fillStyle(0x111111)
-      this.graphics.fillRect(x - 4, y - 20, 7, 2)
+      this.graphics.fillRect(x - 6, y - 30, 11, 3)
     } else {
       this.graphics.fillStyle(0x996655)
-      this.graphics.fillRect(x - 3, y - 20, 6, 1)
+      this.graphics.fillRect(x - 5, y - 30, 9, 2)
     }
 
     // Eyes
     this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x - 3, y - 28, 2, 2)
-    this.graphics.fillRect(x + 1, y - 28, 2, 2)
-    this.graphics.fillRect(x - 6, y - 26, 5, 2)
-    this.graphics.fillRect(x + 1, y - 26, 5, 2)
+    this.graphics.fillRect(x - 5, y - 42, 3, 3)
+    this.graphics.fillRect(x + 2, y - 42, 3, 3)
+    this.graphics.fillRect(x - 9, y - 39, 8, 3)
+    this.graphics.fillRect(x + 2, y - 39, 8, 3)
     // Pupils
     this.graphics.fillStyle(0x333333)
-    this.graphics.fillRect(x - 5, y - 28, 2, 2)
-    this.graphics.fillRect(x + 3, y - 28, 2, 2)
+    this.graphics.fillRect(x - 8, y - 42, 3, 3)
+    this.graphics.fillRect(x + 5, y - 42, 3, 3)
 
     // Nose
     this.graphics.fillStyle(0xD8A080)
-    this.graphics.fillRect(x - 2, y - 24, 3, 3)
+    this.graphics.fillRect(x - 3, y - 36, 5, 5)
 
     // THE BIG COLLAR — drawn over face (1.5x scale)
     this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x - 12, y - 24, 3, 2)
-    this.graphics.fillRect(x + 9, y - 24, 3, 2)
-    this.graphics.fillRect(x - 12, y - 22, 5, 1)
-    this.graphics.fillRect(x + 7, y - 22, 5, 1)
-    this.graphics.fillRect(x - 12, y - 21, 6, 2)
-    this.graphics.fillRect(x + 6, y - 21, 6, 2)
-    this.graphics.fillRect(x - 12, y - 19, 8, 1)
-    this.graphics.fillRect(x + 4, y - 19, 8, 1)
-    this.graphics.fillRect(x - 11, y - 18, 8, 1)
-    this.graphics.fillRect(x + 3, y - 18, 8, 1)
-    this.graphics.fillRect(x - 10, y - 17, 9, 1)
-    this.graphics.fillRect(x + 1, y - 17, 9, 1)
-    this.graphics.fillRect(x - 6, y - 15, 5, 1)
-    this.graphics.fillRect(x + 1, y - 15, 5, 1)
+    this.graphics.fillRect(x - 18, y - 36, 5, 3)
+    this.graphics.fillRect(x + 14, y - 36, 5, 3)
+    this.graphics.fillRect(x - 18, y - 33, 8, 2)
+    this.graphics.fillRect(x + 11, y - 33, 8, 2)
+    this.graphics.fillRect(x - 18, y - 32, 9, 3)
+    this.graphics.fillRect(x + 9, y - 32, 9, 3)
+    this.graphics.fillRect(x - 18, y - 29, 12, 2)
+    this.graphics.fillRect(x + 6, y - 29, 12, 2)
+    this.graphics.fillRect(x - 17, y - 27, 12, 2)
+    this.graphics.fillRect(x + 5, y - 27, 12, 2)
+    this.graphics.fillRect(x - 15, y - 26, 14, 2)
+    this.graphics.fillRect(x + 2, y - 26, 14, 2)
+    this.graphics.fillRect(x - 9, y - 23, 8, 2)
+    this.graphics.fillRect(x + 2, y - 23, 8, 2)
 
     // Collar shadow
     this.graphics.fillStyle(0xE8E0E0)
-    this.graphics.fillRect(x - 10, y - 15, 5, 1)
-    this.graphics.fillRect(x + 6, y - 15, 5, 1)
-    this.graphics.fillRect(x - 6, y - 14, 5, 1)
-    this.graphics.fillRect(x + 1, y - 14, 5, 1)
+    this.graphics.fillRect(x - 15, y - 23, 8, 2)
+    this.graphics.fillRect(x + 9, y - 23, 8, 2)
+    this.graphics.fillRect(x - 9, y - 21, 8, 2)
+    this.graphics.fillRect(x + 2, y - 21, 8, 2)
 
     // Phase indicator glow
     if (this.phase === 2) {
       this.graphics.fillStyle(0x00D4FF, 0.15)
-      this.graphics.fillCircle(x, y, 45)
+      this.graphics.fillCircle(x, y, 68)
     } else if (this.phase === 3) {
       const pulse = Math.sin(time * 0.008) * 0.1 + 0.2
       this.graphics.fillStyle(0xFF2200, pulse)
-      this.graphics.fillCircle(x, y, 50)
+      this.graphics.fillCircle(x, y, 75)
     }
 
     // HP bar (always visible, wider)
-    const barWidth = 60
+    const barWidth = 90
     const barX = x - barWidth / 2
-    const barY = y - 58
+    const barY = y - 87
     this.graphics.fillStyle(0x333333)
     this.graphics.fillRect(barX, barY, barWidth, 5)
     const hpColor = this.phase === 3 ? 0xFF4444 : this.phase === 2 ? 0xFFAA00 : COLORS.RED

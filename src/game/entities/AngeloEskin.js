@@ -1,9 +1,9 @@
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { Megaphone } from './Megaphone.js'
-import { COLORS } from '../constants.js'
+import { COLORS, fontSize } from '../constants.js'
 
-const AE_WIDTH = 45
-const AE_HEIGHT = 80
+const AE_WIDTH = 68
+const AE_HEIGHT = 120
 const MOVE_SPEED = 40
 const CONTACT_DAMAGE = 15
 
@@ -109,10 +109,10 @@ export class AngeloEskin {
     if (this.speechText) this.speechText.destroy()
 
     this.speechText = this.scene.add.text(
-      this.sprite.x, this.sprite.y - 65, text,
+      this.sprite.x, this.sprite.y - 98, text,
       {
         fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
+        fontSize: fontSize(6),
         color: '#FF4444',
         backgroundColor: '#000000',
         padding: { x: 3, y: 2 }
@@ -123,7 +123,7 @@ export class AngeloEskin {
 
     this.scene.tweens.add({
       targets: this.speechText,
-      y: this.sprite.y - 95,
+      y: this.sprite.y - 143,
       alpha: 0,
       duration: 2500,
       onComplete: () => {
@@ -143,7 +143,7 @@ export class AngeloEskin {
       if (!this.alive || !this.sprite.active) return
 
       const dir = playerX < this.sprite.x ? -1 : 1
-      const megaphone = new Megaphone(this.scene, this.sprite.x + dir * 20, this.sprite.y - 15, dir)
+      const megaphone = new Megaphone(this.scene, this.sprite.x + dir * 30, this.sprite.y - 23, dir)
 
       if (this.scene.megaphones) {
         this.scene.megaphones.push(megaphone)
@@ -249,151 +249,151 @@ export class AngeloEskin {
 
     if (this.hitFlash) {
       this.graphics.fillStyle(COLORS.RED)
-      this.graphics.fillRect(x - 22, y - 40, 45, 80)
+      this.graphics.fillRect(x - 33, y - 60, 68, 120)
       return
     }
 
     if (this.stunned) {
       const starPhase = Math.floor(time / 200) % 3
       this.graphics.fillStyle(COLORS.GOLD)
-      this.graphics.fillRect(x - 15 + starPhase * 8, y - 55, 6, 6)
-      this.graphics.fillRect(x + 5 - starPhase * 4, y - 58, 6, 6)
+      this.graphics.fillRect(x - 23 + starPhase * 12, y - 83, 9, 9)
+      this.graphics.fillRect(x + 8 - starPhase * 6, y - 87, 9, 9)
     }
 
-    const legOffset = this.walkFrame % 2 === 0 ? 3 : -3
-    const armSwing = this.walkFrame < 2 ? 4 : -4
+    const legOffset = this.walkFrame % 2 === 0 ? 5 : -5
+    const armSwing = this.walkFrame < 2 ? 6 : -6
 
     // Legs (wide stance)
     this.graphics.fillStyle(0x2A2A3A)
-    this.graphics.fillRect(x - 14, y + 9, 9, 18 + legOffset)
-    this.graphics.fillRect(x + 4, y + 9, 9, 18 - legOffset)
+    this.graphics.fillRect(x - 21, y + 14, 14, 27 + legOffset)
+    this.graphics.fillRect(x + 6, y + 14, 14, 27 - legOffset)
 
     // Shoes
     this.graphics.fillStyle(0x333333)
-    this.graphics.fillRect(x - 15, y + 24 + legOffset, 12, 5)
-    this.graphics.fillRect(x + 3, y + 24 - legOffset, 12, 5)
+    this.graphics.fillRect(x - 23, y + 36 + legOffset, 18, 8)
+    this.graphics.fillRect(x + 5, y + 36 - legOffset, 18, 8)
 
     // Body (wide shared torso)
     this.graphics.fillStyle(0x2A2A3A)
-    this.graphics.fillRect(x - 18, y - 15, 36, 27)
+    this.graphics.fillRect(x - 27, y - 23, 54, 41)
 
     // Lapels
     this.graphics.fillStyle(0x1E1E2E)
-    this.graphics.fillRect(x - 18, y - 15, 3, 24)
-    this.graphics.fillRect(x + 15, y - 15, 3, 24)
+    this.graphics.fillRect(x - 27, y - 23, 5, 36)
+    this.graphics.fillRect(x + 23, y - 23, 5, 36)
 
     // Shirt (muted red)
     this.graphics.fillStyle(0x993333)
-    this.graphics.fillRect(x - 9, y - 15, 18, 21)
+    this.graphics.fillRect(x - 14, y - 23, 27, 32)
 
     // Dividing line (two personalities)
     this.graphics.fillStyle(0x772222)
-    this.graphics.fillRect(x, y - 15, 2, 21)
+    this.graphics.fillRect(x, y - 23, 3, 32)
 
     // Arms
     this.graphics.fillStyle(0x2A2A3A)
-    this.graphics.fillRect(x - 24, y - 12 + armSwing, 8, 18)
-    this.graphics.fillRect(x + 16, y - 12 - armSwing, 8, 18)
+    this.graphics.fillRect(x - 36, y - 18 + armSwing, 12, 27)
+    this.graphics.fillRect(x + 24, y - 18 - armSwing, 12, 27)
 
     // Hands
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x - 24, y + 5 + armSwing, 8, 6)
-    this.graphics.fillRect(x + 16, y + 5 - armSwing, 8, 6)
+    this.graphics.fillRect(x - 36, y + 8 + armSwing, 12, 9)
+    this.graphics.fillRect(x + 24, y + 8 - armSwing, 12, 9)
 
     // Left neck (Angelo)
     this.graphics.fillStyle(0xE0B090)
-    this.graphics.fillRect(x - 12, y - 24, 8, 10)
+    this.graphics.fillRect(x - 18, y - 36, 12, 15)
     // Right neck (Eskin)
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x + 4, y - 24, 8, 10)
+    this.graphics.fillRect(x + 6, y - 36, 12, 15)
 
     // === LEFT HEAD — ANGELO (older, grey hair, yelling) ===
     this.graphics.fillStyle(0xE0B090)
-    this.graphics.fillRect(x - 21, y - 42, 21, 20)
+    this.graphics.fillRect(x - 32, y - 63, 32, 30)
 
     // Grey hair
     this.graphics.fillStyle(0xAAAAAA)
-    this.graphics.fillRect(x - 18, y - 47, 15, 2)
-    this.graphics.fillRect(x - 21, y - 45, 21, 2)
-    this.graphics.fillRect(x - 22, y - 43, 24, 2)
-    this.graphics.fillRect(x - 22, y - 42, 3, 9)
+    this.graphics.fillRect(x - 27, y - 71, 23, 3)
+    this.graphics.fillRect(x - 32, y - 68, 32, 3)
+    this.graphics.fillRect(x - 33, y - 65, 36, 3)
+    this.graphics.fillRect(x - 33, y - 63, 5, 14)
 
     // Angelo eyes
     this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x - 17, y - 35, 5, 3)
-    this.graphics.fillRect(x - 8, y - 35, 5, 3)
+    this.graphics.fillRect(x - 26, y - 53, 8, 5)
+    this.graphics.fillRect(x - 12, y - 53, 8, 5)
     this.graphics.fillStyle(0x443322)
-    this.graphics.fillRect(x - 15, y - 35, 3, 3)
-    this.graphics.fillRect(x - 6, y - 35, 3, 3)
+    this.graphics.fillRect(x - 23, y - 53, 5, 5)
+    this.graphics.fillRect(x - 9, y - 53, 5, 5)
 
     // Angelo bushy eyebrows
     this.graphics.fillStyle(0x888888)
-    this.graphics.fillRect(x - 18, y - 36, 6, 1)
-    this.graphics.fillRect(x - 8, y - 36, 6, 1)
+    this.graphics.fillRect(x - 27, y - 54, 9, 2)
+    this.graphics.fillRect(x - 12, y - 54, 9, 2)
 
     // Angelo mouth (open, yelling)
     this.graphics.fillStyle(0x111111)
-    this.graphics.fillRect(x - 15, y - 26, 9, 3)
+    this.graphics.fillRect(x - 23, y - 39, 14, 5)
     this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x - 14, y - 26, 2, 1)
-    this.graphics.fillRect(x - 9, y - 26, 2, 1)
+    this.graphics.fillRect(x - 21, y - 39, 3, 2)
+    this.graphics.fillRect(x - 14, y - 39, 3, 2)
 
     // === RIGHT HEAD — ESKIN (beard, brown hair) ===
     this.graphics.fillStyle(0xE8B090)
-    this.graphics.fillRect(x + 0, y - 42, 21, 20)
+    this.graphics.fillRect(x + 0, y - 63, 32, 30)
 
     // Brown hair
     this.graphics.fillStyle(0x8B6842)
-    this.graphics.fillRect(x + 3, y - 47, 15, 2)
-    this.graphics.fillRect(x + 0, y - 45, 21, 2)
-    this.graphics.fillRect(x - 1, y - 43, 24, 2)
-    this.graphics.fillRect(x + 21, y - 42, 2, 9)
+    this.graphics.fillRect(x + 5, y - 71, 23, 3)
+    this.graphics.fillRect(x + 0, y - 68, 32, 3)
+    this.graphics.fillRect(x - 2, y - 65, 36, 3)
+    this.graphics.fillRect(x + 32, y - 63, 3, 14)
     // Hair volume
-    this.graphics.fillRect(x + 0, y - 48, 21, 2)
-    this.graphics.fillRect(x + 3, y - 50, 15, 2)
+    this.graphics.fillRect(x + 0, y - 72, 32, 3)
+    this.graphics.fillRect(x + 5, y - 75, 23, 3)
 
     // Eskin eyes
     this.graphics.fillStyle(0xFFFFFF)
-    this.graphics.fillRect(x + 4, y - 35, 5, 3)
-    this.graphics.fillRect(x + 13, y - 35, 5, 3)
+    this.graphics.fillRect(x + 6, y - 53, 8, 5)
+    this.graphics.fillRect(x + 20, y - 53, 8, 5)
     this.graphics.fillStyle(0x443322)
-    this.graphics.fillRect(x + 6, y - 35, 3, 3)
-    this.graphics.fillRect(x + 15, y - 35, 3, 3)
+    this.graphics.fillRect(x + 9, y - 53, 5, 5)
+    this.graphics.fillRect(x + 23, y - 53, 5, 5)
 
     // Eskin eyebrows
     this.graphics.fillStyle(0x6B4822)
-    this.graphics.fillRect(x + 3, y - 36, 6, 1)
-    this.graphics.fillRect(x + 12, y - 36, 6, 1)
+    this.graphics.fillRect(x + 5, y - 54, 9, 2)
+    this.graphics.fillRect(x + 18, y - 54, 9, 2)
 
     // Eskin beard
     this.graphics.fillStyle(0x6B4822)
-    this.graphics.fillRect(x + 1, y - 26, 18, 5)
-    this.graphics.fillRect(x + 3, y - 21, 15, 3)
-    this.graphics.fillRect(x + 5, y - 18, 12, 2)
-    this.graphics.fillRect(x + 0, y - 27, 3, 6)
-    this.graphics.fillRect(x + 18, y - 27, 3, 6)
+    this.graphics.fillRect(x + 2, y - 39, 27, 8)
+    this.graphics.fillRect(x + 5, y - 32, 23, 5)
+    this.graphics.fillRect(x + 8, y - 27, 18, 3)
+    this.graphics.fillRect(x + 0, y - 41, 5, 9)
+    this.graphics.fillRect(x + 27, y - 41, 5, 9)
 
     // Eskin mouth (smirk, visible above beard)
     this.graphics.fillStyle(0x995533)
-    this.graphics.fillRect(x + 6, y - 27, 9, 2)
+    this.graphics.fillRect(x + 9, y - 41, 14, 3)
 
     // Megaphone in hand during throw
     if (this.isThrowing) {
       const throwDir = this.facing || 1
       this.graphics.fillStyle(0xCC2200)
-      this.graphics.fillRect(x + throwDir * 26, y - 8, 8, 10)
+      this.graphics.fillRect(x + throwDir * 39, y - 12, 12, 15)
       this.graphics.fillStyle(0xE8B800)
-      this.graphics.fillRect(x + throwDir * 26, y - 3, 8, 1)
+      this.graphics.fillRect(x + throwDir * 39, y - 5, 12, 2)
     }
 
     // HP bar (always visible since mini-boss)
-    const barWidth = 45
+    const barWidth = 68
     const barX = x - barWidth / 2
-    const barY = y - 55
+    const barY = y - 83
     this.graphics.fillStyle(0x333333)
-    this.graphics.fillRect(barX, barY, barWidth, 4)
+    this.graphics.fillRect(barX, barY, barWidth, 6)
     this.graphics.fillStyle(COLORS.RED)
-    this.graphics.fillRect(barX, barY, barWidth * (this.hp / this.maxHp), 4)
+    this.graphics.fillRect(barX, barY, barWidth * (this.hp / this.maxHp), 6)
   }
 
   destroy() {

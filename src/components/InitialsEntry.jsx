@@ -37,12 +37,12 @@ export default function InitialsEntry({ game }) {
     }
   }, [game])
 
-  const confirm = useCallback(() => {
+  const confirm = useCallback(async () => {
     if (!data || !game) return
     AudioSystem.playMenuConfirm()
     const { letters: cur } = stateRef.current
     const initials = cur.map(i => LETTERS[i]).join('')
-    saveScore(initials, data.score, data.time)
+    await saveScore(initials, data.score, data.time)
 
     game.registry.set('showInitialsEntry', false)
     game.registry.set('leaderboardHighlight', { initials, score: data.score })
