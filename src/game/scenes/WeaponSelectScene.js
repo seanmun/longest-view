@@ -118,14 +118,14 @@ export class WeaponSelectScene extends Phaser.Scene {
 
     // Controls hint
     const isMobile = 'ontouchstart' in window && window.innerWidth < 1024
-    const controlText = isMobile ? 'TAP TO SELECT  •  START TO CONFIRM' : '← → SELECT  •  ENTER TO CONFIRM'
+    const controlText = isMobile ? 'TAP WEAPON  •  TAP AGAIN TO CONFIRM' : '← → SELECT  •  ENTER TO CONFIRM'
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 25, controlText, {
       fontFamily: '"Press Start 2P"',
       fontSize: fontSize(7),
       color: '#555555'
     }).setOrigin(0.5)
 
-    // Input
+    // Input — keyboard
     this.input.keyboard.on('keydown-LEFT', () => this.moveSelection(-1))
     this.input.keyboard.on('keydown-RIGHT', () => this.moveSelection(1))
     this.input.keyboard.on('keydown-A', () => this.moveSelection(-1))
@@ -133,17 +133,36 @@ export class WeaponSelectScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ENTER', () => this.confirmSelection())
     this.input.keyboard.on('keydown-SPACE', () => this.confirmSelection())
 
-    // Mobile: tap left/right halves to navigate, or use mobile events
+    // Touch: tap a card to select it, tap again to confirm
     this.input.on('pointerdown', (pointer) => {
       AudioSystem.resume()
       if (this.confirmed) return
-      const third = GAME_WIDTH / 3
-      if (pointer.x < third) {
-        this.moveSelection(-1)
-      } else if (pointer.x > third * 2) {
-        this.moveSelection(1)
-      } else {
-        this.confirmSelection()
+
+      // Find which card was tapped (check hit area for each card)
+      const cardWidth = 220
+      const cardHeight = 200
+      let tappedCard = -1
+
+      for (let i = 0; i < this.cardPositions.length; i++) {
+        const cx = this.cardPositions[i].x
+        const cy = this.cardPositions[i].y
+        if (pointer.x >= cx - cardWidth / 2 && pointer.x <= cx + cardWidth / 2 &&
+            pointer.y >= cy - 95 && pointer.y <= cy - 95 + cardHeight) {
+          tappedCard = i
+          break
+        }
+      }
+
+      if (tappedCard >= 0) {
+        if (tappedCard === this.selectedIndex) {
+          // Tapped already-selected card — confirm
+          this.confirmSelection()
+        } else {
+          // Tapped a different card — select it
+          this.selectedIndex = tappedCard
+          AudioSystem.playMenuSelect()
+          this.hinkieTargetX = this.cardPositions[tappedCard].x
+        }
       }
     })
 
