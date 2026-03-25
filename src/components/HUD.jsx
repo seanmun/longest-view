@@ -31,7 +31,11 @@ export default function HUD({ game }) {
     }
 
     registry.events.on('changedata', onChange)
-    return () => registry.events.off('changedata', onChange)
+    registry.events.on('setdata', onChange)
+    return () => {
+      registry.events.off('changedata', onChange)
+      registry.events.off('setdata', onChange)
+    }
   }, [game])
 
   const hpPercent = (hp / maxHp) * 100
@@ -44,8 +48,8 @@ export default function HUD({ game }) {
   }
 
   return (
-    <div className="absolute top-0 left-0 w-full pointer-events-none z-10 p-3"
-      style={{ fontFamily: '"Press Start 2P", monospace' }}>
+    <div className="absolute top-0 left-0 w-full pointer-events-none z-10"
+      style={{ fontFamily: '"Press Start 2P", monospace', padding: '16px 24px' }}>
       <div className="flex justify-between items-start">
         {/* Left side — HP and Lives */}
         <div className="flex flex-col gap-1">

@@ -48,21 +48,8 @@ body {
   100% { opacity: 0.02; }
 }
 
-/* CRT TV Bezel Frame */
-.crt-bezel {
-  background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #111111 100%);
-  border-radius: 28px;
-  padding: 20px;
-  box-shadow:
-    0 0 0 3px #333,
-    0 0 0 6px #1a1a1a,
-    0 8px 30px rgba(0, 0, 0, 0.8),
-    inset 0 2px 4px rgba(255, 255, 255, 0.05);
-}
-
-/* CRT Screen (inner container) — rounded like real CRT glass */
+/* CRT Screen — just the curved game area, no bezel frame */
 .crt-screen {
-  border-radius: 20px;
   overflow: hidden;
   position: relative;
 }
@@ -82,7 +69,6 @@ body {
   background-size: 100% 2px, 3px 100%;
   z-index: 1000;
   pointer-events: none;
-  border-radius: 20px;
 }
 
 /* Subtle screen flicker */
@@ -98,59 +84,13 @@ body {
   opacity: 0;
   z-index: 1000;
   pointer-events: none;
-  border-radius: 20px;
   animation: crt-flicker 0.15s infinite;
 }
 
-/* CRT Glass reflection effect */
-.crt-glass {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1001;
-  border-radius: 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.03) 25%,
-    transparent 50%,
-    transparent 100%
-  );
-}
-
-/* CRT Vignette (darker at edges) */
-.crt-vignette {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 999;
-  border-radius: 20px;
-  box-shadow: inset 0 0 100px 30px rgba(0, 0, 0, 0.5);
-}
-
 @media (max-width: 768px) {
-  .crt-bezel {
-    background: none;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
-    max-width: 100% !important;
-  }
   .crt-screen {
-    border-radius: 0;
     aspect-ratio: auto !important;
-  }
-  .crt-screen::before,
-  .crt-screen::after,
-  .crt-glass,
-  .crt-vignette {
-    border-radius: 0;
+    max-width: 100% !important;
   }
 }
 

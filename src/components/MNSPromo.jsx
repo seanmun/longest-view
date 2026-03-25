@@ -13,7 +13,11 @@ export default function MNSPromo({ game }) {
     }
 
     game.registry.events.on('changedata', onChange)
-    return () => game.registry.events.off('changedata', onChange)
+    game.registry.events.on('setdata', onChange)
+    return () => {
+      game.registry.events.off('changedata', onChange)
+      game.registry.events.off('setdata', onChange)
+    }
   }, [game])
 
   if (!show) return null

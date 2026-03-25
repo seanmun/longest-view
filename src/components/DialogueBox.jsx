@@ -8,13 +8,24 @@ export default function DialogueBox({ game }) {
   useEffect(() => {
     if (!game) return
 
+    // Read current values in case events already fired before mount
+    const curActive = game.registry.get('dialogueActive')
+    const curData = game.registry.get('dialogueData')
+    if (curActive) setActive(true)
+    if (curData) setData(curData)
+
     const onChange = (_, key, value) => {
       if (key === 'dialogueActive') setActive(value)
       if (key === 'dialogueData') setData(value)
     }
 
+    // Listen for both setdata (first-time key) and changedata (subsequent updates)
     game.registry.events.on('changedata', onChange)
-    return () => game.registry.events.off('changedata', onChange)
+    game.registry.events.on('setdata', onChange)
+    return () => {
+      game.registry.events.off('changedata', onChange)
+      game.registry.events.off('setdata', onChange)
+    }
   }, [game])
 
   if (!active || !data) return null

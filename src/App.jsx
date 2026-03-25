@@ -20,31 +20,26 @@ export default function App() {
   if (window.location.pathname === '/editor') return <PixelEditor />
 
   const gameContent = (
-    <div className="crt-bezel" style={{ width: '100%', maxWidth: '1200px' }}>
-      <div className="crt-screen relative bg-black overflow-hidden"
-        style={{ width: '100%', aspectRatio: '4 / 3' }}>
-        {/* Game canvas */}
-        <GameCanvas onGameReady={setGame} />
+    <div className="crt-screen relative bg-black overflow-hidden"
+      style={{ width: '100%', maxWidth: '1200px', aspectRatio: '4 / 3' }}>
+      {/* Game canvas */}
+      <GameCanvas onGameReady={setGame} />
 
-        {/* React overlays — positioned relative to game area */}
-        {game && (
-          <>
-            <HUD game={game} />
-            <DialogueBox game={game} />
-            <MNSPromo game={game} />
-            <PauseMenu game={game} />
-            <LevelCompleteScreen game={game} />
-            <InitialsEntry game={game} />
-            <Leaderboard game={game} />
-          </>
-        )}
+      {/* React overlays — positioned relative to game area */}
+      {game && (
+        <>
+          <HUD game={game} />
+          <DialogueBox game={game} />
+          <MNSPromo game={game} />
+          <PauseMenu game={game} />
+          <LevelCompleteScreen game={game} />
+          <InitialsEntry game={game} />
+          <Leaderboard game={game} />
+        </>
+      )}
 
-        {/* Volume control */}
-        <VolumeControl />
-
-        {/* CRT effects stack (scanlines + flicker via ::before/::after, barrel distortion via Phaser shader) */}
-        <div className="crt-glass" />
-      </div>
+      {/* Volume control */}
+      <VolumeControl />
     </div>
   )
 
