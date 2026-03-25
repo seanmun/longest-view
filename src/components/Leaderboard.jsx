@@ -32,14 +32,20 @@ export default function Leaderboard({ game }) {
 
     const dismiss = () => {
       AudioSystem.playMenuConfirm()
+      const fromMenu = game.registry.get('leaderboardFromMenu')
       game.registry.set('showLeaderboard', false)
-      game.registry.set('showMNSPromo', true)
-      game.registry.set('mnsPromoMessage',
-        'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMoneyNeverSleeps.app — The smartest fantasy basketball platform on the internet.')
+      game.registry.set('leaderboardFromMenu', false)
+
+      // Only show MNS promo after completing the game, not from main menu
+      if (!fromMenu) {
+        game.registry.set('showMNSPromo', true)
+        game.registry.set('mnsPromoMessage',
+          'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMoneyNeverSleeps.app — The smartest fantasy basketball platform on the internet.')
+      }
     }
 
     const handleKey = (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === 'Escape') {
         e.preventDefault()
         dismiss()
       }
@@ -69,8 +75,19 @@ export default function Leaderboard({ game }) {
   }
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/90"
-      style={{ fontFamily: '"Press Start 2P", monospace' }}>
+    <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/90 cursor-pointer"
+      style={{ fontFamily: '"Press Start 2P", monospace' }}
+      onClick={() => {
+        const fromMenu = game.registry.get('leaderboardFromMenu')
+        AudioSystem.playMenuConfirm()
+        game.registry.set('showLeaderboard', false)
+        game.registry.set('leaderboardFromMenu', false)
+        if (!fromMenu) {
+          game.registry.set('showMNSPromo', true)
+          game.registry.set('mnsPromoMessage',
+            'While Hinkie rebuilds Philly, rebuild your fantasy roster.\nMoneyNeverSleeps.app — The smartest fantasy basketball platform on the internet.')
+        }
+      }}>
       <div className="text-center p-6 w-full max-w-md">
         <div className="text-[16px] mb-6" style={{ color: '#E8B800' }}>
           HIGH SCORES
@@ -113,7 +130,7 @@ export default function Leaderboard({ game }) {
         </div>
 
         <div className="text-[7px] text-gray-500 mt-6 animate-pulse">
-          PRESS ENTER TO CONTINUE
+          {'ontouchstart' in window ? 'TAP TO CLOSE' : 'PRESS ENTER TO CLOSE'}
         </div>
       </div>
     </div>

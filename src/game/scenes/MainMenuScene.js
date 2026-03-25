@@ -47,7 +47,7 @@ export class MainMenuScene extends Phaser.Scene {
     })
 
     // Menu options
-    const menuItems = ['PLAY', 'HOW TO PLAY', 'CREDITS']
+    const menuItems = ['PLAY', 'LEADERBOARD', 'HOW TO PLAY', 'CREDITS']
     this.selectedIndex = 0
     this.menuTexts = []
 
@@ -56,7 +56,22 @@ export class MainMenuScene extends Phaser.Scene {
         fontFamily: '"Press Start 2P"',
         fontSize: fontSize(10),
         color: i === 0 ? '#E8B800' : '#666666'
-      }).setOrigin(0.5)
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true })
+
+      // Tap to select, tap again to confirm
+      text.on('pointerdown', () => {
+        AudioSystem.resume()
+        if (i === this.selectedIndex) {
+          this.selectMenu()
+        } else {
+          this.selectedIndex = i
+          AudioSystem.playMenuSelect()
+          this.menuTexts.forEach((t, j) => {
+            t.setColor(j === this.selectedIndex ? '#E8B800' : '#666666')
+          })
+        }
+      })
+
       this.menuTexts.push(text)
     })
 
@@ -110,14 +125,18 @@ export class MainMenuScene extends Phaser.Scene {
 
   selectMenu() {
     AudioSystem.playMenuConfirm()
-    AudioSystem.stopMusic()
 
     if (this.selectedIndex === 0) {
       // PLAY — go to weapon select
+      AudioSystem.stopMusic()
       this.cameras.main.fadeOut(500, 0, 0, 0)
       this.time.delayedCall(500, () => {
         this.scene.start('WeaponSelectScene')
       })
+    } else if (this.selectedIndex === 1) {
+      // LEADERBOARD — show overlay (music keeps playing)
+      this.game.registry.set('leaderboardFromMenu', true)
+      this.game.registry.set('showLeaderboard', true)
     }
     // HOW TO PLAY and CREDITS can be added later
   }
