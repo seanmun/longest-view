@@ -49,7 +49,7 @@ export default function HUD({ game }) {
 
   return (
     <div className="absolute top-0 left-0 w-full pointer-events-none z-10"
-      style={{ fontFamily: '"Press Start 2P", monospace', padding: '16px 24px' }}>
+      style={{ fontFamily: '"Press Start 2P", monospace', padding: '20px 40px' }}>
       <div className="flex justify-between items-start">
         {/* Left side — HP and Lives */}
         <div className="flex flex-col gap-1">

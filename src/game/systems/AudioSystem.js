@@ -280,4 +280,47 @@ export class AudioSystem {
     }
     playLoop()
   }
+
+  static playVillainMusic() {
+    AudioSystem.stopMusic()
+    const music = { stop: false }
+    AudioSystem._currentMusic = music
+
+    // Lower-pitched, menacing bassline — evil villain theme
+    const bassline = [
+      [65, 0.3], [73, 0.15], [65, 0.3], [55, 0.3],
+      [65, 0.15], [73, 0.15], [82, 0.3], [73, 0.15],
+      [65, 0.3], [55, 0.3], [49, 0.3], [55, 0.15],
+      [65, 0.3], [55, 0.15], [49, 0.45]
+    ]
+
+    const playLoop = () => {
+      if (music.stop) return
+      const ctx = audioCtx()
+      let time = ctx.currentTime
+      bassline.forEach(([freq, dur]) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sawtooth'
+        osc.frequency.value = freq
+        gain.gain.setValueAtTime(0.12, time)
+        gain.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.85)
+        osc.connect(gain)
+        gain.connect(AudioSystem._musicGain || ctx.destination)
+        osc.start(time)
+        osc.stop(time + dur)
+        time += dur
+      })
+      const totalDur = bassline.reduce((s, [, d]) => s + d, 0) * 1000
+      setTimeout(() => playLoop(), totalDur)
+    }
+    playLoop()
+  }
+
+  static playVillainIntro() {
+    // Dramatic low drone + impact for villain entrance
+    AudioSystem._playTone(55, 0.6, 'sawtooth', 0.35)
+    setTimeout(() => AudioSystem._playTone(45, 0.4, 'sawtooth', 0.3), 200)
+    setTimeout(() => AudioSystem._playTone(110, 0.15, 'square', 0.4), 500)
+  }
 }

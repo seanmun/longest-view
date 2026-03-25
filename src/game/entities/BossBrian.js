@@ -4,7 +4,7 @@ import { COLORS, GAME_WIDTH } from '../constants.js'
 
 const BOSS_WIDTH = 36
 const BOSS_HEIGHT = 80
-const MAX_HP = 30
+const MAX_HP = 50
 
 const PHASE_THRESHOLDS = { phase2: 0.5, phase3: 0.25 }
 

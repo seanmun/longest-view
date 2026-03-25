@@ -19,8 +19,8 @@ const SPEECH_BUBBLES = [
 export class AngeloEskin {
   constructor(scene, x, y) {
     this.scene = scene
-    this.hp = 8
-    this.maxHp = 8
+    this.hp = 15
+    this.maxHp = 15
     this.alive = true
     this.speed = MOVE_SPEED
     this.contactDamage = CONTACT_DAMAGE

@@ -139,28 +139,56 @@ export class MainMenuScene extends Phaser.Scene {
     const y = GAME_HEIGHT - 60
     const legOffset = this.demoWalkFrame % 2 === 0 ? 3 : -3
 
-    // Small walking Hinkie (1.5x scale)
+    // Walking Hinkie (matches Player.js)
+    const g = this.demoGraphics
+    const armSwing = this.demoWalkFrame < 2 ? 5 : -5
+
     // Legs
-    this.demoGraphics.fillStyle(0x1a1a3a)
-    this.demoGraphics.fillRect(x - 6, y + 6, 5, 15 + legOffset)
-    this.demoGraphics.fillRect(x + 2, y + 6, 5, 15 - legOffset)
+    g.fillStyle(0x1a1a3a)
+    g.fillRect(x - 10, y + 9, 8, 21 + legOffset)
+    g.fillRect(x + 3, y + 9, 8, 21 - legOffset)
+    // Shoes
+    g.fillStyle(0x3B2314)
+    g.fillRect(x - 12, y + 27 + legOffset, 10, 5)
+    g.fillRect(x + 2, y + 27 - legOffset, 10, 5)
     // Body
-    this.demoGraphics.fillStyle(0x1a1a4a)
-    this.demoGraphics.fillRect(x - 8, y - 9, 15, 18)
+    g.fillStyle(0x1a1a4a)
+    g.fillRect(x - 14, y - 15, 27, 27)
+    // Collar
+    g.fillStyle(0xF0F0F0)
+    g.fillRect(x - 6, y - 15, 12, 5)
     // Tie
-    this.demoGraphics.fillStyle(COLORS.RED)
-    this.demoGraphics.fillRect(x - 2, y - 6, 3, 11)
+    g.fillStyle(COLORS.RED)
+    g.fillRect(x - 2, y - 15, 3, 21)
+    // Arms
+    g.fillStyle(0x1a1a4a)
+    g.fillRect(x - 20, y - 12 + armSwing, 8, 18)
+    g.fillRect(x + 12, y - 12 - armSwing, 8, 18)
+    // Hands
+    g.fillStyle(0xE8B090)
+    g.fillRect(x - 20, y + 5 + armSwing, 8, 5)
+    g.fillRect(x + 12, y + 5 - armSwing, 8, 5)
     // Head
-    this.demoGraphics.fillStyle(0xE8B090)
-    this.demoGraphics.fillRect(x - 6, y - 21, 12, 14)
-    // Bald head — skin top with shine
-    this.demoGraphics.fillStyle(0xE8B090)
-    this.demoGraphics.fillRect(x - 6, y - 24, 12, 3)
-    this.demoGraphics.fillStyle(0xF0C8A0, 0.5)
-    this.demoGraphics.fillRect(x - 3, y - 24, 6, 2)
+    g.fillStyle(0xE8B090)
+    g.fillRect(x - 10, y - 33, 21, 20)
+    // Hair
+    g.fillStyle(0x3D2517)
+    g.fillRect(x - 12, y - 36, 3, 12)
+    g.fillRect(x + 9, y - 36, 3, 12)
+    g.fillRect(x - 9, y - 38, 18, 3)
+    g.fillRect(x - 5, y - 35, 9, 2)
     // Glasses
-    this.demoGraphics.fillStyle(0x333333)
-    this.demoGraphics.fillRect(x - 5, y - 18, 5, 3)
-    this.demoGraphics.fillRect(x + 1, y - 18, 5, 3)
+    g.fillStyle(0x666666)
+    g.fillRect(x - 8, y - 27, 6, 5)
+    g.fillRect(x + 2, y - 27, 6, 5)
+    g.fillStyle(0xFFFFFF)
+    g.fillRect(x - 6, y - 25, 3, 2)
+    g.fillRect(x + 3, y - 25, 3, 2)
+    g.fillStyle(0x111111)
+    g.fillRect(x - 5, y - 25, 2, 2)
+    g.fillRect(x + 4, y - 25, 2, 2)
+    // Mouth
+    g.fillStyle(0x333333)
+    g.fillRect(x - 3, y - 18, 6, 2)
   }
 }

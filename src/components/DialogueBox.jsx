@@ -40,28 +40,28 @@ export default function DialogueBox({ game }) {
   }
 
   return (
-    <div className="absolute inset-0 flex items-end justify-center z-50 pointer-events-auto pb-8">
-      <div className="bg-black/95 border-2 border-yellow-500 rounded p-4 max-w-xl w-full mx-4"
-        style={{ fontFamily: '"Press Start 2P", monospace' }}>
+    <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-auto">
+      <div className="bg-black/95 border-2 border-yellow-500 rounded w-full h-full flex flex-col justify-center"
+        style={{ fontFamily: '"Press Start 2P", monospace', padding: 'clamp(12px, 4vw, 32px)' }}>
 
         {/* Speaker */}
-        <div className="text-[10px] mb-2" style={{ color: '#E8B800' }}>
+        <div className="mb-4" style={{ color: '#E8B800', fontSize: 'clamp(14px, 3.5vw, 22px)' }}>
           {data.speaker}
         </div>
 
         {/* Text */}
-        <div className="text-[8px] text-white mb-4 leading-relaxed">
+        <div className="text-white mb-8" style={{ fontSize: 'clamp(11px, 2.5vw, 16px)', lineHeight: '1.8' }}>
           {data.text}
         </div>
 
         {/* Options */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           {data.options.map((option, i) => (
             <button
               key={i}
               onClick={() => handleChoice(option, i)}
-              className="text-left text-[7px] px-3 py-2 border border-gray-600 hover:border-cyan-400 hover:text-cyan-400 text-gray-300 transition-colors cursor-pointer"
-              style={{ fontFamily: '"Press Start 2P", monospace' }}
+              className="text-left px-5 py-4 border-2 border-gray-600 hover:border-cyan-400 hover:text-cyan-400 text-gray-300 transition-colors cursor-pointer"
+              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: 'clamp(9px, 2vw, 14px)' }}
             >
               {String.fromCharCode(65 + i)}) {option.text}
             </button>

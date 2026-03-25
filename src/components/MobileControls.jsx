@@ -217,27 +217,6 @@ function SystemButton({ label, onPress }) {
   )
 }
 
-// Speaker grille dots
-function SpeakerGrille() {
-  const dots = []
-  for (let row = 0; row < 4; row++) {
-    for (let col = 0; col < 3; col++) {
-      dots.push(
-        <div key={`${row}-${col}`} style={{
-          width: 4, height: 4, borderRadius: '50%',
-          backgroundColor: '#5a4580',
-          margin: 2,
-        }} />
-      )
-    }
-  }
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 8px)' }}>
-      {dots}
-    </div>
-  )
-}
-
 // Button action handlers
 const pressA = () => { VirtualInput.actionA = true }
 const releaseA = () => { VirtualInput.actionA = false }
@@ -251,14 +230,14 @@ const pressStart = () => {
 }
 
 // ============================================
-// GAMEBOY LAYOUT (Portrait)
+// PORTRAIT LAYOUT (no shell — just screen + controls)
 // ============================================
-function GameboyShell({ children }) {
+function PortraitLayout({ children }) {
   return (
     <div style={{
       width: '100vw',
       height: '100dvh',
-      backgroundColor: '#6B4FA0',
+      backgroundColor: '#000000',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -268,56 +247,16 @@ function GameboyShell({ children }) {
       top: 0,
       left: 0,
     }}>
-      {/* Screen bezel */}
+      {/* Game screen — sits directly, no bezel */}
       <div style={{
-        width: '94%',
+        width: '100%',
         flex: '1 1 auto',
-        backgroundColor: '#2a2040',
-        borderRadius: 8,
-        padding: '6px',
-        marginTop: 'max(env(safe-area-inset-top, 4px), 4px)',
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
-        display: 'flex',
-        flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative',
         minHeight: 0,
+        marginTop: 'max(env(safe-area-inset-top, 0px), 0px)',
       }}>
-        {/* Power LED */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 4,
-          marginBottom: 3, marginLeft: 4, flex: '0 0 auto',
-        }}>
-          <div style={{
-            width: 5, height: 5, borderRadius: '50%',
-            backgroundColor: '#00ff44',
-            boxShadow: '0 0 4px #00ff44',
-          }} />
-          <span style={{ fontSize: 4, color: '#888' }}>BATTERY</span>
-        </div>
-
-        {/* Game canvas container — fills available bezel space */}
-        <div style={{
-          width: '100%',
-          flex: '1 1 auto',
-          backgroundColor: '#0a0a1a',
-          borderRadius: 4,
-          overflow: 'hidden',
-          position: 'relative',
-          minHeight: 0,
-        }}>
-          {children}
-        </div>
-      </div>
-
-      {/* Label */}
-      <div style={{
-        fontSize: 6,
-        color: '#3d2d6b',
-        marginTop: 4,
-        letterSpacing: 2,
-        fontWeight: 'bold',
-        flex: '0 0 auto',
-      }}>
-        LONGEST VIEW
+        {children}
       </div>
 
       {/* Controls area */}
@@ -326,6 +265,7 @@ function GameboyShell({ children }) {
         width: '100%',
         padding: '8px 20px',
         paddingBottom: 'max(env(safe-area-inset-bottom, 8px), 8px)',
+        backgroundColor: '#111111',
       }}>
         {/* D-pad + Action buttons row */}
         <div style={{
@@ -336,18 +276,18 @@ function GameboyShell({ children }) {
         }}>
           <DPad />
 
-          {/* A + B buttons — angled like real Gameboy */}
+          {/* A + B buttons */}
           <div style={{
             display: 'flex', gap: 14, alignItems: 'center',
             transform: 'rotate(-15deg)',
           }}>
             <div style={{ marginTop: 24, textAlign: 'center' }}>
               <ActionButton label="B" color="#00D4FF" pressedColor="#0099BB" onPress={pressB} onRelease={releaseB} />
-              <div style={{ fontSize: 6, color: '#3d2d6b', marginTop: 4 }}>JUMP</div>
+              <div style={{ fontSize: 6, color: '#555', marginTop: 4 }}>JUMP</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <ActionButton label="A" color="#E8B800" pressedColor="#B08E00" onPress={pressA} onRelease={releaseA} />
-              <div style={{ fontSize: 6, color: '#3d2d6b', marginTop: 4 }}>FIRE</div>
+              <div style={{ fontSize: 6, color: '#555', marginTop: 4 }}>FIRE</div>
             </div>
           </div>
         </div>
@@ -360,28 +300,19 @@ function GameboyShell({ children }) {
           <SystemButton label="START" onPress={pressStart} />
         </div>
       </div>
-
-      {/* Speaker grille */}
-      <div style={{
-        position: 'absolute',
-        bottom: 'max(calc(env(safe-area-inset-bottom, 8px) + 12px), 20px)',
-        right: 20,
-      }}>
-        <SpeakerGrille />
-      </div>
     </div>
   )
 }
 
 // ============================================
-// GAME GEAR LAYOUT (Landscape)
+// LANDSCAPE LAYOUT (no shell — just screen + controls)
 // ============================================
-function GameGearShell({ children }) {
+function LandscapeLayout({ children }) {
   return (
     <div style={{
       width: '100vw',
       height: '100dvh',
-      backgroundColor: '#1a1a2e',
+      backgroundColor: '#000000',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -401,23 +332,15 @@ function GameGearShell({ children }) {
         <SystemButton label="SELECT" onPress={pressSelect} />
       </div>
 
-      {/* Center screen */}
+      {/* Center screen — no bezel, just the game */}
       <div style={{
-        flex: 1, maxWidth: '58%',
-        backgroundColor: '#0f0f1e', borderRadius: 6,
-        padding: 5,
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+        flex: 1,
         margin: '0 6px',
-        display: 'flex',
-        height: '85%',
+        height: '100%',
+        overflow: 'hidden',
+        position: 'relative',
       }}>
-        <div style={{
-          width: '100%', height: '100%',
-          backgroundColor: '#0a0a1a', borderRadius: 4,
-          overflow: 'hidden', position: 'relative',
-        }}>
-          {children}
-        </div>
+        {children}
       </div>
 
       {/* Right controls */}
@@ -468,6 +391,6 @@ export default function MobileControls({ children }) {
   if (!isMobile) return children
 
   return orientation === 'portrait'
-    ? <GameboyShell>{children}</GameboyShell>
-    : <GameGearShell>{children}</GameGearShell>
+    ? <PortraitLayout>{children}</PortraitLayout>
+    : <LandscapeLayout>{children}</LandscapeLayout>
 }

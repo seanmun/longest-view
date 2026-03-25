@@ -159,45 +159,65 @@ export class CutsceneScene extends Phaser.Scene {
     const x = this.hinkieX
     const y = GAME_HEIGHT - 120
 
-    // Draw Hinkie (larger version for cutscene — 1.5x scale)
+    // Draw Hinkie (same as Player.js standing pose)
+    const g = this.hinkieGraphics
+
     // Legs
-    this.hinkieGraphics.fillStyle(0x1a1a3a)
-    this.hinkieGraphics.fillRect(x - 12, y + 12, 9, 27)
-    this.hinkieGraphics.fillRect(x + 3, y + 12, 9, 27)
-    // Shoes
-    this.hinkieGraphics.fillStyle(0x222222)
-    this.hinkieGraphics.fillRect(x - 14, y + 36, 12, 6)
-    this.hinkieGraphics.fillRect(x + 2, y + 36, 12, 6)
-    // White stripe on shoes
-    this.hinkieGraphics.fillStyle(0xFFFFFF)
-    this.hinkieGraphics.fillRect(x - 14, y + 36, 12, 2)
-    this.hinkieGraphics.fillRect(x + 2, y + 36, 12, 2)
-    // Body
-    this.hinkieGraphics.fillStyle(0x1a1a4a)
-    this.hinkieGraphics.fillRect(x - 17, y - 21, 33, 36)
+    g.fillStyle(0x1a1a3a)
+    g.fillRect(x - 10, y + 9, 8, 21)
+    g.fillRect(x + 3, y + 9, 8, 21)
+
+    // Shoes (dark brown dress shoes)
+    g.fillStyle(0x3B2314)
+    g.fillRect(x - 12, y + 27, 10, 5)
+    g.fillRect(x + 2, y + 27, 10, 5)
+
+    // Body (suit jacket)
+    g.fillStyle(0x1a1a4a)
+    g.fillRect(x - 14, y - 15, 27, 27)
+
+    // White dress shirt collar
+    g.fillStyle(0xF0F0F0)
+    g.fillRect(x - 6, y - 15, 12, 5)
+
     // Tie
-    this.hinkieGraphics.fillStyle(COLORS.RED)
-    this.hinkieGraphics.fillRect(x - 2, y - 15, 5, 24)
+    g.fillStyle(COLORS.RED)
+    g.fillRect(x - 2, y - 15, 3, 21)
+
     // Arms
-    this.hinkieGraphics.fillStyle(0x1a1a4a)
-    this.hinkieGraphics.fillRect(x - 24, y - 18, 9, 24)
-    this.hinkieGraphics.fillRect(x + 15, y - 18, 9, 24)
+    g.fillStyle(0x1a1a4a)
+    g.fillRect(x - 20, y - 12, 8, 18)
+    g.fillRect(x + 12, y - 12, 8, 18)
+
     // Hands
-    this.hinkieGraphics.fillStyle(0xE8B090)
-    this.hinkieGraphics.fillRect(x - 24, y + 5, 9, 6)
-    this.hinkieGraphics.fillRect(x + 15, y + 5, 9, 6)
+    g.fillStyle(0xE8B090)
+    g.fillRect(x - 20, y + 5, 8, 5)
+    g.fillRect(x + 12, y + 5, 8, 5)
+
     // Head
-    this.hinkieGraphics.fillStyle(0xE8B090)
-    this.hinkieGraphics.fillRect(x - 14, y - 45, 27, 26)
-    // Bald head — skin top with shine
-    this.hinkieGraphics.fillStyle(0xE8B090)
-    this.hinkieGraphics.fillRect(x - 14, y - 50, 27, 6)
-    this.hinkieGraphics.fillStyle(0xF0C8A0, 0.5)
-    this.hinkieGraphics.fillRect(x - 6, y - 50, 12, 2)
-    // Glasses
-    this.hinkieGraphics.fillStyle(0x333333)
-    this.hinkieGraphics.fillRect(x - 10, y - 38, 8, 6)
-    this.hinkieGraphics.fillRect(x + 3, y - 38, 8, 6)
-    this.hinkieGraphics.fillRect(x - 3, y - 36, 6, 2)
+    g.fillStyle(0xE8B090)
+    g.fillRect(x - 10, y - 33, 21, 20)
+
+    // Hair (receding hairline — sides fuller, top thinning at front)
+    g.fillStyle(0x3D2517)
+    g.fillRect(x - 12, y - 36, 3, 12)
+    g.fillRect(x + 9, y - 36, 3, 12)
+    g.fillRect(x - 9, y - 38, 18, 3)
+    g.fillRect(x - 5, y - 35, 9, 2)
+
+    // Glasses (regular frames with visible eyes)
+    g.fillStyle(0x666666)
+    g.fillRect(x - 8, y - 27, 6, 5)
+    g.fillRect(x + 2, y - 27, 6, 5)
+    g.fillStyle(0xFFFFFF)
+    g.fillRect(x - 6, y - 25, 3, 2)
+    g.fillRect(x + 3, y - 25, 3, 2)
+    g.fillStyle(0x111111)
+    g.fillRect(x - 5, y - 25, 2, 2)
+    g.fillRect(x + 4, y - 25, 2, 2)
+
+    // Mouth
+    g.fillStyle(0x333333)
+    g.fillRect(x - 3, y - 18, 6, 2)
   }
 }

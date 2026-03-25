@@ -40,10 +40,10 @@ const WAVES = [
     { x: 4000, variant: 'fast' }, { x: 4100, variant: 'fast' },
     { x: 4200, variant: 'normal' }
   ]},
-  // Wave 6: Final push + mini-boss (4 enemies)
+  // Wave 6: Final push (4 enemies, no duplicate AngeloEskin)
   { trigger: 4200, enemies: [
     { x: 4600, variant: 'fast' }, { x: 4700, variant: 'normal' },
-    { x: 4800, variant: 'angeloeskin' }, { x: 4900, variant: 'fast' }
+    { x: 4800, variant: 'fast' }, { x: 4900, variant: 'fast' }
   ]}
 ]
 
@@ -86,6 +86,9 @@ export class Level1Scene extends Phaser.Scene {
     this.bossTriggered = false
     this.boss = null
     this.levelComplete = false
+    this.villainAnnouncementActive = false
+    this.villainMusicActive = false
+    this.finishLineX = null
     this.startTime = this.time.now
     this.enemiesDefeated = 0
     this.totalDamageTaken = 0
@@ -370,10 +373,12 @@ export class Level1Scene extends Phaser.Scene {
   }
 
   spawnWave(waveData) {
+    let hasVillain = false
     waveData.enemies.forEach(e => {
       let enemy
       if (e.variant === 'angeloeskin') {
         enemy = new AngeloEskin(this, e.x, GROUND_Y - 50)
+        hasVillain = true
       } else {
         enemy = new FanEnemy(this, e.x, GROUND_Y - 40, e.variant)
       }
@@ -381,11 +386,91 @@ export class Level1Scene extends Phaser.Scene {
       this.physics.add.collider(enemy.sprite, this.envObjects)
       this.enemies.push(enemy)
     })
+
+    // Villain entrance: announce + Embiid + evil music
+    if (hasVillain) {
+      this.showVillainAnnouncement('ANGELO & ESKIN', 'PHILLY SPORTS RADIO\'S WORST', 0xFF4444)
+      AudioSystem.playVillainIntro()
+
+      // Switch to villain music after announcement
+      this.villainMusicActive = true
+      this.time.delayedCall(800, () => {
+        AudioSystem.playVillainMusic()
+      })
+
+      // Spawn Embiid to help
+      if (!this.embiidTriggered) {
+        this.embiidTriggered = true
+        this.time.delayedCall(1500, () => {
+          const px = this.player.sprite.x
+          this.embiid = new EmbiidAlly(this, px - 200, GROUND_Y - 70)
+          this.physics.add.collider(this.embiid.sprite, this.ground)
+        })
+      }
+    }
+  }
+
+  showVillainAnnouncement(name, subtitle, color) {
+    // Brief pause
+    this.villainAnnouncementActive = true
+    this.physics.pause()
+
+    const camX = this.cameras.main.scrollX
+    const centerX = camX + GAME_WIDTH / 2
+    const centerY = GAME_HEIGHT / 2
+
+    // Dark overlay
+    const overlay = this.add.rectangle(camX + GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+    overlay.setScrollFactor(0).setDepth(150)
+
+    // Big villain name
+    const nameText = this.add.text(GAME_WIDTH / 2, centerY - 15, name, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '24px',
+      color: '#' + color.toString(16).padStart(6, '0'),
+      stroke: '#000000',
+      strokeThickness: 4
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(200)
+
+    // Subtitle
+    const subText = this.add.text(GAME_WIDTH / 2, centerY + 20, subtitle, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#FFFFFF'
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(200)
+
+    // Scale in effect
+    nameText.setScale(0.3)
+    this.tweens.add({
+      targets: nameText,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 400,
+      ease: 'Back.easeOut'
+    })
+
+    // Resume after 1.5 seconds
+    this.time.delayedCall(1500, () => {
+      this.villainAnnouncementActive = false
+      this.physics.resume()
+
+      this.tweens.add({
+        targets: [overlay, nameText, subText],
+        alpha: 0,
+        duration: 400,
+        onComplete: () => {
+          overlay.destroy()
+          nameText.destroy()
+          subText.destroy()
+        }
+      })
+    })
   }
 
   update(time) {
     if (this.dialogueSystem.isActive()) return
     if (this.levelComplete) return
+    if (this.villainAnnouncementActive) return
 
     // Update timer
     const elapsed = Math.floor((time - this.startTime) / 1000)
@@ -407,19 +492,27 @@ export class Level1Scene extends Phaser.Scene {
       this.dialogueSystem.showDialogue(SIDE_QUEST)
     }
 
-    // Embiid ally trigger — after wave 4, player reaches x=3000
-    if (!this.embiidTriggered && this.waveIndex >= 4 && playerX > 3000) {
-      this.embiidTriggered = true
-      this.embiid = new EmbiidAlly(this, playerX - 200, GROUND_Y - 70)
-      this.physics.add.collider(this.embiid.sprite, this.ground)
+    // Check if AngeloEskin was defeated — restore normal music
+    if (this.villainMusicActive && !this.enemies.some(e => e instanceof AngeloEskin && e.alive)) {
+      this.villainMusicActive = false
+      if (!this.bossTriggered) {
+        AudioSystem.playLevel1Music()
+      }
     }
 
     // Boss trigger — all waves spawned, all regular enemies dead, player past x=4600
     if (!this.bossTriggered && this.waveIndex >= WAVES.length &&
         this.enemies.length === 0 && playerX > 4600) {
       this.bossTriggered = true
-      this.boss = new BossBrian(this, playerX + 300, GROUND_Y - 55)
-      this.physics.add.collider(this.boss.sprite, this.ground)
+      this.showVillainAnnouncement('BRIAN COLANGELO', 'SON OF JERRY. DESTROYER OF PROCESSES.', 0xE8B800)
+      AudioSystem.playVillainIntro()
+
+      this.time.delayedCall(1500, () => {
+        this.boss = new BossBrian(this, playerX + 300, GROUND_Y - 55)
+        this.physics.add.collider(this.boss.sprite, this.ground)
+        AudioSystem.playVillainMusic()
+        this.villainMusicActive = true
+      })
     }
 
     // Update balls
@@ -630,8 +723,15 @@ export class Level1Scene extends Phaser.Scene {
       }
     }
 
-    // Level complete check — boss defeated
-    if (this.boss && !this.boss.alive) {
+    // Boss defeated — show finish line
+    if (this.boss && !this.boss.alive && !this.finishLineX) {
+      this.villainMusicActive = false
+      AudioSystem.playLevel1Music()
+      this.showFinishLine()
+    }
+
+    // Level complete check — player crosses finish line
+    if (this.finishLineX && playerX > this.finishLineX) {
       this.completeLevel()
     }
   }
@@ -658,6 +758,55 @@ export class Level1Scene extends Phaser.Scene {
       this.player.takeDamage(10)
       this.scoreSystem.showLabelText('BAD PROCESS', this.player.sprite.x, this.player.sprite.y, COLORS.RED)
     }
+  }
+
+  showFinishLine() {
+    // Place finish line 200px ahead of boss position
+    const bossX = this.boss ? this.boss.sprite.x : this.player.sprite.x + 200
+    this.finishLineX = bossX + 200
+
+    // Draw finish line (checkered pattern)
+    const fg = this.add.graphics()
+    fg.setDepth(5)
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 2; col++) {
+        const isWhite = (row + col) % 2 === 0
+        fg.fillStyle(isWhite ? 0xFFFFFF : 0x111111)
+        fg.fillRect(this.finishLineX + col * 10, GROUND_Y - 80 + row * 10, 10, 10)
+      }
+    }
+
+    // Arrow pointing right
+    const arrowText = this.add.text(this.finishLineX + 40, GROUND_Y - 50, '>>>', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '10px',
+      color: '#E8B800'
+    }).setDepth(50)
+
+    this.tweens.add({
+      targets: arrowText,
+      x: arrowText.x + 15,
+      duration: 600,
+      yoyo: true,
+      repeat: -1
+    })
+
+    // "NBA DRAFT AWAITS" text
+    const draftText = this.add.text(this.finishLineX + 30, GROUND_Y - 90, 'NBA DRAFT AWAITS', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#00D4FF',
+      stroke: '#000000',
+      strokeThickness: 3
+    }).setOrigin(0.5, 1).setDepth(50)
+
+    this.tweens.add({
+      targets: draftText,
+      y: draftText.y - 5,
+      duration: 800,
+      yoyo: true,
+      repeat: -1
+    })
   }
 
   completeLevel() {
