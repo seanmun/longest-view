@@ -12,13 +12,12 @@ export const COLORS = {
   skin: '#E0B48C',
 }
 
-// A person: 1.8m capsule body, head, and a floating nametag.
-export function Person({ name, position, color = COLORS.sixersBlue, height = 1.8 }) {
+// A body capsule and head, feet at y=0, facing +Z (the glTF convention Meshy models use).
+export function PersonModel({ color = COLORS.sixersBlue, height = 1.8 }) {
   const radius = 0.3
   const body = height - 0.3 // leave room for the head
   return (
-    <RigidBody type="fixed" position={position} colliders={false}>
-      <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
+    <group>
       <mesh position={[0, body / 2, 0]}>
         <capsuleGeometry args={[radius, body - radius * 2, 4, 12]} />
         <meshStandardMaterial color={color} />
@@ -27,6 +26,34 @@ export function Person({ name, position, color = COLORS.sixersBlue, height = 1.8
         <sphereGeometry args={[0.15, 16, 12]} />
         <meshStandardMaterial color={COLORS.skin} />
       </mesh>
+    </group>
+  )
+}
+
+// Hinkie: navy suit, red tie, glasses. 1.8m to match the player capsule.
+export function HinkieModel() {
+  return (
+    <group>
+      <PersonModel color={COLORS.navy} height={1.8} />
+      <mesh position={[0, 1.2, 0.29]}>
+        <boxGeometry args={[0.08, 0.35, 0.03]} />
+        <meshStandardMaterial color={COLORS.sixersRed} />
+      </mesh>
+      <mesh position={[0, 1.67, 0.14]}>
+        <boxGeometry args={[0.22, 0.05, 0.03]} />
+        <meshStandardMaterial color="#111111" />
+      </mesh>
+    </group>
+  )
+}
+
+// A person NPC: solid body plus a floating nametag.
+export function Person({ name, position, color = COLORS.sixersBlue, height = 1.8 }) {
+  const radius = 0.3
+  return (
+    <RigidBody type="fixed" position={position} colliders={false}>
+      <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
+      <PersonModel color={color} height={height} />
       <Billboard position={[0, height + 0.35, 0]}>
         <Text fontSize={0.22} color="white" outlineWidth={0.02} outlineColor="black" anchorY="middle">
           {name}

@@ -1,6 +1,6 @@
 # Longest View: Sam Hinkie's Revenge (3D)
 
-First-person story adventure in the browser, desktop and phone. Satire of
+Third-person story adventure (camera behind Hinkie) in the browser, desktop and phone. Satire of
 the Process-era 76ers; Hinkie fights through hostile fans with explosive
 ping pong balls. Doubles as a light ad for mnsfantasy.com (not "MNS.COM").
 
@@ -17,7 +17,7 @@ database URL, which would ship credentials to the browser.
 
 ## Layout
 
-- `src/game/` — 3D scene: `Player`, `World`, `Placeholders`, `input`
+- `src/game/` — 3D scene: `Player` (Hinkie + orbit camera), `World`, `Placeholders`, `input`
 - `src/ui/` — React overlays: desktop and touch controls
 
 ## Rules

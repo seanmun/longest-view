@@ -18,10 +18,7 @@ export default function World() {
 
       {/* Floor, ceiling, walls */}
       <Box position={[0, -0.1, 0]} size={[LENGTH, 0.2, WIDTH]} color="#8C7B6B" />
-      <mesh position={[0, HEIGHT, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[LENGTH, WIDTH]} />
-        <meshStandardMaterial color="#15151F" />
-      </mesh>
+      <Box position={[0, HEIGHT + 0.1, 0]} size={[LENGTH, 0.2, WIDTH]} color="#15151F" />
       <Box position={[0, HEIGHT / 2, -WIDTH / 2 - WALL / 2]} size={[LENGTH, HEIGHT, WALL]} color="#3B4152" />
       <Box position={[0, HEIGHT / 2, WIDTH / 2 + WALL / 2]} size={[LENGTH, HEIGHT, WALL]} color="#3B4152" />
       <Box position={[-LENGTH / 2 - WALL / 2, HEIGHT / 2, 0]} size={[WALL, HEIGHT, WIDTH]} color="#2A2F3C" />
