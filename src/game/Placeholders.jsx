@@ -2,6 +2,7 @@
 // Meshy model will have, so swapping in a model later changes nothing else.
 import { Billboard, Text } from '@react-three/drei'
 import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@react-three/rapier'
+import { useGame } from './state.js'
 
 export const COLORS = {
   sixersBlue: '#006BB6',
@@ -47,16 +48,17 @@ export function HinkieModel() {
   )
 }
 
-// A person NPC: solid body plus a floating nametag.
-export function Person({ name, position, color = COLORS.sixersBlue, height = 1.8 }) {
+// A person NPC: solid body plus a floating nametag (turns into a gold BELIEVER once convinced).
+export function Person({ id, name, position, color = COLORS.sixersBlue, height = 1.8 }) {
   const radius = 0.3
+  const convinced = useGame((s) => s.flags[id] === true)
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
       <PersonModel color={color} height={height} />
       <Billboard position={[0, height + 0.35, 0]}>
-        <Text fontSize={0.22} color="white" outlineWidth={0.02} outlineColor="black" anchorY="middle">
-          {name}
+        <Text fontSize={0.22} color={convinced ? COLORS.gold : 'white'} outlineWidth={0.02} outlineColor="black" anchorY="middle">
+          {convinced ? 'BELIEVER' : name}
         </Text>
       </Billboard>
     </RigidBody>

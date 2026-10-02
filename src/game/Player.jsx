@@ -3,6 +3,9 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier'
 import { input, consumeLook, keyboardAxes, listenKeyboard } from './input.js'
 import { HinkieModel } from './Placeholders.jsx'
+import { PEOPLE, TALK_RANGE } from './level1.js'
+import { polar } from './ring.js'
+import { getState, setState } from './state.js'
 
 const WALK_SPEED = 4 // m/s
 const TURN_SPEED = 2.2 // rad/s, arrow keys
@@ -18,6 +21,8 @@ const CAM_WALL_PADDING = 0.3 // m, stay this far in front of walls
 const CAPSULE_HALF = 0.6
 const CAPSULE_RADIUS = 0.3
 const FEET = -(CAPSULE_HALF + CAPSULE_RADIUS)
+
+const PEOPLE_XZ = PEOPLE.map((p) => { const [x, , z] = polar(p.r, p.angle); return { id: p.id, x, z } })
 
 export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
   const body = useRef()
@@ -39,8 +44,10 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     yaw.current -= look.x + keys.turn * TURN_SPEED * dt
     elevation.current = Math.max(CAM_MIN_ELEVATION, Math.min(CAM_MAX_ELEVATION, elevation.current + look.y))
 
-    let mx = keys.x + input.moveX
-    let my = keys.y + input.moveY
+    // Hold still while talking
+    const talking = getState().talk != null
+    let mx = talking ? 0 : keys.x + input.moveX
+    let my = talking ? 0 : keys.y + input.moveY
     const len = Math.hypot(mx, my)
     if (len > 1) { mx /= len; my /= len }
 
@@ -51,17 +58,27 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     const vz = (-mx * sin - my * cos) * WALK_SPEED
     b.setLinvel({ x: vx, y: b.linvel().y, z: vz }, true)
 
-    // Turn Hinkie toward where he's walking, the short way around
-    if (len > 0.1) {
-      const target = Math.atan2(vx, vz)
+    // Turn Hinkie toward where he's walking (or who he's talking to), the short way around
+    const p = b.translation()
+    const partner = talking && PEOPLE_XZ.find((person) => person.id === getState().talk.id)
+    if (partner || len > 0.1) {
+      const target = partner ? Math.atan2(partner.x - p.x, partner.z - p.z) : Math.atan2(vx, vz)
       let diff = target - facing.current
       diff = Math.atan2(Math.sin(diff), Math.cos(diff))
       facing.current += diff * Math.min(1, FACE_SPEED * dt)
     }
     model.current.rotation.y = facing.current
 
+    // Who's close enough to talk to?
+    let nearby = null
+    let best = TALK_RANGE
+    for (const person of PEOPLE_XZ) {
+      const d = Math.hypot(person.x - p.x, person.z - p.z)
+      if (d < best) { best = d; nearby = person.id }
+    }
+    if (nearby !== getState().nearby) setState({ nearby })
+
     // Camera sits behind Hinkie; pull it in if a wall is in the way
-    const p = b.translation()
     const target = { x: p.x, y: p.y + CAM_TARGET_HEIGHT, z: p.z }
     const ce = Math.cos(elevation.current)
     const dir = { x: sin * ce, y: Math.sin(elevation.current), z: cos * ce }

@@ -37,7 +37,7 @@ database URL, which would ship credentials to the browser.
 
 1. Movement sandbox
 2. Concourse layout (ring around the bowl, START / FINISH at the tunnel)
-3. Dialogue system
+3. Dialogue system (convince 6 fans; cast and lines in `src/game/level1.js`)
 4. Binder puzzle (3 pieces unlock the locker-room door)
 5. Fan mob encounter
 6. Intro + end card

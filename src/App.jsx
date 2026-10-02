@@ -1,10 +1,12 @@
 import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
-import World, { polar, R_MID } from './game/World.jsx'
+import World from './game/World.jsx'
+import { polar, R_MID } from './game/ring.js'
 import Player from './game/Player.jsx'
 import TouchControls from './ui/TouchControls.jsx'
 import DesktopControls from './ui/DesktopControls.jsx'
+import Talk from './ui/Talk.jsx'
 
 // ?at=<radians> spawns elsewhere on the ring, for testing
 const START_ANGLE = Number(new URLSearchParams(window.location.search).get('at')) || 0.25
@@ -24,6 +26,7 @@ export default function App() {
         </Suspense>
       </Canvas>
       {isTouch ? <TouchControls /> : <DesktopControls />}
+      <Talk isTouch={isTouch} />
     </div>
   )
 }

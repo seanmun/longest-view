@@ -6,10 +6,9 @@ import { BackSide, DoubleSide } from 'three'
 import { Text } from '@react-three/drei'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
 import { Person, TrashCan, HotDogCart, Banner, COLORS } from './Placeholders.jsx'
+import { R_IN, R_OUT, R_MID, polar } from './ring.js'
+import { PEOPLE } from './level1.js'
 
-export const R_IN = 26 // inner wall (arena side)
-export const R_OUT = 36 // outer wall
-export const R_MID = (R_IN + R_OUT) / 2
 const HEIGHT = 4.5
 const WALL = 0.4
 const SEGMENTS = 96 // collider pieces per ring
@@ -20,11 +19,6 @@ const PORTALS = Array.from({ length: 8 }, (_, i) => ({
 }))
 const PORTAL_WIDTH = 4 // m
 const PORTAL_HEIGHT = 2.6
-
-// Position on the ring floor at radius r, angle a
-export function polar(r, a, y = 0) {
-  return [r * Math.sin(a), y, r * Math.cos(a)]
-}
 
 // Rotation that makes local +Z point outward at angle a
 const facingOut = (a) => [0, a, 0]
@@ -186,15 +180,6 @@ const BANNERS = [
   { angle: 5.8, text: 'TRUST THE PROCESS' },
 ]
 
-const PEOPLE = [
-  { angle: 0.35, r: 29, name: 'FAN' },
-  { angle: 1.1, r: 33, name: 'FAN', color: COLORS.sixersRed },
-  { angle: 1.9, r: 30, name: 'ANALYST', color: COLORS.cream },
-  { angle: 2.8, r: 32, name: 'FAN' },
-  { angle: 3.7, r: 29, name: 'FAN', color: COLORS.sixersRed },
-  { angle: 4.6, r: 33, name: 'DRUNK FAN', height: 1.85 },
-  { angle: 5.5, r: 30, name: 'FAN' },
-]
 
 export default function World() {
   return (
@@ -220,7 +205,7 @@ export default function World() {
       ))}
 
       {PEOPLE.map((p) => (
-        <Person key={p.angle} name={p.name} position={polar(p.r, p.angle)} color={p.color} height={p.height} />
+        <Person key={p.id} id={p.id} name={p.name} position={polar(p.r, p.angle)} color={p.color} height={p.height} />
       ))}
     </>
   )
