@@ -6,7 +6,7 @@ import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@r
 export const COLORS = {
   sixersBlue: '#006BB6',
   sixersRed: '#ED174C',
-  navy: '#1B2A4A',
+  navy: '#2A3F6E',
   gold: '#E8B800',
   cream: '#F2E8D5',
   skin: '#E0B48C',
