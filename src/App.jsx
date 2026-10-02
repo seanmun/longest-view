@@ -1,53 +1,27 @@
-import { useState } from 'react'
-import GameCanvas from './components/GameCanvas.jsx'
-import HUD from './components/HUD.jsx'
-import DialogueBox from './components/DialogueBox.jsx'
-import MNSPromo from './components/MNSPromo.jsx'
-import PauseMenu from './components/PauseMenu.jsx'
-import LevelCompleteScreen from './components/LevelCompleteScreen.jsx'
-import InitialsEntry from './components/InitialsEntry.jsx'
-import Leaderboard from './components/Leaderboard.jsx'
-import VolumeControl from './components/VolumeControl.jsx'
-import MobileControls from './components/MobileControls.jsx'
-import CharacterDesignPage from './components/CharacterDesignPage.jsx'
-import PixelEditor from './components/PixelEditor.jsx'
+import { Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { Physics } from '@react-three/rapier'
+import World from './game/World.jsx'
+import Player from './game/Player.jsx'
+import TouchControls from './ui/TouchControls.jsx'
+import DesktopControls from './ui/DesktopControls.jsx'
+
+const isTouch = window.matchMedia('(pointer: coarse)').matches
 
 export default function App() {
-  const [game, setGame] = useState(null)
-
-  // Path-based routing
-  if (window.location.pathname === '/design') return <CharacterDesignPage />
-  if (window.location.pathname === '/editor') return <PixelEditor />
-
-  const gameContent = (
-    <div className="crt-screen relative bg-black overflow-hidden"
-      style={{ width: '100%', maxWidth: '1200px', aspectRatio: '4 / 3' }}>
-      {/* Game canvas */}
-      <GameCanvas onGameReady={setGame} />
-
-      {/* React overlays — positioned relative to game area */}
-      {game && (
-        <>
-          <HUD game={game} />
-          <DialogueBox game={game} />
-          <MNSPromo game={game} />
-          <PauseMenu game={game} />
-          <LevelCompleteScreen game={game} />
-          <InitialsEntry game={game} />
-          <Leaderboard game={game} />
-        </>
-      )}
-
-      {/* Volume control */}
-      <VolumeControl />
-    </div>
-  )
-
   return (
-    <div className="w-screen h-screen bg-black flex items-center justify-center">
-      <MobileControls>
-        {gameContent}
-      </MobileControls>
+    <div className="fixed inset-0">
+      <Canvas camera={{ fov: 70, near: 0.1, far: 200 }} dpr={[1, 2]}>
+        <color attach="background" args={['#0a0a1a']} />
+        <Suspense fallback={null}>
+          <Physics>
+            <World />
+            {/* Start at the tunnel end, facing down the concourse (+x) */}
+            <Player position={[-22, 1, 0]} yaw={-Math.PI / 2} />
+          </Physics>
+        </Suspense>
+      </Canvas>
+      {isTouch ? <TouchControls /> : <DesktopControls />}
     </div>
   )
 }

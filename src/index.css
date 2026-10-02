@@ -1,114 +1,17 @@
 @import "tailwindcss";
 
-* {
+html, body, #root {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background-color: #0a0a1a;
-  overflow: hidden;
-  font-family: 'Press Start 2P', monospace;
-  color: #ffffff;
-  width: 100vw;
-  height: 100vh;
-}
-
-#root {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* CRT Flicker Animation */
-@keyframes crt-flicker {
-  0% { opacity: 0.03; }
-  5% { opacity: 0.01; }
-  10% { opacity: 0.04; }
-  15% { opacity: 0.02; }
-  20% { opacity: 0.05; }
-  25% { opacity: 0.01; }
-  30% { opacity: 0.03; }
-  35% { opacity: 0.04; }
-  40% { opacity: 0.01; }
-  45% { opacity: 0.05; }
-  50% { opacity: 0.02; }
-  55% { opacity: 0.04; }
-  60% { opacity: 0.01; }
-  65% { opacity: 0.03; }
-  70% { opacity: 0.05; }
-  75% { opacity: 0.02; }
-  80% { opacity: 0.04; }
-  85% { opacity: 0.01; }
-  90% { opacity: 0.03; }
-  95% { opacity: 0.05; }
-  100% { opacity: 0.02; }
-}
-
-/* CRT Screen — just the curved game area, no bezel frame */
-.crt-screen {
   overflow: hidden;
-  position: relative;
+  background: #0a0a1a;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 18px;
+  overscroll-behavior: none;
 }
 
-/* Scanlines + RGB sub-pixel columns (replaces old .scanlines div) */
-.crt-screen::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background:
-    linear-gradient(transparent 50%, rgba(0, 0, 0, 0.25) 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 2px, 3px 100%;
-  z-index: 1000;
-  pointer-events: none;
-}
-
-/* Subtle screen flicker */
-.crt-screen::after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: rgba(18, 16, 16, 0.1);
-  opacity: 0;
-  z-index: 1000;
-  pointer-events: none;
-  animation: crt-flicker 0.15s infinite;
-}
-
-@media (max-width: 768px) {
-  .crt-screen {
-    aspect-ratio: auto !important;
-    max-width: 100% !important;
-  }
-}
-
-/* Press Start 2P font utility */
-.font-pixel {
+.title {
   font-family: 'Press Start 2P', monospace;
-}
-
-/* Mobile touch prevention */
-@media (max-width: 768px) {
-  html, body {
-    touch-action: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    overscroll-behavior: none;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
 }
