@@ -3,11 +3,15 @@
 import { Suspense, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { Box3, Vector3 } from 'three'
+import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 export const modelUrl = (name) => `${import.meta.env.BASE_URL}models/${name}.glb`
 
 function Fitted({ url, height, rotationY }) {
-  const { scene } = useGLTF(url)
+  const { scene: source } = useGLTF(url)
+  // Each placement gets its own copy (an object can only sit in one place);
+  // geometry and textures stay shared.
+  const scene = useMemo(() => cloneSkinned(source), [source])
   const { scale, offsetY, offsetX, offsetZ } = useMemo(() => {
     const box = new Box3().setFromObject(scene)
     const size = box.getSize(new Vector3())

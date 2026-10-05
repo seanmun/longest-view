@@ -3,6 +3,7 @@
 import { Billboard, Text } from '@react-three/drei'
 import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@react-three/rapier'
 import { useGame } from './state.js'
+import Model from './Model.jsx'
 
 export const COLORS = {
   sixersBlue: '#006BB6',
@@ -78,28 +79,40 @@ export function Box({ position, size, color, rotation }) {
 }
 
 export function TrashCan({ position }) {
+  const placeholder = (
+    <mesh position={[0, 0.45, 0]}>
+      <cylinderGeometry args={[0.26, 0.22, 0.9, 16]} />
+      <meshStandardMaterial color="#3A3F47" />
+    </mesh>
+  )
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
-      <CylinderCollider args={[0.45, 0.3]} position={[0, 0.45, 0]} />
-      <mesh position={[0, 0.45, 0]}>
-        <cylinderGeometry args={[0.3, 0.26, 0.9, 16]} />
-        <meshStandardMaterial color="#3A3F47" />
-      </mesh>
+      <CylinderCollider args={[0.475, 0.25]} position={[0, 0.475, 0]} />
+      <Model name="trash-can" height={0.95} fallback={placeholder} />
     </RigidBody>
   )
 }
 
+// Cart model is ~1.4m square and 2m tall
 export function HotDogCart({ position, rotation }) {
-  return (
-    <group position={position} rotation={rotation}>
-      <Box position={[0, 0.55, 0]} size={[1.6, 1.1, 0.8]} color={COLORS.sixersRed} />
+  const placeholder = (
+    <>
+      <mesh position={[0, 0.55, 0]}>
+        <boxGeometry args={[1.3, 1.1, 1.3]} />
+        <meshStandardMaterial color={COLORS.sixersRed} />
+      </mesh>
       <mesh position={[0, 1.9, 0]}>
-        <boxGeometry args={[1.8, 0.08, 1]} />
+        <boxGeometry args={[1.5, 0.08, 1.5]} />
         <meshStandardMaterial color={COLORS.gold} />
       </mesh>
-      <Billboard position={[0, 2.25, 0]}>
-        <Text fontSize={0.2} color="white" outlineWidth={0.02} outlineColor="black">HOT DOGS</Text>
-      </Billboard>
+    </>
+  )
+  return (
+    <group position={position} rotation={rotation}>
+      <RigidBody type="fixed" colliders={false}>
+        <CuboidCollider args={[0.65, 0.55, 0.65]} position={[0, 0.55, 0]} />
+      </RigidBody>
+      <Model name="hot-dog-cart" height={2} fallback={placeholder} />
     </group>
   )
 }
