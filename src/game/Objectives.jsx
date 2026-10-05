@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import { COLORS } from './Placeholders.jsx'
+import Model from './Model.jsx'
 import { R_OUT, polar } from './ring.js'
 import { PAGES, PICKUP_RANGE, DOOR, DOOR_RANGE, ENTER_RANGE } from './level1.js'
 import { getState, setState, useGame, player, toast } from './state.js'
@@ -24,13 +25,19 @@ function Page({ id, pos }) {
     ref.current.position.y = 1 + Math.sin(clock.elapsedTime * 2) * 0.12
   })
   if (taken) return null
+  const placeholder = (
+    <mesh position={[0, 0.28, 0]}>
+      <boxGeometry args={[0.5, 0.65, 0.05]} />
+      <meshStandardMaterial color={COLORS.cream} emissive={COLORS.gold} emissiveIntensity={0.9} />
+    </mesh>
+  )
   return (
     <group position={pos}>
       <group ref={ref}>
-        <mesh>
-          <boxGeometry args={[0.5, 0.65, 0.05]} />
-          <meshStandardMaterial color={COLORS.cream} emissive={COLORS.gold} emissiveIntensity={0.9} />
-        </mesh>
+        {/* Binder model is ~0.9m wide so it reads on a phone; centered on the bobbing point */}
+        <group position={[0, -0.28, 0]}>
+          <Model name="binder" height={0.56} fallback={placeholder} />
+        </group>
       </group>
       <Billboard position={[0, 1.65, 0]}>
         <Text fontSize={0.2} color={COLORS.gold} outlineWidth={0.02} outlineColor="black">BINDER PAGE</Text>
