@@ -84,9 +84,18 @@ export const PEOPLE = [
 
 export const FAN_COUNT = PEOPLE.filter((p) => p.fan).length
 
-// The mob crowding the locker-room door. Each one is [radius, angle offset from the door].
+// The mob crowding the locker-room door, led by Badman (a giggling weasel).
+// r / da: radius and angle offset from the door. model: null shows a
+// placeholder until that character's Meshy model arrives.
+// Rigged mob models share clip names: stomp, stomp2, hit, run.
 export const MOB = [
-  [34.8, -0.075], [33.4, -0.05], [32.7, 0], [33.4, 0.05], [34.8, 0.075],
-].map(([r, da], i) => ({ id: `mob${i}`, r, angle: DOOR.angle + da }))
+  {
+    id: 'badman', name: 'BADMAN', model: 'badman', leader: true, r: 32.7, da: 0, height: 1.9,
+    stomp: 'stomp', hitTime: 1.5,
+    shouts: ['HEHEHEHEHE!', 'Hehe... JUST WIN GAMES, BRO!', 'HEHEHE! FIRE HIM!'],
+  },
+  { id: 'pj', name: 'PJ', model: 'pj', r: 33.4, da: -0.05, stomp: 'stomp', hitTime: 2.2, shouts: ['WHAT IS A PING PONG BALL?!'] },
+  { id: 'stine', name: 'STINE', model: null, r: 33.4, da: 0.05, shouts: ['WE WANT WINS!'] },
+  { id: 'teamike', name: 'TEA MIKE', model: null, r: 34.8, da: -0.075, shouts: ['BOOOOO!'] },
+].map((m) => ({ ...m, angle: DOOR.angle + m.da }))
 export const MOB_BARRIER_RADIUS = 2.5 // m around the door, solid until the mob is gone
-export const MOB_SHOUTS = ['JUST WIN GAMES BRO!', 'FIRE HIM!', 'WHAT IS A PING PONG BALL', 'WE WANT WINS!', 'BOOOO!']

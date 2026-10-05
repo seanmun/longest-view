@@ -23,11 +23,15 @@ function upperBodyOnly(clip) {
   return c
 }
 
-function Fitted({ url, height, rotationY, anim }) {
+function Fitted({ url, height, rotationY, anim, decorate }) {
   const { scene: source, animations } = useGLTF(url)
   // Each placement gets its own copy (an object can only sit in one place);
   // geometry and textures stay shared.
-  const scene = useMemo(() => cloneSkinned(source), [source])
+  const scene = useMemo(() => {
+    const copy = cloneSkinned(source)
+    decorate?.(copy) // e.g. real sunglasses where Meshy only painted them
+    return copy
+  }, [source, decorate])
   const { scale, offsetY, offsetX, offsetZ } = useMemo(() => {
     const box = new Box3().setFromObject(scene)
     const size = box.getSize(new Vector3())
@@ -81,10 +85,10 @@ function Fitted({ url, height, rotationY, anim }) {
 }
 
 // Shows `fallback` (the placeholder) while the model downloads
-export default function Model({ name, height, rotationY = 0, fallback = null, anim }) {
+export default function Model({ name, height, rotationY = 0, fallback = null, anim, decorate }) {
   return (
     <Suspense fallback={fallback}>
-      <Fitted url={modelUrl(name)} height={height} rotationY={rotationY} anim={anim} />
+      <Fitted url={modelUrl(name)} height={height} rotationY={rotationY} anim={anim} decorate={decorate} />
     </Suspense>
   )
 }

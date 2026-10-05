@@ -90,6 +90,9 @@ export const sfx = {
   bad: () => tone({ freq: 220, to: 110, type: 'sawtooth', dur: 0.35, vol: 0.5 }),
   page: () => notes([784, 988, 1175, 1568, 1976], { type: 'triangle', step: 0.07, dur: 0.15 }),
   door: () => notes([392, 523, 659, 784, 1047], { step: 0.12, dur: 0.2 }),
+  // Badman's weaselly "hehehehe": quick high bleats wobbling down
+  giggle: () => [1320, 1240, 1180, 1100, 1040].forEach((f, i) =>
+    tone({ freq: f, to: f * 0.85, type: 'triangle', dur: 0.07, vol: 0.6, at: i * 0.085 })),
   complete: () => {
     notes([523, 523, 523, 659, 784, 659, 784, 1047], { step: 0.16, dur: 0.22 })
     notes([131, 131, 131, 165, 196, 165, 196, 262], { type: 'triangle', step: 0.16, dur: 0.22, vol: 0.9 })

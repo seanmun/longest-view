@@ -1,5 +1,5 @@
-// The "JUST WIN GAMES BRO" mob around the locker-room door: Badman bobbleheads
-// stomping mad. A ping pong ball knocks one back (hit clip + dizzy stars); then
+// The "JUST WIN GAMES BRO" mob around the locker-room door, led by Badman, a
+// giggling weasel. Rigged members stomp mad. A ping pong ball knocks one back (hit clip + dizzy stars); then
 // they run off through the tunnel. The door stays walled off until every
 // member is gone.
 import { useEffect, useRef } from 'react'
@@ -9,12 +9,14 @@ import { RigidBody, CylinderCollider } from '@react-three/rapier'
 import { PersonModel, COLORS } from './Placeholders.jsx'
 import Model from './Model.jsx'
 import { R_OUT, polar } from './ring.js'
-import { MOB, MOB_BARRIER_RADIUS, MOB_SHOUTS, DOOR } from './level1.js'
+import { MOB, MOB_BARRIER_RADIUS, DOOR } from './level1.js'
+import { addSunglasses } from './accessories.js'
 import { getState, setState, useGame, player, toast } from './state.js'
 import { sfx } from './audio.js'
 
 const HIT_RADIUS = 0.5 // m, ball center to member center
-const DIZZY_TIME = 1.5 // s
+const GIGGLE_EVERY = 3.5 // s, Badman giggles while Hinkie is near
+const GIGGLE_RANGE = 10 // m
 const RUN_SPEED = 5 // m/s
 const SHOUT_TIME = 1.4 // s each; one member shouts at a time so it stays readable
 const NOTICE_RANGE = 12 // m from the door when the mob hint first shows
@@ -22,13 +24,19 @@ const [TUNNEL_X, , TUNNEL_Z] = polar(R_OUT - 0.4, 0.03)
 const DOOR_FRONT = polar(R_OUT - 0.8, DOOR.angle)
 const isTouch = window.matchMedia('(pointer: coarse)').matches
 
+// Meshy painted PJ's sunglasses on badly; give him real ones
+const DECORATE = {
+  pj: (scene) => addSunglasses(scene, { y: 1.69, z: 0.33, lensW: 0.215, lensH: 0.14, earX: 0.375, earY: 1.665, earZ: -0.09 }),
+}
+
 const members = MOB.map((m, i) => {
   const [x, , z] = polar(m.r, m.angle)
   return {
-    id: m.id, x, z, state: 'angry', t: 0,
+    ...m, x, z, state: 'angry', t: 0, giggleAt: 0,
+    height: m.height ?? 1.8,
+    hitTime: m.hitTime ?? 1.5,
+    stomp: m.stomp ?? 'stomp',
     color: i % 2 ? COLORS.sixersRed : COLORS.sixersBlue,
-    shout: MOB_SHOUTS[i % MOB_SHOUTS.length],
-    stomp: i % 2 ? 'stomp2' : 'stomp', // alternate the two stomp clips
     pace: 0.85 + (i * 0.37) % 0.3, // slightly different speeds so they don't move in lockstep
   }
 })
@@ -38,7 +46,12 @@ export function hitMob(x, y, z) {
   if (y > 1.9) return false
   for (const m of members) {
     if ((m.state === 'angry' || m.state === 'dizzy') && Math.hypot(x - m.x, z - m.z) < HIT_RADIUS) {
-      if (m.state === 'angry') { m.state = 'dizzy'; m.t = 0; sfx.dizzy() }
+      if (m.state === 'angry') {
+        m.state = 'dizzy'
+        m.t = 0
+        if (m.leader) sfx.giggle()
+        else sfx.dizzy()
+      }
       return true
     }
   }
@@ -48,7 +61,7 @@ export function hitMob(x, y, z) {
 function Member({ m }) {
   const root = useRef()
   const body = useRef()
-  const shout = useRef()
+  const shouts = useRef([])
   const stars = useRef()
   const anim = useRef({ name: m.stomp, speed: m.pace })
 
@@ -59,7 +72,15 @@ function Member({ m }) {
     m.t += dt
     const time = clock.elapsedTime
 
-    if (m.state === 'dizzy' && m.t > DIZZY_TIME) { m.state = 'fleeing'; m.t = 0 }
+    if (m.state === 'dizzy' && m.t > m.hitTime) {
+      m.state = 'fleeing'
+      m.t = 0
+      if (m.leader) sfx.giggle() // scurries off giggling
+    }
+    if (m.leader && m.state === 'angry' && time > m.giggleAt && Math.hypot(player.x - m.x, player.z - m.z) < GIGGLE_RANGE) {
+      sfx.giggle()
+      m.giggleAt = time + GIGGLE_EVERY
+    }
     if (m.state === 'fleeing') {
       const dx = TUNNEL_X - m.x
       const dz = TUNNEL_Z - m.z
@@ -77,14 +98,18 @@ function Member({ m }) {
     g.visible = m.state !== 'gone'
     g.position.set(m.x, 0, m.z)
     const angry = members.filter((o) => o.state === 'angry')
-    shout.current.visible = m.state === 'angry' && angry[Math.floor(time / SHOUT_TIME) % angry.length] === m
+    const turn = Math.floor(time / SHOUT_TIME)
+    const myTurn = m.state === 'angry' && angry[turn % angry.length] === m
+    shouts.current.forEach((b, i) => { if (b) b.visible = myTurn && i === turn % m.shouts.length })
     stars.current.visible = m.state === 'dizzy'
 
     if (m.state === 'angry') {
       anim.current = { name: m.stomp, speed: m.pace }
       body.current.rotation.y = Math.atan2(player.x - m.x, player.z - m.z) // glare at Hinkie
+      if (!m.model) body.current.position.y = Math.abs(Math.sin(time * 6 + m.x)) * 0.15 // placeholder hops mad
     } else if (m.state === 'dizzy') {
       anim.current = { name: 'hit', speed: 1 }
+      body.current.position.y = 0
       stars.current.rotation.y = m.t * 5
     } else if (m.state === 'fleeing') {
       anim.current = { name: 'run', speed: 1.2 }
@@ -94,9 +119,11 @@ function Member({ m }) {
   return (
     <group ref={root}>
       <group ref={body}>
-        <Model name="badman" height={1.8} anim={anim} fallback={<PersonModel color={m.color} />} />
+        {m.model
+          ? <Model name={m.model} height={m.height} anim={anim} decorate={DECORATE[m.id]} fallback={<PersonModel color={m.color} />} />
+          : <PersonModel color={m.color} height={m.height} />}
       </group>
-      <group ref={stars} position={[0, 2.05, 0]}>
+      <group ref={stars} position={[0, m.height + 0.25, 0]}>
         {[0, 1, 2].map((i) => {
           const a = (i / 3) * Math.PI * 2
           return (
@@ -107,11 +134,18 @@ function Member({ m }) {
           )
         })}
       </group>
-      <Billboard ref={shout} position={[0, 2.3, 0]}>
-        <Text fontSize={0.32} color="white" outlineWidth={0.03} outlineColor={COLORS.sixersRed} maxWidth={3} textAlign="center">
-          {m.shout}
+      <Billboard position={[0, m.height + 0.2, 0]}>
+        <Text fontSize={0.2} color={m.leader ? COLORS.gold : 'white'} outlineWidth={0.02} outlineColor="black">
+          {m.leader ? `${m.name} (LEADER)` : m.name}
         </Text>
       </Billboard>
+      {m.shouts.map((line, i) => (
+        <Billboard key={line} ref={(b) => { shouts.current[i] = b }} position={[0, m.height + 0.55, 0]} visible={false}>
+          <Text fontSize={0.32} color="white" outlineWidth={0.03} outlineColor={COLORS.sixersRed} maxWidth={3} textAlign="center">
+            {line}
+          </Text>
+        </Billboard>
+      ))}
     </group>
   )
 }
