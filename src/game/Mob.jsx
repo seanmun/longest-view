@@ -17,6 +17,7 @@ import { sfx } from './audio.js'
 const HIT_RADIUS = 0.5 // m, ball center to member center
 const GIGGLE_EVERY = 3.5 // s, Badman giggles while Hinkie is near
 const GIGGLE_RANGE = 10 // m
+const MOOD_TIME = 5 // s per clip for members with `moods` (e.g. Tea Mike: stomp, then dance)
 const RUN_SPEED = 5 // m/s
 const SHOUT_TIME = 1.4 // s each; one member shouts at a time so it stays readable
 const NOTICE_RANGE = 12 // m from the door when the mob hint first shows
@@ -104,7 +105,8 @@ function Member({ m }) {
     stars.current.visible = m.state === 'dizzy'
 
     if (m.state === 'angry') {
-      anim.current = { name: m.stomp, speed: m.pace }
+      const mood = m.moods ? m.moods[Math.floor((time + m.pace * 3) / MOOD_TIME) % m.moods.length] : m.stomp
+      anim.current = { name: mood, speed: m.pace }
       body.current.rotation.y = Math.atan2(player.x - m.x, player.z - m.z) // glare at Hinkie
       if (!m.model) body.current.position.y = Math.abs(Math.sin(time * 6 + m.x)) * 0.15 // placeholder hops mad
     } else if (m.state === 'dizzy') {
