@@ -4,6 +4,17 @@ import { COLORS } from './Placeholders.jsx'
 
 export const TALK_RANGE = 2.6 // m from Hinkie's center to theirs
 
+// Missing pages of the analytics binder. All three open the locker-room door.
+export const PAGES = [
+  { id: 'page1', angle: (1.5 * Math.PI) / 4, r: 27.6 }, // in front of SECTION 104
+  { id: 'page2', angle: 3.05, r: 34.8 }, // by a trash can on the outer wall
+  { id: 'page3', angle: 5.0, r: 31 }, // middle of the concourse
+]
+export const PICKUP_RANGE = 1.2 // m
+export const DOOR = { angle: -0.06 } // on the outer wall, just before the finish line
+export const DOOR_RANGE = 3 // m: close enough to read the door
+export const ENTER_RANGE = 1.4 // m: walked into the open doorway
+
 export const PEOPLE = [
   {
     id: 'fan1', name: 'FAN', angle: 0.35, r: 29, fan: true,

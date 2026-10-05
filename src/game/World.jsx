@@ -157,15 +157,7 @@ function StartFinish() {
         outlineWidth={0.02} outlineColor="black">
         {'←  THIS WAY'}
       </Text>
-      {/* Locker-room door: the end of the lap, just before the line */}
-      <mesh position={polar(R_OUT - 0.05, -0.06, 1.2)} rotation={facingIn(-0.06)}>
-        <boxGeometry args={[1.6, 2.4, 0.1]} />
-        <meshStandardMaterial color={COLORS.gold} />
-      </mesh>
-      <Text position={polar(R_OUT - 0.12, -0.06, 2.75)} rotation={facingIn(-0.06)} fontSize={0.3} color="white"
-        outlineWidth={0.02} outlineColor="black">
-        LOCKER ROOM
-      </Text>
+      {/* Locker-room door lives in Objectives.jsx */}
     </group>
   )
 }

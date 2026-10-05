@@ -5,7 +5,7 @@ import { input, consumeLook, keyboardAxes, listenKeyboard } from './input.js'
 import { HinkieModel } from './Placeholders.jsx'
 import { PEOPLE, TALK_RANGE } from './level1.js'
 import { polar } from './ring.js'
-import { getState, setState } from './state.js'
+import { getState, setState, player } from './state.js'
 
 const WALK_SPEED = 4 // m/s
 const TURN_SPEED = 2.2 // rad/s, arrow keys
@@ -44,10 +44,11 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     yaw.current -= look.x + keys.turn * TURN_SPEED * dt
     elevation.current = Math.max(CAM_MIN_ELEVATION, Math.min(CAM_MAX_ELEVATION, elevation.current + look.y))
 
-    // Hold still while talking
+    // Hold still while talking or once the level is over
     const talking = getState().talk != null
-    let mx = talking ? 0 : keys.x + input.moveX
-    let my = talking ? 0 : keys.y + input.moveY
+    const frozen = talking || getState().complete
+    let mx = frozen ? 0 : keys.x + input.moveX
+    let my = frozen ? 0 : keys.y + input.moveY
     const len = Math.hypot(mx, my)
     if (len > 1) { mx /= len; my /= len }
 
@@ -68,6 +69,9 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
       facing.current += diff * Math.min(1, FACE_SPEED * dt)
     }
     model.current.rotation.y = facing.current
+
+    player.x = p.x
+    player.z = p.z
 
     // Who's close enough to talk to?
     let nearby = null

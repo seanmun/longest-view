@@ -5,7 +5,15 @@ let state = {
   nearby: null, // id of the person in talking range
   talk: null, // { id, reply } while a conversation is open
   flags: {}, // id -> true once that person is convinced
+  pages: {}, // binder page id -> true once picked up
+  nearDoor: false, // standing at the locker-room door
+  doorOpen: false,
+  complete: false, // walked through the open door
+  toast: null, // { text, key } short message; key changes on every new toast
 }
+
+// Hinkie's floor position, written by the Player every frame. Not React state.
+export const player = { x: 0, z: 0 }
 const listeners = new Set()
 
 export const getState = () => state
@@ -22,3 +30,7 @@ function subscribe(l) {
 
 // selector must return a primitive or a stable reference
 export const useGame = (selector) => useSyncExternalStore(subscribe, () => selector(state))
+
+export function toast(text) {
+  setState({ toast: { text, key: Date.now() } })
+}
