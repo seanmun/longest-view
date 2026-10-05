@@ -1,16 +1,27 @@
 // Loads a GLB from public/models and fits it to a real-world height with its
 // feet at y=0, so it drops into the same spot as the placeholder it replaces.
 // Rigged models can play their clips: pass `anim`, a ref whose .current is
-// { name, speed }, and the matching clip crossfades in.
+// { name, speed, shot }. `name` crossfades in as the base loop; `shot`
+// ({ id, name, start, speed }, new id each time) plays once on the upper body
+// over it, so legs keep walking or running during a throw.
 import { Suspense, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useAnimations, useGLTF } from '@react-three/drei'
-import { Box3, Vector3 } from 'three'
+import { Box3, LoopOnce, Vector3 } from 'three'
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 export const modelUrl = (name) => `${import.meta.env.BASE_URL}models/${name}.glb`
 
 const FADE = 0.2 // s crossfade between clips
+const SHOT_WEIGHT = 5 // upper-body shot vs base loop: about 5/6 shot on shared bones
+const UPPER_BODY = /spine|neck|head|shoulder|arm|hand/i
+
+// A copy of a clip that only moves the upper body
+function upperBodyOnly(clip) {
+  const c = clip.clone()
+  c.tracks = c.tracks.filter((t) => UPPER_BODY.test(t.name.split('.')[0]))
+  return c
+}
 
 function Fitted({ url, height, rotationY, anim }) {
   const { scene: source, animations } = useGLTF(url)
@@ -26,11 +37,32 @@ function Fitted({ url, height, rotationY, anim }) {
   }, [scene, height])
 
   const root = useRef()
-  const { actions } = useAnimations(animations, root)
+  const clips = useMemo(() => animations.map((c) => (c.name.startsWith('throw') ? upperBodyOnly(c) : c)), [animations])
+  const { actions } = useAnimations(clips, root)
   const playing = useRef(null)
+  const lastShot = useRef(null)
   useFrame(() => {
     if (!anim?.current) return
-    const { name, speed = 1 } = anim.current
+    const { name, speed = 1, shot } = anim.current
+
+    if (shot && shot.id !== lastShot.current && actions[shot.name]) {
+      lastShot.current = shot.id
+      const a = actions[shot.name]
+      a.reset()
+      a.setLoop(LoopOnce, 1)
+      a.time = shot.start ?? 0
+      a.timeScale = shot.speed ?? 1
+      a.weight = SHOT_WEIGHT
+      a.fadingOut = false
+      a.fadeIn(0.05).play()
+    }
+    if (shot && actions[shot.name]) {
+      const a = actions[shot.name]
+      const left = (a.getClip().duration - a.time) / a.timeScale
+      if (a.isRunning() && left < FADE && !a.fadingOut) { a.fadeOut(FADE); a.fadingOut = true }
+      if (!a.isRunning()) a.fadingOut = false
+    }
+
     const next = actions[name]
     if (!next) return
     if (playing.current !== name) {

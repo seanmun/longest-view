@@ -22,6 +22,8 @@ const CAM_MAX_ELEVATION = 1.1 // rad, looking down from above
 const CAM_WALL_PADDING = 0.3 // m, stay this far in front of walls
 
 const RUN_FROM = 0.65 // stick push (0..1) where walking turns into running; keyboard is always 1
+const THROW_CLIP = { name: 'throw', start: 0.3, speed: 2.5 } // skip the wind-up, play fast
+const RELEASE_DELAY = 0.18 // s from tap to the ball leaving his hand in that clip
 const THROW_SPEED = 13 // m/s forward
 const THROW_LIFT = 2.5 // m/s upward
 
@@ -34,7 +36,9 @@ const PEOPLE_XZ = PEOPLE.map((p) => { const [x, , z] = polar(p.r, p.angle); retu
 export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
   const body = useRef()
   const model = useRef()
-  const anim = useRef({ name: 'idle', speed: 1 }) // which clip Hinkie's model plays
+  const anim = useRef({ name: 'idle', speed: 1, shot: null }) // which clips Hinkie's model plays
+  const pendingThrow = useRef(null) // { at, dir } waiting for the release moment
+  const shots = useRef(0)
   const yaw = useRef(startYaw) // camera yaw
   const elevation = useRef(0.35)
   const facing = useRef(startYaw + Math.PI) // Hinkie's model rotation; models face +Z
@@ -77,24 +81,36 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
       facing.current += diff * Math.min(1, FACE_SPEED * dt)
     }
 
-    // Throw where the camera faces; Hinkie turns to throw
+    // Throw where the camera faces: Hinkie turns, winds up, and the ball
+    // leaves his hand a beat later
     if (input.throws > 0) {
       input.throws = 0
-      if (!frozen) {
+      if (!frozen && !pendingThrow.current) {
         const fx = -sin
         const fz = -cos
         facing.current = Math.atan2(fx, fz)
+        pendingThrow.current = { at: RELEASE_DELAY, fx, fz }
+        anim.current.shot = { ...THROW_CLIP, id: ++shots.current }
+      }
+    }
+    if (pendingThrow.current) {
+      const t = pendingThrow.current
+      t.at -= dt
+      facing.current = Math.atan2(t.fx, t.fz)
+      if (t.at <= 0) {
+        pendingThrow.current = null
         sfx.throw()
-        throwBall(p.x + fx * 0.5, p.y + 0.4, p.z + fz * 0.5, fx * THROW_SPEED, THROW_LIFT, fz * THROW_SPEED)
+        throwBall(p.x + t.fx * 0.5, p.y + 0.4, p.z + t.fz * 0.5, t.fx * THROW_SPEED, THROW_LIFT, t.fz * THROW_SPEED)
       }
     }
     model.current.rotation.y = facing.current
 
     // Idle, walk on a gentle push, run on a full one; clip speed follows the stick
     const push = Math.min(1, len)
-    if (push < 0.08) anim.current = { name: 'idle', speed: 1 }
-    else if (push < RUN_FROM) anim.current = { name: 'walk', speed: 0.7 + push }
-    else anim.current = { name: 'run', speed: push }
+    const a = anim.current
+    if (push < 0.08) { a.name = 'idle'; a.speed = 1 }
+    else if (push < RUN_FROM) { a.name = 'walk'; a.speed = 0.7 + push }
+    else { a.name = 'run'; a.speed = push }
 
     player.x = p.x
     player.z = p.z
