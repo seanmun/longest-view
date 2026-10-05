@@ -8,6 +8,7 @@ import { PEOPLE, TALK_RANGE } from './level1.js'
 import { polar } from './ring.js'
 import { getState, setState, player } from './state.js'
 import { throwBall } from './Balls.jsx'
+import { followers, isFollowing, updateFollowers } from './follow.js'
 import { sfx } from './audio.js'
 
 const WALK_SPEED = 4 // m/s
@@ -73,7 +74,8 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
 
     // Turn Hinkie toward where he's walking (or who he's talking to), the short way around
     const p = b.translation()
-    const partner = talking && PEOPLE_XZ.find((person) => person.id === getState().talk.id)
+    const talkId = talking && getState().talk.id
+    const partner = talking && (followers[talkId] ?? PEOPLE_XZ.find((person) => person.id === talkId))
     if (partner || len > 0.1) {
       const target = partner ? Math.atan2(partner.x - p.x, partner.z - p.z) : Math.atan2(vx, vz)
       let diff = target - facing.current
@@ -114,11 +116,13 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
 
     player.x = p.x
     player.z = p.z
+    if (!getState().complete) updateFollowers(dt)
 
     // Who's close enough to talk to?
     let nearby = null
     let best = TALK_RANGE
     for (const person of PEOPLE_XZ) {
+      if (isFollowing(person.id)) continue // followers walk with him; not someone to walk up to
       const d = Math.hypot(person.x - p.x, person.z - p.z)
       if (d < best) { best = d; nearby = person.id }
     }

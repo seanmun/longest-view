@@ -3,6 +3,8 @@
 import { getState, setState } from './state.js'
 import { PEOPLE } from './level1.js'
 import { sfx } from './audio.js'
+import { join } from './follow.js'
+import { polar } from './ring.js'
 
 export const personById = (id) => PEOPLE.find((p) => p.id === id)
 
@@ -19,7 +21,11 @@ export function choose(index) {
   if (!talk || talk.reply) return
   const choice = personById(talk.id).choices[index]
   if (!choice) return
-  if (choice.win) sfx.good()
+  if (choice.win) {
+    sfx.good()
+    const person = personById(talk.id)
+    if (person.fan) { const [x, , z] = polar(person.r, person.angle); join(talk.id, x, z) }
+  }
   else sfx.bad()
   setState((s) => ({
     talk: { id: talk.id, reply: choice.reply },

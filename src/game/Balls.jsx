@@ -7,6 +7,7 @@ import { R_IN, R_OUT, polar } from './ring.js'
 import { PEOPLE } from './level1.js'
 import { hitMob } from './Mob.jsx'
 import { sfx } from './audio.js'
+import { isFollowing } from './follow.js'
 
 const GRAVITY = 9.8
 const BOUNCE = 0.6 // fraction of vertical speed kept on a floor bounce
@@ -20,7 +21,7 @@ const CONFETTI_MAX = 400
 const CONFETTI_LIFE = 1.2 // s
 const CONFETTI_COLORS = ['#E8B800', '#ED174C', '#006BB6', '#ffffff', '#00D4FF'].map((c) => new Color(c))
 
-const PEOPLE_XZ = PEOPLE.map((p) => { const [x, , z] = polar(p.r, p.angle); return { x, z, h: p.height ?? 1.8 } })
+const PEOPLE_XZ = PEOPLE.map((p) => { const [x, , z] = polar(p.r, p.angle); return { id: p.id, x, z, h: p.height ?? 1.8 } })
 
 const balls = [] // { x, y, z, vx, vy, vz, age }
 const confetti = [] // { x, y, z, vx, vy, vz, age, spin, color }
@@ -45,7 +46,8 @@ function pop(x, y, z) {
 }
 
 function hitsPerson(b) {
-  return PEOPLE_XZ.some((p) => b.y < p.h + 0.1 && Math.hypot(b.x - p.x, b.z - p.z) < HIT_RADIUS)
+  // Followers have left their spots; balls pass through the line
+  return PEOPLE_XZ.some((p) => !isFollowing(p.id) && b.y < p.h + 0.1 && Math.hypot(b.x - p.x, b.z - p.z) < HIT_RADIUS)
 }
 
 export default function Balls() {

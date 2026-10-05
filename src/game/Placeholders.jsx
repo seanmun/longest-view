@@ -1,8 +1,11 @@
 // Stand-in shapes for characters and props. Each matches the real-world size its
 // Meshy model will have, so swapping in a model later changes nothing else.
 import { Billboard, Text } from '@react-three/drei'
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@react-three/rapier'
 import { useGame } from './state.js'
+import { followers } from './follow.js'
 import Model from './Model.jsx'
 
 export const COLORS = {
@@ -49,10 +52,36 @@ export function HinkieModel() {
   )
 }
 
-// A person NPC: solid body plus a floating nametag (turns into a gold BELIEVER once convinced).
-export function Person({ id, name, position, color = COLORS.sixersBlue, height = 1.8 }) {
+// A convinced fan walking in Hinkie's line: no collider, so the line never
+// blocks or traps him.
+function Follower({ id, color, height }) {
+  const root = useRef()
+  const body = useRef()
+  const step = useRef(0)
+  useFrame((_, dt) => {
+    const f = followers[id]
+    if (!f || !root.current) return
+    root.current.position.set(f.x, 0, f.z)
+    root.current.rotation.y = f.yaw
+    step.current += dt * f.speed * 2.5
+    body.current.position.y = f.speed > 0.2 ? Math.abs(Math.sin(step.current)) * 0.08 : 0 // bob while walking
+  })
+  return (
+    <group ref={root}>
+      <group ref={body}><PersonModel color={color} height={height} /></group>
+      <Billboard position={[0, height + 0.35, 0]}>
+        <Text fontSize={0.22} color={COLORS.gold} outlineWidth={0.02} outlineColor="black" anchorY="middle">BELIEVER</Text>
+      </Billboard>
+    </group>
+  )
+}
+
+// A person NPC: solid body plus a floating nametag. A convinced fan becomes a
+// gold BELIEVER and falls in line behind Hinkie.
+export function Person({ id, name, position, color = COLORS.sixersBlue, height = 1.8, fan = false }) {
   const radius = 0.3
   const convinced = useGame((s) => s.flags[id] === true)
+  if (fan && convinced) return <Follower id={id} color={color} height={height} />
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
