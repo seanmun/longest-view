@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider, useRapier } from '@react-three/rapier'
 import { input, consumeLook, keyboardAxes, listenKeyboard } from './input.js'
 import { HinkieModel } from './Placeholders.jsx'
+import Model from './Model.jsx'
 import { PEOPLE, TALK_RANGE } from './level1.js'
 import { polar } from './ring.js'
 import { getState, setState, player } from './state.js'
@@ -20,6 +21,7 @@ const CAM_MIN_ELEVATION = 0.05 // rad, nearly level
 const CAM_MAX_ELEVATION = 1.1 // rad, looking down from above
 const CAM_WALL_PADDING = 0.3 // m, stay this far in front of walls
 
+const WADDLE_RATE = 11 // steps per second at full speed (the model has no walk animation)
 const THROW_SPEED = 13 // m/s forward
 const THROW_LIFT = 2.5 // m/s upward
 
@@ -32,6 +34,8 @@ const PEOPLE_XZ = PEOPLE.map((p) => { const [x, , z] = polar(p.r, p.angle); retu
 export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
   const body = useRef()
   const model = useRef()
+  const waddle = useRef()
+  const step = useRef(0)
   const yaw = useRef(startYaw) // camera yaw
   const elevation = useRef(0.35)
   const facing = useRef(startYaw + Math.PI) // Hinkie's model rotation; models face +Z
@@ -87,6 +91,12 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     }
     model.current.rotation.y = facing.current
 
+    // Bobblehead waddle while walking: rock side to side with a little hop
+    const moving = Math.min(1, len)
+    step.current += dt * WADDLE_RATE * moving
+    waddle.current.rotation.z = Math.sin(step.current) * 0.12 * moving
+    waddle.current.position.y = Math.abs(Math.sin(step.current)) * 0.06 * moving
+
     player.x = p.x
     player.z = p.z
 
@@ -113,7 +123,9 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     <RigidBody ref={body} position={position} colliders={false} enabledRotations={[false, false, false]} canSleep={false}>
       <CapsuleCollider args={[CAPSULE_HALF, CAPSULE_RADIUS]} friction={0} />
       <group ref={model} position={[0, FEET, 0]}>
-        <HinkieModel />
+        <group ref={waddle}>
+          <Model name="hinkie" height={1.85} fallback={<HinkieModel />} />
+        </group>
       </group>
     </RigidBody>
   )

@@ -24,9 +24,12 @@ database URL, which would ship credentials to the browser.
 
 - **Placeholders are real-scale.** Every stand-in shape matches its final
   Meshy model's size and position; swapping in a GLB changes nothing else.
-- **Meshy flow:** Claude writes the prompt, Sean generates and drops the
-  GLB into `public/models/`, Claude wires it in. Real people are prompted
-  as caricatures by description, never from photos.
+- **Meshy flow:** Sean generates (bobblehead style) and drops the raw GLB
+  into `models-raw/` (gitignored; Meshy exports run ~40 MB). Claude shrinks
+  it to `public/models/<name>.glb` with gltf-transform — `weld`, then
+  `simplify` to ~20k triangles, `resize` textures to 1024, `webp` — and
+  wires it in via `Model.jsx` (fits height, feet at y=0, placeholder as
+  the loading fallback). Characters without a rig get a code waddle.
 - **Units are meters.** People ~1.8m, eye height ~1.6m, walk 4 m/s.
 - **Phone is first-class.** Every feature works with the touch controls.
   Large readable text (18px base), no dead ends.
