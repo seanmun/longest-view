@@ -4,6 +4,7 @@ export const input = {
   moveY: 0, // touch joystick, -1..1 (forward +)
   lookX: 0, // accumulated yaw delta in radians
   lookY: 0, // accumulated pitch delta in radians
+  throws: 0, // queued ping pong ball throws
 }
 
 const keys = new Set()

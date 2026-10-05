@@ -6,6 +6,7 @@ import { HinkieModel } from './Placeholders.jsx'
 import { PEOPLE, TALK_RANGE } from './level1.js'
 import { polar } from './ring.js'
 import { getState, setState, player } from './state.js'
+import { throwBall } from './Balls.jsx'
 
 const WALK_SPEED = 4 // m/s
 const TURN_SPEED = 2.2 // rad/s, arrow keys
@@ -17,6 +18,9 @@ const CAM_TARGET_HEIGHT = 0.6 // look-at point above capsule center (~head)
 const CAM_MIN_ELEVATION = 0.05 // rad, nearly level
 const CAM_MAX_ELEVATION = 1.1 // rad, looking down from above
 const CAM_WALL_PADDING = 0.3 // m, stay this far in front of walls
+
+const THROW_SPEED = 13 // m/s forward
+const THROW_LIFT = 2.5 // m/s upward
 
 const CAPSULE_HALF = 0.6
 const CAPSULE_RADIUS = 0.3
@@ -67,6 +71,17 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
       let diff = target - facing.current
       diff = Math.atan2(Math.sin(diff), Math.cos(diff))
       facing.current += diff * Math.min(1, FACE_SPEED * dt)
+    }
+
+    // Throw where the camera faces; Hinkie turns to throw
+    if (input.throws > 0) {
+      input.throws = 0
+      if (!frozen) {
+        const fx = -sin
+        const fz = -cos
+        facing.current = Math.atan2(fx, fz)
+        throwBall(p.x + fx * 0.5, p.y + 0.4, p.z + fz * 0.5, fx * THROW_SPEED, THROW_LIFT, fz * THROW_SPEED)
+      }
     }
     model.current.rotation.y = facing.current
 

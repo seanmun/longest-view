@@ -16,11 +16,21 @@ export default function DesktopControls() {
       input.lookX += e.movementX * MOUSE_SENSITIVITY
       input.lookY += e.movementY * MOUSE_SENSITIVITY
     }
+    const onMouseDown = (e) => {
+      if (document.pointerLockElement && e.button === 0) input.throws++
+    }
+    const onKeyDown = (e) => {
+      if (e.code === 'KeyF' && !e.repeat) input.throws++
+    }
     document.addEventListener('pointerlockchange', onLockChange)
     document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('keydown', onKeyDown)
     return () => {
       document.removeEventListener('pointerlockchange', onLockChange)
       document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('keydown', onKeyDown)
     }
   }, [])
 
@@ -37,7 +47,7 @@ export default function DesktopControls() {
     >
       <h1 className="title text-2xl text-[#E8B800]">LONGEST VIEW</h1>
       <p className="text-2xl">Click to start</p>
-      <p className="text-lg text-white/80">WASD or arrows to walk · Mouse to look · E to talk · Esc to pause</p>
+      <p className="text-lg text-white/80">WASD or arrows to walk · Mouse to look · Click or F to throw · E to talk · Esc to pause</p>
     </button>
   )
 }

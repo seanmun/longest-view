@@ -39,7 +39,7 @@ database URL, which would ship credentials to the browser.
 2. Concourse layout (ring around the bowl, START / FINISH at the tunnel)
 3. Dialogue system (convince 6 fans; cast and lines in `src/game/level1.js`)
 4. Binder puzzle (3 pages unlock the locker-room door; walking in completes the level)
-5. Fan mob encounter
+5. Fan mob encounter (5 fans wall off the door; ping pong balls pop into confetti, dizzy stars, they flee into the tunnel)
 6. Intro + end card
 7. Meshy models
 8. Sound

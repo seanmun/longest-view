@@ -12,7 +12,7 @@ export const PAGES = [
 ]
 export const PICKUP_RANGE = 1.2 // m
 export const DOOR = { angle: -0.06 } // on the outer wall, just before the finish line
-export const DOOR_RANGE = 3 // m: close enough to read the door
+export const DOOR_RANGE = 3.5 // m: close enough to read the door
 export const ENTER_RANGE = 1.4 // m: walked into the open doorway
 
 export const PEOPLE = [
@@ -83,3 +83,10 @@ export const PEOPLE = [
 ]
 
 export const FAN_COUNT = PEOPLE.filter((p) => p.fan).length
+
+// The mob crowding the locker-room door. Each one is [radius, angle offset from the door].
+export const MOB = [
+  [34.8, -0.075], [33.4, -0.05], [32.7, 0], [33.4, 0.05], [34.8, 0.075],
+].map(([r, da], i) => ({ id: `mob${i}`, r, angle: DOOR.angle + da }))
+export const MOB_BARRIER_RADIUS = 2.5 // m around the door, solid until the mob is gone
+export const MOB_SHOUTS = ['JUST WIN GAMES BRO!', 'FIRE HIM!', 'WHAT IS A PING PONG BALL', 'WE WANT WINS!', 'BOOOO!']

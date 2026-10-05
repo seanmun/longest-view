@@ -75,7 +75,7 @@ export default function Objectives() {
     if (nearDoor !== s.nearDoor) setState({ nearDoor })
 
     const haveAll = Object.keys(s.pages).length === PAGES.length
-    if (nearDoor && haveAll && !s.doorOpen) setState({ doorOpen: true })
+    if (nearDoor && haveAll && s.mobLeft === 0 && !s.doorOpen) setState({ doorOpen: true })
     if (s.doorOpen && doorDist < ENTER_RANGE) setState({ complete: true })
   })
 

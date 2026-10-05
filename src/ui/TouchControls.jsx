@@ -56,6 +56,12 @@ export default function TouchControls() {
       onPointerUp={up}
       onPointerCancel={up}
     >
+      <button
+        className="absolute bottom-20 right-6 z-10 min-h-16 rounded-2xl border-2 border-white/60 bg-white/15 px-7 text-xl font-bold text-white active:bg-white/35"
+        onPointerDown={(e) => { e.stopPropagation(); input.throws++ }}
+      >
+        THROW
+      </button>
       {stick ? (
         <div className="pointer-events-none absolute rounded-full border-2 border-white/50 bg-white/10"
           style={{ left: stick.x - STICK_RADIUS, top: stick.y - STICK_RADIUS, width: STICK_RADIUS * 2, height: STICK_RADIUS * 2 }}>

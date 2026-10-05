@@ -3,6 +3,8 @@ import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import World from './game/World.jsx'
 import Objectives from './game/Objectives.jsx'
+import Mob from './game/Mob.jsx'
+import Balls from './game/Balls.jsx'
 import { polar, R_MID } from './game/ring.js'
 import Player from './game/Player.jsx'
 import TouchControls from './ui/TouchControls.jsx'
@@ -25,6 +27,8 @@ export default function App() {
           <Physics>
             <World />
             <Objectives />
+            <Mob />
+            <Balls />
             {/* Start just past the START / FINISH line, facing the direction of the lap */}
             <Player position={polar(START_R, START_ANGLE, 1)} yaw={START_ANGLE - Math.PI / 2} />
           </Physics>

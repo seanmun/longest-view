@@ -39,7 +39,7 @@ export default function Talk({ isTouch }) {
     <>
       {nearby && !talking && (isTouch ? (
         <button
-          className="fixed bottom-20 right-6 z-10 min-h-16 rounded-2xl border-2 border-[#E8B800] bg-[#2A3F6E] px-8 text-xl font-bold text-white active:bg-[#1B2A4A]"
+          className="fixed bottom-44 right-6 z-10 min-h-16 rounded-2xl border-2 border-[#E8B800] bg-[#2A3F6E] px-8 text-xl font-bold text-white active:bg-[#1B2A4A]"
           onClick={openTalk}
         >
           TALK

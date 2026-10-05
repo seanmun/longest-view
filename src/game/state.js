@@ -9,11 +9,13 @@ let state = {
   nearDoor: false, // standing at the locker-room door
   doorOpen: false,
   complete: false, // walked through the open door
+  mobLeft: 5, // mob members still at the door
+  mobSeen: false, // the "mob blocks the door" hint has shown
   toast: null, // { text, key } short message; key changes on every new toast
 }
 
 // Hinkie's floor position, written by the Player every frame. Not React state.
-export const player = { x: 0, z: 0 }
+export const player = { x: 0, z: 0, y: 1, yaw: 0 }
 const listeners = new Set()
 
 export const getState = () => state

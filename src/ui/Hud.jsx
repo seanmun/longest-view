@@ -17,8 +17,8 @@ function Toast() {
   }, [toast])
   if (!visible) return null
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-24 z-10 flex justify-center px-4">
-      <div className="rounded-xl border-2 border-[#E8B800] bg-black/80 px-5 py-3 text-center text-xl text-white">{visible}</div>
+    <div className="pointer-events-none fixed inset-x-0 bottom-24 z-10 flex justify-center px-4">
+      <div className="rounded-xl border-2 border-[#E8B800] bg-black/80 max-w-[60vw] px-5 py-3 text-center text-xl text-white">{visible}</div>
     </div>
   )
 }
@@ -29,6 +29,7 @@ export default function Hud() {
   const nearDoor = useGame((s) => s.nearDoor)
   const doorOpen = useGame((s) => s.doorOpen)
   const complete = useGame((s) => s.complete)
+  const mobLeft = useGame((s) => s.mobLeft)
 
   const convinced = PEOPLE.filter((p) => p.fan && flags[p.id]).length
   const found = Object.keys(pages).length
@@ -63,16 +64,18 @@ export default function Hud() {
 
       <Toast />
 
-      {nearDoor && !doorOpen && (
-        <div className="pointer-events-none fixed inset-x-0 top-24 z-10 flex justify-center px-4">
-          <div className="rounded-xl bg-black/80 px-5 py-3 text-center text-xl text-white">
-            Locked. Find {missing} more binder {missing === 1 ? 'page' : 'pages'} around the concourse.
+      {nearDoor && !doorOpen && (mobLeft > 0 || missing > 0) && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-10 flex justify-center px-4">
+          <div className="rounded-xl bg-black/80 max-w-[60vw] px-5 py-3 text-center text-xl text-white">
+            {mobLeft > 0
+              ? 'The mob is blocking the door! Throw ping pong balls at them.'
+              : `Locked. Find ${missing} more binder ${missing === 1 ? 'page' : 'pages'} around the concourse.`}
           </div>
         </div>
       )}
       {nearDoor && doorOpen && (
-        <div className="pointer-events-none fixed inset-x-0 top-24 z-10 flex justify-center px-4">
-          <div className="rounded-xl bg-black/80 px-5 py-3 text-center text-xl text-[#E8B800]">The locker room is open. Walk in.</div>
+        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-10 flex justify-center px-4">
+          <div className="rounded-xl bg-black/80 max-w-[60vw] px-5 py-3 text-center text-xl text-[#E8B800]">The locker room is open. Walk in.</div>
         </div>
       )}
     </>
