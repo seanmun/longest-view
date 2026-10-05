@@ -22,6 +22,12 @@ const CAM_MIN_ELEVATION = 0.05 // rad, nearly level
 const CAM_MAX_ELEVATION = 1.1 // rad, looking down from above
 const CAM_WALL_PADDING = 0.3 // m, stay this far in front of walls
 
+// Opening shot: start on Hinkie's face, then pull back and swing around behind him
+const OPENING_HOLD = 0.7 // s on his face
+const OPENING_MOVE = 2.6 // s to swing behind
+const OPENING_DISTANCE = 1.1 // m in front of his face
+const OPENING_ELEVATION = 0.06 // rad, eye level
+
 const RUN_FROM = 0.65 // stick push (0..1) where walking turns into running; keyboard is always 1
 const THROW_CLIP = { name: 'throw', start: 0.3, speed: 2.5 } // skip the wind-up, play fast
 const RELEASE_DELAY = 0.18 // s from tap to the ball leaving his hand in that clip
@@ -42,6 +48,7 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
   const shots = useRef(0)
   const yaw = useRef(startYaw) // camera yaw
   const elevation = useRef(0.35)
+  const opening = useRef(getState().intro ? 0 : null) // seconds into the opening shot; null once done
   const facing = useRef(startYaw + Math.PI) // Hinkie's model rotation; models face +Z
   const camera = useThree((s) => s.camera)
   const { world, rapier } = useRapier()
@@ -54,12 +61,21 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
 
     const look = consumeLook()
     const keys = keyboardAxes()
+
+    // Opening shot runs after the intro text; pushing to move cuts it short
+    const stick = Math.hypot(keys.x + input.moveX, keys.y + input.moveY)
+    if (opening.current !== null && !getState().intro) {
+      opening.current += Math.min(dt, 0.05) // the first frame after the intro can hitch for seconds
+      if (opening.current > OPENING_HOLD + OPENING_MOVE || (opening.current > 0.3 && stick > 0.3)) opening.current = null
+    }
+    const inOpening = opening.current !== null
+    if (inOpening) { look.x = 0; look.y = 0; keys.turn = 0 } // camera is on rails
     yaw.current -= look.x + keys.turn * TURN_SPEED * dt
     elevation.current = Math.max(CAM_MIN_ELEVATION, Math.min(CAM_MAX_ELEVATION, elevation.current + look.y))
 
     // Hold still while talking or once the level is over
     const talking = getState().talk != null
-    const frozen = talking || getState().complete || getState().intro
+    const frozen = talking || getState().complete || getState().intro || inOpening
     let mx = frozen ? 0 : keys.x + input.moveX
     let my = frozen ? 0 : keys.y + input.moveY
     const len = Math.hypot(mx, my)
@@ -128,12 +144,24 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     }
     if (nearby !== getState().nearby) setState({ nearby })
 
-    // Camera sits behind Hinkie; pull it in if a wall is in the way
+    // Camera sits behind Hinkie; pull it in if a wall is in the way.
+    // During the opening shot it starts in front of his face (half a turn
+    // around) and eases back to its usual spot.
+    let swing = 0
+    let reach = CAM_DISTANCE
+    let elev = elevation.current
+    if (inOpening) {
+      const t = Math.min(1, Math.max(0, (opening.current - OPENING_HOLD) / OPENING_MOVE))
+      const e = t * t * (3 - 2 * t) // ease in and out
+      swing = Math.PI * (1 - e)
+      reach = OPENING_DISTANCE + (CAM_DISTANCE - OPENING_DISTANCE) * e
+      elev = OPENING_ELEVATION + (elevation.current - OPENING_ELEVATION) * e
+    }
     const target = { x: p.x, y: p.y + CAM_TARGET_HEIGHT, z: p.z }
-    const ce = Math.cos(elevation.current)
-    const dir = { x: sin * ce, y: Math.sin(elevation.current), z: cos * ce }
-    const hit = world.castRay(new rapier.Ray(target, dir), CAM_DISTANCE, true, undefined, undefined, undefined, b)
-    const dist = hit ? Math.max(0.5, hit.timeOfImpact - CAM_WALL_PADDING) : CAM_DISTANCE
+    const ce = Math.cos(elev)
+    const dir = { x: Math.sin(yaw.current + swing) * ce, y: Math.sin(elev), z: Math.cos(yaw.current + swing) * ce }
+    const hit = world.castRay(new rapier.Ray(target, dir), reach, true, undefined, undefined, undefined, b)
+    const dist = hit ? Math.max(0.5, hit.timeOfImpact - CAM_WALL_PADDING) : reach
     camera.position.set(target.x + dir.x * dist, target.y + dir.y * dist, target.z + dir.z * dist)
     camera.lookAt(target.x, target.y, target.z)
   })
