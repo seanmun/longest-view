@@ -1,11 +1,13 @@
-// The "JUST WIN GAMES BRO" mob around the locker-room door. A ping pong ball
-// makes a member dizzy; then they run off through the tunnel. The door stays
-// walled off until every member is gone.
+// The "JUST WIN GAMES BRO" mob around the locker-room door: Badman bobbleheads
+// stomping mad. A ping pong ball knocks one back (hit clip + dizzy stars); then
+// they run off through the tunnel. The door stays walled off until every
+// member is gone.
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import { RigidBody, CylinderCollider } from '@react-three/rapier'
 import { PersonModel, COLORS } from './Placeholders.jsx'
+import Model from './Model.jsx'
 import { R_OUT, polar } from './ring.js'
 import { MOB, MOB_BARRIER_RADIUS, MOB_SHOUTS, DOOR } from './level1.js'
 import { getState, setState, useGame, player, toast } from './state.js'
@@ -22,7 +24,13 @@ const isTouch = window.matchMedia('(pointer: coarse)').matches
 
 const members = MOB.map((m, i) => {
   const [x, , z] = polar(m.r, m.angle)
-  return { id: m.id, x, z, state: 'angry', t: 0, color: i % 2 ? COLORS.sixersRed : COLORS.sixersBlue, shout: MOB_SHOUTS[i % MOB_SHOUTS.length] }
+  return {
+    id: m.id, x, z, state: 'angry', t: 0,
+    color: i % 2 ? COLORS.sixersRed : COLORS.sixersBlue,
+    shout: MOB_SHOUTS[i % MOB_SHOUTS.length],
+    stomp: i % 2 ? 'stomp2' : 'stomp', // alternate the two stomp clips
+    pace: 0.85 + (i * 0.37) % 0.3, // slightly different speeds so they don't move in lockstep
+  }
 })
 
 // Called by each ball every frame; true means the ball hit someone and pops.
@@ -42,6 +50,7 @@ function Member({ m }) {
   const body = useRef()
   const shout = useRef()
   const stars = useRef()
+  const anim = useRef({ name: m.stomp, speed: m.pace })
 
   useFrame(({ clock }, rawDt) => {
     const dt = Math.min(rawDt, 0.05)
@@ -72,22 +81,20 @@ function Member({ m }) {
     stars.current.visible = m.state === 'dizzy'
 
     if (m.state === 'angry') {
-      body.current.position.y = Math.abs(Math.sin(time * 6 + m.x)) * 0.15 // hopping mad
-      body.current.rotation.set(0, Math.atan2(player.x - m.x, player.z - m.z), 0)
+      anim.current = { name: m.stomp, speed: m.pace }
+      body.current.rotation.y = Math.atan2(player.x - m.x, player.z - m.z) // glare at Hinkie
     } else if (m.state === 'dizzy') {
-      body.current.position.y = 0
-      body.current.rotation.z = Math.sin(m.t * 10) * 0.15
+      anim.current = { name: 'hit', speed: 1 }
       stars.current.rotation.y = m.t * 5
     } else if (m.state === 'fleeing') {
-      body.current.position.y = Math.abs(Math.sin(m.t * 14)) * 0.1
-      body.current.rotation.z = 0
+      anim.current = { name: 'run', speed: 1.2 }
     }
   })
 
   return (
     <group ref={root}>
       <group ref={body}>
-        <PersonModel color={m.color} />
+        <Model name="badman" height={1.8} anim={anim} fallback={<PersonModel color={m.color} />} />
       </group>
       <group ref={stars} position={[0, 2.05, 0]}>
         {[0, 1, 2].map((i) => {
