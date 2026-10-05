@@ -7,6 +7,7 @@ import { COLORS } from './Placeholders.jsx'
 import { R_OUT, polar } from './ring.js'
 import { PAGES, PICKUP_RANGE, DOOR, DOOR_RANGE, ENTER_RANGE } from './level1.js'
 import { getState, setState, useGame, player, toast } from './state.js'
+import { sfx, stopMusic } from './audio.js'
 
 const facingIn = (a) => [0, a + Math.PI, 0]
 const distTo = ([x, , z]) => Math.hypot(x - player.x, z - player.z)
@@ -63,6 +64,7 @@ export default function Objectives() {
         const pages = { ...s.pages, [page.id]: true }
         const count = Object.keys(pages).length
         setState({ pages })
+        sfx.page()
         toast(count === PAGES.length
           ? 'All 3 binder pages! The locker room will open for you.'
           : `Binder page found: ${count} of ${PAGES.length}`)
@@ -75,8 +77,12 @@ export default function Objectives() {
     if (nearDoor !== s.nearDoor) setState({ nearDoor })
 
     const haveAll = Object.keys(s.pages).length === PAGES.length
-    if (nearDoor && haveAll && s.mobLeft === 0 && !s.doorOpen) setState({ doorOpen: true })
-    if (s.doorOpen && doorDist < ENTER_RANGE) setState({ complete: true, finishedAt: performance.now() })
+    if (nearDoor && haveAll && s.mobLeft === 0 && !s.doorOpen) { setState({ doorOpen: true }); sfx.door() }
+    if (s.doorOpen && doorDist < ENTER_RANGE) {
+      setState({ complete: true, finishedAt: performance.now() })
+      stopMusic()
+      sfx.complete()
+    }
   })
 
   return (

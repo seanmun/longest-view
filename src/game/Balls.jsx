@@ -6,6 +6,7 @@ import { Color, Object3D } from 'three'
 import { R_IN, R_OUT, polar } from './ring.js'
 import { PEOPLE } from './level1.js'
 import { hitMob } from './Mob.jsx'
+import { sfx } from './audio.js'
 
 const GRAVITY = 9.8
 const BOUNCE = 0.6 // fraction of vertical speed kept on a floor bounce
@@ -70,12 +71,14 @@ export default function Balls() {
       b.z += b.vz * dt
       if (b.y < BALL_RADIUS && b.vy < 0) {
         b.y = BALL_RADIUS
+        if (b.vy < -1) sfx.bounce()
         b.vy = -b.vy * BOUNCE
       }
       const r = Math.hypot(b.x, b.z)
       const hitWall = r < R_IN + 0.1 || r > R_OUT - 0.1 || b.y > 4.4
       if (hitWall || b.age > LIFETIME || hitMob(b.x, b.y, b.z) || hitsPerson(b)) {
         pop(b.x, Math.max(b.y, 0.3), b.z)
+        sfx.pop()
         balls.splice(i, 1)
       }
     }

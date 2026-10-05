@@ -1,6 +1,7 @@
 // Opening cutscene: lines appear one at a time on black, then "Let's begin".
 import { useEffect, useState } from 'react'
 import { setState, useGame } from '../game/state.js'
+import { unlockAudio } from '../game/audio.js'
 
 const LINES = [
   'Philadelphia, 2013.',
@@ -26,6 +27,7 @@ export default function Intro({ isTouch }) {
   // Desktop: the click that starts the game also captures the mouse
   function begin() {
     setState({ intro: false, startedAt: performance.now() })
+    unlockAudio() // starts the music now that play has begun
     if (!isTouch) {
       try { document.body.requestPointerLock()?.catch?.(() => {}) } catch { /* click again to look */ }
     }

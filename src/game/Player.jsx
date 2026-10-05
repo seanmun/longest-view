@@ -7,6 +7,7 @@ import { PEOPLE, TALK_RANGE } from './level1.js'
 import { polar } from './ring.js'
 import { getState, setState, player } from './state.js'
 import { throwBall } from './Balls.jsx'
+import { sfx } from './audio.js'
 
 const WALK_SPEED = 4 // m/s
 const TURN_SPEED = 2.2 // rad/s, arrow keys
@@ -80,6 +81,7 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
         const fx = -sin
         const fz = -cos
         facing.current = Math.atan2(fx, fz)
+        sfx.throw()
         throwBall(p.x + fx * 0.5, p.y + 0.4, p.z + fz * 0.5, fx * THROW_SPEED, THROW_LIFT, fz * THROW_SPEED)
       }
     }

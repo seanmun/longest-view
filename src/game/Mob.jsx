@@ -9,6 +9,7 @@ import { PersonModel, COLORS } from './Placeholders.jsx'
 import { R_OUT, polar } from './ring.js'
 import { MOB, MOB_BARRIER_RADIUS, MOB_SHOUTS, DOOR } from './level1.js'
 import { getState, setState, useGame, player, toast } from './state.js'
+import { sfx } from './audio.js'
 
 const HIT_RADIUS = 0.5 // m, ball center to member center
 const DIZZY_TIME = 1.5 // s
@@ -29,7 +30,7 @@ export function hitMob(x, y, z) {
   if (y > 1.9) return false
   for (const m of members) {
     if ((m.state === 'angry' || m.state === 'dizzy') && Math.hypot(x - m.x, z - m.z) < HIT_RADIUS) {
-      if (m.state === 'angry') { m.state = 'dizzy'; m.t = 0 }
+      if (m.state === 'angry') { m.state = 'dizzy'; m.t = 0; sfx.dizzy() }
       return true
     }
   }

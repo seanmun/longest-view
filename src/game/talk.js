@@ -2,12 +2,14 @@
 // or the person's answer once Hinkie has picked a line.
 import { getState, setState } from './state.js'
 import { PEOPLE } from './level1.js'
+import { sfx } from './audio.js'
 
 export const personById = (id) => PEOPLE.find((p) => p.id === id)
 
 export function openTalk() {
   const { nearby, talk, flags } = getState()
   if (!nearby || talk) return
+  sfx.blip()
   // Already convinced: skip the question, go straight to their happy line
   setState({ talk: { id: nearby, reply: flags[nearby] ? personById(nearby).after : null } })
 }
@@ -17,6 +19,8 @@ export function choose(index) {
   if (!talk || talk.reply) return
   const choice = personById(talk.id).choices[index]
   if (!choice) return
+  if (choice.win) sfx.good()
+  else sfx.bad()
   setState((s) => ({
     talk: { id: talk.id, reply: choice.reply },
     flags: choice.win ? { ...s.flags, [talk.id]: true } : s.flags,
