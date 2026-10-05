@@ -17,8 +17,8 @@ function Toast() {
   }, [toast])
   if (!visible) return null
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-24 z-10 flex justify-center px-4">
-      <div className="rounded-xl border-2 border-[#E8B800] bg-black/80 max-w-[60vw] px-5 py-3 text-center text-xl text-white">{visible}</div>
+    <div className="pointer-events-none fixed inset-x-0 top-28 z-10 flex justify-center px-4 [@media(max-height:500px)]:top-3">
+      <div className="rounded-xl border-2 border-[#E8B800] bg-black/80 max-w-[90vw] px-4 py-2 text-center text-lg [@media(max-height:500px)]:max-w-[40vw] text-white">{visible}</div>
     </div>
   )
 }
@@ -100,8 +100,8 @@ export default function Hud() {
       <Toast />
 
       {nearDoor && !doorOpen && (mobLeft > 0 || missing > 0) && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-10 flex justify-center px-4">
-          <div className="rounded-xl bg-black/80 max-w-[60vw] px-5 py-3 text-center text-xl text-white">
+        <div className="pointer-events-none fixed inset-x-0 top-28 z-10 flex justify-center px-4 [@media(max-height:500px)]:top-3">
+          <div className="rounded-xl bg-black/80 max-w-[90vw] px-4 py-2 text-center text-lg [@media(max-height:500px)]:max-w-[40vw] text-white">
             {mobLeft > 0
               ? 'The mob is blocking the door! Throw ping pong balls at them.'
               : `Locked. Find ${missing} more binder ${missing === 1 ? 'page' : 'pages'} around the concourse.`}
@@ -109,8 +109,8 @@ export default function Hud() {
         </div>
       )}
       {nearDoor && doorOpen && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-10 flex justify-center px-4">
-          <div className="rounded-xl bg-black/80 max-w-[60vw] px-5 py-3 text-center text-xl text-[#E8B800]">The locker room is open. Walk in.</div>
+        <div className="pointer-events-none fixed inset-x-0 top-28 z-10 flex justify-center px-4 [@media(max-height:500px)]:top-3">
+          <div className="rounded-xl bg-black/80 max-w-[90vw] px-4 py-2 text-center text-lg [@media(max-height:500px)]:max-w-[40vw] text-[#E8B800]">The locker room is open. Walk in.</div>
         </div>
       )}
     </>

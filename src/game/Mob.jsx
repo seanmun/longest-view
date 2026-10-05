@@ -90,8 +90,9 @@ function Member({ m }) {
         m.state = 'gone'
         setState((s) => ({ mobLeft: s.mobLeft - 1 }))
       } else {
-        m.x += (dx / d) * RUN_SPEED * dt
-        m.z += (dz / d) * RUN_SPEED * dt
+        const speed = m.fleeSpeed ?? RUN_SPEED
+        m.x += (dx / d) * speed * dt
+        m.z += (dz / d) * speed * dt
         body.current.rotation.y = Math.atan2(dx, dz)
       }
     }
@@ -114,7 +115,7 @@ function Member({ m }) {
       body.current.position.y = 0
       stars.current.rotation.y = m.t * 5
     } else if (m.state === 'fleeing') {
-      anim.current = { name: 'run', speed: 1.2 }
+      anim.current = { name: m.flee ?? 'run', speed: m.flee ? 1 : 1.2 }
     }
   })
 

@@ -16,6 +16,26 @@ const FADE = 0.2 // s crossfade between clips
 const SHOT_WEIGHT = 5 // upper-body shot vs base loop: about 5/6 shot on shared bones
 const UPPER_BODY = /spine|neck|head|shoulder|arm|hand/i
 
+// Meshy clips often carry the character across the floor (a crawl travels
+// meters; falls end a meter away). The game moves characters itself, so take
+// out the hips' net floor travel and keep their sway and bounce.
+function inPlace(clip) {
+  for (const track of clip.tracks) {
+    if (!/Hips\.position$/.test(track.name)) continue
+    const v = track.values
+    const n = v.length / 3
+    if (n < 2) continue
+    const dx = v[(n - 1) * 3] - v[0]
+    const dz = v[(n - 1) * 3 + 2] - v[2]
+    for (let i = 0; i < n; i++) {
+      const f = i / (n - 1)
+      v[i * 3] -= dx * f
+      v[i * 3 + 2] -= dz * f
+    }
+  }
+  return clip
+}
+
 // A copy of a clip that only moves the upper body
 function upperBodyOnly(clip) {
   const c = clip.clone()
@@ -41,7 +61,7 @@ function Fitted({ url, height, rotationY, anim, decorate }) {
   }, [scene, height])
 
   const root = useRef()
-  const clips = useMemo(() => animations.map((c) => (c.name.startsWith('throw') ? upperBodyOnly(c) : c)), [animations])
+  const clips = useMemo(() => animations.map((c) => (c.name.startsWith('throw') ? upperBodyOnly(c) : inPlace(c.clone()))), [animations])
   const { actions } = useAnimations(clips, root)
   const playing = useRef(null)
   const lastShot = useRef(null)

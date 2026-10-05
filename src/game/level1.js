@@ -88,7 +88,8 @@ export const FAN_COUNT = PEOPLE.filter((p) => p.fan).length
 // r / da: radius and angle offset from the door. model: null shows a
 // placeholder until that character's Meshy model arrives.
 // Rigged mob models share clip names: stomp, stomp2, hit, run. `moods` (optional)
-// lists clips a member cycles through while blocking the door.
+// lists clips a member cycles through while blocking the door; `flee` / `fleeSpeed`
+// override how they get away (default: run at 5 m/s).
 export const MOB = [
   {
     id: 'badman', name: 'BADMAN', model: 'badman', leader: true, r: 32.7, da: 0, height: 1.9,
@@ -96,7 +97,12 @@ export const MOB = [
     shouts: ['HEHEHEHEHE!', 'Hehe... JUST WIN GAMES, BRO!', 'HEHEHE! FIRE HIM!'],
   },
   { id: 'pj', name: 'PJ', model: 'pj', r: 33.4, da: -0.05, stomp: 'stomp', hitTime: 2.2, shouts: ['WHAT IS A PING PONG BALL?!'] },
-  { id: 'stine', name: 'STINE', model: null, r: 33.4, da: 0.05, shouts: ['WE WANT WINS!'] },
+  {
+    // Bad knee: taunts and Frankenstein-limps; a hit drops him flat, then he crawls off
+    id: 'stine', name: 'STINE', model: 'stine', r: 33.4, da: 0.05, hitTime: 2.9,
+    moods: ['taunt', 'limp'], flee: 'crawl', fleeSpeed: 0.8, // matches the crawl clip's pace
+    shouts: ['WE WANT WINS!', 'YOU CALL THAT A PLAN?!'],
+  },
   {
     id: 'teamike', name: 'TEA MIKE', model: 'teamike', r: 34.8, da: -0.075, hitTime: 2.5,
     moods: ['stomp', 'dance'], shouts: ['BOOOOO!', 'TRUST THE... NO!'],
