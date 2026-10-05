@@ -29,7 +29,10 @@ database URL, which would ship credentials to the browser.
   it to `public/models/<name>.glb` with gltf-transform — `weld`, then
   `simplify` to ~20k triangles, `resize` textures to 1024, `webp` — and
   wires it in via `Model.jsx` (fits height, feet at y=0, placeholder as
-  the loading fallback). Characters without a rig get a code waddle.
+  the loading fallback). Rigged characters: Meshy exports one zip per
+  animation, each with the full model; merge the clips onto one copy
+  (same skeleton, channels matched by bone name) named `idle`/`walk`/`run`,
+  and pass `anim` to `Model` to crossfade them.
 - **Units are meters.** People ~1.8m, eye height ~1.6m, walk 4 m/s.
 - **Phone is first-class.** Every feature works with the touch controls.
   Large readable text (18px base), no dead ends.
