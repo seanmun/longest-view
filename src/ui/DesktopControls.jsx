@@ -8,6 +8,8 @@ const MOUSE_SENSITIVITY = 0.0025 // rad per px
 export default function DesktopControls() {
   const [locked, setLocked] = useState(false)
   const talking = useGame((s) => s.talk != null)
+  const intro = useGame((s) => s.intro)
+  const complete = useGame((s) => s.complete)
 
   useEffect(() => {
     const onLockChange = () => setLocked(document.pointerLockElement != null)
@@ -34,7 +36,7 @@ export default function DesktopControls() {
     }
   }, [])
 
-  if (talking) return null // dialogue has the mouse
+  if (talking || intro || complete) return null // dialogue, intro, or end card has the mouse
 
   if (locked) {
     return <div className="pointer-events-none fixed left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80" />
@@ -46,7 +48,7 @@ export default function DesktopControls() {
       onClick={() => document.body.requestPointerLock()}
     >
       <h1 className="title text-2xl text-[#E8B800]">LONGEST VIEW</h1>
-      <p className="text-2xl">Click to start</p>
+      <p className="text-2xl">Paused. Click to keep playing</p>
       <p className="text-lg text-white/80">WASD or arrows to walk · Mouse to look · Click or F to throw · E to talk · Esc to pause</p>
     </button>
   )

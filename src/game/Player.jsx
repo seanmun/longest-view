@@ -50,7 +50,7 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
 
     // Hold still while talking or once the level is over
     const talking = getState().talk != null
-    const frozen = talking || getState().complete
+    const frozen = talking || getState().complete || getState().intro
     let mx = frozen ? 0 : keys.x + input.moveX
     let my = frozen ? 0 : keys.y + input.moveY
     const len = Math.hypot(mx, my)

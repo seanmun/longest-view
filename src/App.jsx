@@ -11,6 +11,7 @@ import TouchControls from './ui/TouchControls.jsx'
 import DesktopControls from './ui/DesktopControls.jsx'
 import Talk from './ui/Talk.jsx'
 import Hud from './ui/Hud.jsx'
+import Intro from './ui/Intro.jsx'
 
 // ?at=<radians>&r=<meters> spawns elsewhere on the ring, for testing
 const params = new URLSearchParams(window.location.search)
@@ -37,6 +38,7 @@ export default function App() {
       {isTouch ? <TouchControls /> : <DesktopControls />}
       <Hud />
       <Talk isTouch={isTouch} />
+      <Intro isTouch={isTouch} />
     </div>
   )
 }

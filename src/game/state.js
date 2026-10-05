@@ -1,7 +1,13 @@
 // Tiny game-state store shared by the 3D scene and the React overlays.
 import { useSyncExternalStore } from 'react'
 
+// Testing spawns (?at=) skip the intro
+const skipIntro = new URLSearchParams(window.location.search).has('at')
+
 let state = {
+  intro: !skipIntro, // opening cutscene showing
+  startedAt: skipIntro ? performance.now() : null, // ms, when play began
+  finishedAt: null, // ms, when Hinkie walked into the locker room
   nearby: null, // id of the person in talking range
   talk: null, // { id, reply } while a conversation is open
   flags: {}, // id -> true once that person is convinced
