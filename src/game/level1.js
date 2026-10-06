@@ -17,7 +17,7 @@ export const ENTER_RANGE = 1.4 // m: walked into the open doorway
 
 export const PEOPLE = [
   {
-    id: 'fan1', name: 'WOODS', model: 'woods', angle: 0.35, r: 29, fan: true,
+    id: 'fan1', name: 'SEAN', angle: 0.35, r: 29, fan: true, // Sean's model goes here
     line: 'Hinkie! What is a ping pong ball even FOR?!',
     choices: [
       { label: 'The draft lottery. Lose now, win later.', reply: '...So we lose ON PURPOSE? ...That\'s kind of genius.', win: true },
@@ -27,7 +27,7 @@ export const PEOPLE = [
     after: 'TRUST THE PROCESS! ...I bought the shirt.',
   },
   {
-    id: 'fan2', name: 'FAN', angle: 1.1, r: 33, color: COLORS.sixersRed, fan: true,
+    id: 'fan2', name: 'WOODS', model: 'woods', angle: 1.1, r: 33, color: COLORS.sixersRed, fan: true,
     line: 'JUST WIN GAMES, BRO!',
     choices: [
       { label: 'Have you considered a draft pick?', reply: 'I\'ve considered booing you.' },
