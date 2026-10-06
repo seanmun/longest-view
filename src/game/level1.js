@@ -17,7 +17,7 @@ export const ENTER_RANGE = 1.4 // m: walked into the open doorway
 
 export const PEOPLE = [
   {
-    id: 'fan1', name: 'FAN', angle: 0.35, r: 29, fan: true,
+    id: 'fan1', name: 'WOODS', model: 'woods', angle: 0.35, r: 29, fan: true,
     line: 'Hinkie! What is a ping pong ball even FOR?!',
     choices: [
       { label: 'The draft lottery. Lose now, win later.', reply: '...So we lose ON PURPOSE? ...That\'s kind of genius.', win: true },

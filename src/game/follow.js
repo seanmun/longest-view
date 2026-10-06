@@ -19,7 +19,7 @@ export const isFollowing = (id) => id in followers
 export function join(id, x, z) {
   if (isFollowing(id)) return
   order.push(id)
-  followers[id] = { x, z, yaw: 0, speed: 0 }
+  followers[id] = { x, z, yaw: 0, speed: 0, joinedAt: performance.now() }
 }
 
 // The point `dist` meters back along Hinkie's trail

@@ -197,7 +197,7 @@ export default function World() {
       ))}
 
       {PEOPLE.map((p) => (
-        <Person key={p.id} id={p.id} name={p.name} position={polar(p.r, p.angle)} color={p.color} height={p.height} fan={p.fan} />
+        <Person key={p.id} id={p.id} name={p.name} model={p.model} position={polar(p.r, p.angle)} color={p.color} height={p.height} fan={p.fan} />
       ))}
     </>
   )

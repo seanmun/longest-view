@@ -4,7 +4,7 @@ import { Billboard, Text } from '@react-three/drei'
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@react-three/rapier'
-import { useGame } from './state.js'
+import { useGame, player } from './state.js'
 import { followers } from './follow.js'
 import Model from './Model.jsx'
 
@@ -52,40 +52,73 @@ export function HinkieModel() {
   )
 }
 
+const CELEBRATE_MS = 2500 // happy dance when a named fan is won over
+
 // A convinced fan walking in Hinkie's line: no collider, so the line never
-// blocks or traps him.
-function Follower({ id, color, height }) {
+// blocks or traps him. Rigged fans play happy / walk / run clips.
+function Follower({ id, name, model, color, height }) {
   const root = useRef()
   const body = useRef()
   const step = useRef(0)
+  const anim = useRef({ name: 'happy', speed: 1 })
   useFrame((_, dt) => {
     const f = followers[id]
     if (!f || !root.current) return
     root.current.position.set(f.x, 0, f.z)
     root.current.rotation.y = f.yaw
-    step.current += dt * f.speed * 2.5
-    body.current.position.y = f.speed > 0.2 ? Math.abs(Math.sin(step.current)) * 0.08 : 0 // bob while walking
+    if (model) {
+      const celebrating = performance.now() - f.joinedAt < CELEBRATE_MS
+      if (celebrating || f.speed < 0.2) anim.current = { name: 'happy', speed: 1 } // cheer while waiting
+      else if (f.speed < 4.8) anim.current = { name: 'walk', speed: f.speed / 3 }
+      else anim.current = { name: 'run', speed: f.speed / 6 }
+    } else {
+      step.current += dt * f.speed * 2.5
+      body.current.position.y = f.speed > 0.2 ? Math.abs(Math.sin(step.current)) * 0.08 : 0 // bob while walking
+    }
   })
   return (
     <group ref={root}>
-      <group ref={body}><PersonModel color={color} height={height} /></group>
+      <group ref={body}>
+        {model
+          ? <Model name={model} height={height} anim={anim} fallback={<PersonModel color={color} height={height} />} />
+          : <PersonModel color={color} height={height} />}
+      </group>
       <Billboard position={[0, height + 0.35, 0]}>
-        <Text fontSize={0.22} color={COLORS.gold} outlineWidth={0.02} outlineColor="black" anchorY="middle">BELIEVER</Text>
+        <Text fontSize={0.22} color={COLORS.gold} outlineWidth={0.02} outlineColor="black" anchorY="middle">
+          {model ? name : 'BELIEVER'}
+        </Text>
       </Billboard>
+    </group>
+  )
+}
+
+// A rigged fan still waiting to be convinced: stands still, turned toward Hinkie
+function Watching({ model, height, color }) {
+  const turn = useRef()
+  const anim = useRef({ name: 'walk', speed: 0 }) // first walk frame, held, is a neutral stance
+  useFrame(() => {
+    const g = turn.current
+    if (!g) return
+    const p = g.getWorldPosition(g.userData.v ??= g.position.clone())
+    g.rotation.y = Math.atan2(player.x - p.x, player.z - p.z)
+  })
+  return (
+    <group ref={turn}>
+      <Model name={model} height={height} anim={anim} fallback={<PersonModel color={color} height={height} />} />
     </group>
   )
 }
 
 // A person NPC: solid body plus a floating nametag. A convinced fan becomes a
 // gold BELIEVER and falls in line behind Hinkie.
-export function Person({ id, name, position, color = COLORS.sixersBlue, height = 1.8, fan = false }) {
+export function Person({ id, name, model, position, color = COLORS.sixersBlue, height = 1.8, fan = false }) {
   const radius = 0.3
   const convinced = useGame((s) => s.flags[id] === true)
-  if (fan && convinced) return <Follower id={id} color={color} height={height} />
+  if (fan && convinced) return <Follower id={id} name={name} model={model} color={color} height={height} />
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
-      <PersonModel color={color} height={height} />
+      {model ? <Watching model={model} height={height} color={color} /> : <PersonModel color={color} height={height} />}
       <Billboard position={[0, height + 0.35, 0]}>
         <Text fontSize={0.22} color={convinced ? COLORS.gold : 'white'} outlineWidth={0.02} outlineColor="black" anchorY="middle">
           {convinced ? 'BELIEVER' : name}
@@ -139,7 +172,8 @@ export function HotDogCart({ position, rotation }) {
   return (
     <group position={position} rotation={rotation}>
       <RigidBody type="fixed" colliders={false}>
-        <CuboidCollider args={[0.65, 0.55, 0.65]} position={[0, 0.55, 0]} />
+        {/* Full height, umbrella included, so the camera can't swing through it */}
+        <CuboidCollider args={[0.65, 1, 0.65]} position={[0, 1, 0]} />
       </RigidBody>
       <Model name="hot-dog-cart" height={2} fallback={placeholder} />
     </group>
