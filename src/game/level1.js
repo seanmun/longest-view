@@ -107,5 +107,9 @@ export const MOB = [
     id: 'teamike', name: 'TEA MIKE', model: 'teamike', r: 34.8, da: -0.075, hitTime: 2.5,
     moods: ['stomp', 'dance'], shouts: ['BOOOOO!', 'TRUST THE... NO!'],
   },
+  {
+    id: 'rick', name: 'RICK', model: 'rick', r: 34.8, da: 0.075, hitTime: 2,
+    moods: ['stomp', 'tantrum'], shouts: ['ANTI-FAN FOR LIFE!', 'SELL THE TEAM!'],
+  },
 ].map((m) => ({ ...m, angle: DOOR.angle + m.da }))
 export const MOB_BARRIER_RADIUS = 2.5 // m around the door, solid until the mob is gone
