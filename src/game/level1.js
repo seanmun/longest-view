@@ -45,7 +45,7 @@ export const PEOPLE = [
     after: 'I keep re-running your numbers. They keep being right.',
   },
   {
-    id: 'fan3', name: 'FAN', angle: 2.8, r: 32, fan: true,
+    id: 'fan3', name: 'STEVE', model: 'steve', watch: 'discuss', angle: 2.8, r: 32, fan: true, // argues his case
     line: 'My kid asked who our best player is. I said "a future second-round pick."',
     choices: [
       { label: 'Exactly. And he\'ll be great by 2019.', reply: '...2019. Okay. I\'m from Philly. We wait.', win: true },
