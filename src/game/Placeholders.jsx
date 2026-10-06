@@ -67,13 +67,15 @@ function Follower({ id, name, model, color, height }) {
     root.current.position.set(f.x, 0, f.z)
     root.current.rotation.y = f.yaw
     if (model) {
-      const celebrating = performance.now() - f.joinedAt < CELEBRATE_MS
-      if (celebrating || f.speed < 0.2) anim.current = { name: 'happy', speed: 1 } // cheer while waiting
-      else if (f.speed < 4.8) anim.current = { name: 'walk', speed: f.speed / 3 }
-      else anim.current = { name: 'run', speed: f.speed / 6 }
+      const celebrating = performance.now() - f.joinedAt < CELEBRATE_MS && f.speed < 1.5
+      const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
+      const a = anim.current
+      if (celebrating || f.gait === 'idle') { a.name = 'happy'; a.speed = 1 } // cheer while waiting
+      else if (f.gait === 'walk') { a.name = 'walk'; a.speed = clamp(f.speed / 2.2, 0.6, 1.6) }
+      else { a.name = 'run'; a.speed = clamp(f.speed / 5.5, 0.8, 1.4) }
     } else {
       step.current += dt * f.speed * 2.5
-      body.current.position.y = f.speed > 0.2 ? Math.abs(Math.sin(step.current)) * 0.08 : 0 // bob while walking
+      body.current.position.y = f.gait !== 'idle' ? Math.abs(Math.sin(step.current)) * 0.08 : 0 // bob while walking
     }
   })
   return (

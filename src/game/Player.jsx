@@ -132,7 +132,7 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
 
     player.x = p.x
     player.z = p.z
-    if (!getState().complete) updateFollowers(dt)
+    if (!getState().complete) updateFollowers(dt, performance.now() / 1000)
 
     // Who's close enough to talk to?
     let nearby = null
