@@ -92,10 +92,12 @@ function Follower({ id, name, model, color, height }) {
   )
 }
 
-// A rigged fan still waiting to be convinced: stands still, turned toward Hinkie
-function Watching({ model, height, color }) {
+// A rigged fan still waiting to be convinced, turned toward Hinkie. Plays the
+// `watch` clip if given (Sean waves him over); otherwise holds the first walk
+// frame, a neutral stance.
+function Watching({ model, watch, height, color }) {
   const turn = useRef()
-  const anim = useRef({ name: 'walk', speed: 0 }) // first walk frame, held, is a neutral stance
+  const anim = useRef(watch ? { name: watch, speed: 1 } : { name: 'walk', speed: 0 })
   useFrame(() => {
     const g = turn.current
     if (!g) return
@@ -111,14 +113,14 @@ function Watching({ model, height, color }) {
 
 // A person NPC: solid body plus a floating nametag. A convinced fan becomes a
 // gold BELIEVER and falls in line behind Hinkie.
-export function Person({ id, name, model, position, color = COLORS.sixersBlue, height = 1.8, fan = false }) {
+export function Person({ id, name, model, watch, position, color = COLORS.sixersBlue, height = 1.8, fan = false }) {
   const radius = 0.3
   const convinced = useGame((s) => s.flags[id] === true)
   if (fan && convinced) return <Follower id={id} name={name} model={model} color={color} height={height} />
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
-      {model ? <Watching model={model} height={height} color={color} /> : <PersonModel color={color} height={height} />}
+      {model ? <Watching model={model} watch={watch} height={height} color={color} /> : <PersonModel color={color} height={height} />}
       <Billboard position={[0, height + 0.35, 0]}>
         <Text fontSize={0.22} color={convinced ? COLORS.gold : 'white'} outlineWidth={0.02} outlineColor="black" anchorY="middle">
           {convinced ? 'BELIEVER' : name}
