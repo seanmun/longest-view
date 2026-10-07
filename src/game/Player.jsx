@@ -38,7 +38,8 @@ const CAPSULE_HALF = 0.6
 const CAPSULE_RADIUS = 0.3
 const FEET = -(CAPSULE_HALF + CAPSULE_RADIUS)
 
-const PEOPLE_XZ = PEOPLE.map((p) => { const [x, , z] = polar(p.r, p.angle); return { id: p.id, x, z } })
+// Cluster members (`with`) are talked to through their fan, so they're not talk targets
+const PEOPLE_XZ = PEOPLE.filter((p) => !p.with).map((p) => { const [x, , z] = polar(p.r, p.angle); return { id: p.id, x, z } })
 
 export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
   const body = useRef()

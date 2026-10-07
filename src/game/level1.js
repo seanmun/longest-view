@@ -80,9 +80,15 @@ export const PEOPLE = [
     ],
     after: 'Jojo. The dog\'s name is going to be Jojo.',
   },
+  // Cluster members stand beside a fan (`with`) and are won over in that fan's
+  // conversation. They have no lines of their own.
+  { id: 'pudd', name: 'PUDD', model: 'pudd', with: 'fan2', angle: 1.15, r: 34.2, fan: true },
 ]
 
 export const FAN_COUNT = PEOPLE.filter((p) => p.fan).length
+
+// A fan plus everyone standing with them
+export const clusterOf = (id) => PEOPLE.filter((p) => p.id === id || p.with === id)
 
 // The mob crowding the locker-room door, led by Badman (a giggling weasel).
 // r / da: radius and angle offset from the door. model: null shows a
