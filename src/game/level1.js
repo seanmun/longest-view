@@ -72,7 +72,7 @@ export const PEOPLE = [
     after: '*hic* Seven now. Still trusting.',
   },
   {
-    id: 'fan5', name: 'FAN', angle: 5.5, r: 30, fan: true,
+    id: 'fan5', name: 'IAN', model: 'ian', watch: 'wave', angle: 5.5, r: 30, fan: true, // no dance clip; 'happy' is his idle
     line: 'Embiid hasn\'t played in two years. TWO YEARS, Sam!',
     choices: [
       { label: 'He\'s resting.', reply: 'For TWO YEARS?!' },
