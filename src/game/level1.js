@@ -54,7 +54,7 @@ export const PEOPLE = [
     after: 'See you in 2019, Sam.',
   },
   {
-    id: 'fan4', name: 'FAN', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true,
+    id: 'fan4', name: 'MUSKET', model: 'musket', watch: 'wave', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true,
     line: 'I paid $90 for this seat to watch us lose by 40!',
     choices: [
       { label: 'The seats are nice, though.', reply: 'THE SEATS ARE NOT NICE.' },
