@@ -10,7 +10,6 @@ import { PersonModel, COLORS } from './Placeholders.jsx'
 import Model from './Model.jsx'
 import { R_OUT, polar } from './ring.js'
 import { MOB, MOB_BARRIER_RADIUS, DOOR } from './level1.js'
-import { addSunglasses } from './accessories.js'
 import { targets } from './targets.js'
 import { getState, setState, useGame, player, toast } from './state.js'
 import { sfx } from './audio.js'
@@ -27,10 +26,6 @@ const [TUNNEL_X, , TUNNEL_Z] = polar(R_OUT - 0.4, DOOR.angle)
 const DOOR_FRONT = polar(R_OUT - 0.8, DOOR.angle)
 const isTouch = window.matchMedia('(pointer: coarse)').matches
 
-// Meshy painted PJ's sunglasses on badly; give him real ones
-const DECORATE = {
-  pj: (scene) => addSunglasses(scene, { y: 1.69, z: 0.33, lensW: 0.215, lensH: 0.14, earX: 0.375, earY: 1.665, earZ: -0.09 }),
-}
 
 const members = MOB.map((m, i) => {
   const [x, , z] = polar(m.r, m.angle)
@@ -140,7 +135,7 @@ function Member({ m }) {
     <group ref={root}>
       <group ref={body}>
         {m.model
-          ? <Model name={m.model} height={m.height} anim={anim} decorate={DECORATE[m.id]} fallback={<PersonModel color={m.color} />} />
+          ? <Model name={m.model} height={m.height} anim={anim} fallback={<PersonModel color={m.color} />} />
           : <PersonModel color={m.color} height={m.height} />}
       </group>
       <group ref={stars} position={[0, m.height + 0.25, 0]}>

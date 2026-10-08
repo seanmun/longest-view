@@ -9,6 +9,7 @@ import { useFrame } from '@react-three/fiber'
 import { useAnimations, useGLTF } from '@react-three/drei'
 import { Box3, LoopOnce, Vector3 } from 'three'
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js'
+import { DECORATIONS } from './accessories.js'
 
 export const modelUrl = (name) => `${import.meta.env.BASE_URL}models/${name}.glb`
 
@@ -109,7 +110,7 @@ function Fitted({ url, height, rotationY, anim, decorate, extraClips }) {
 export default function Model({ name, height, rotationY = 0, fallback = null, anim, decorate, extraClips }) {
   return (
     <Suspense fallback={fallback}>
-      <Fitted url={modelUrl(name)} height={height} rotationY={rotationY} anim={anim} decorate={decorate} extraClips={extraClips} />
+      <Fitted url={modelUrl(name)} height={height} rotationY={rotationY} anim={anim} decorate={decorate ?? DECORATIONS[name]} extraClips={extraClips} />
     </Suspense>
   )
 }

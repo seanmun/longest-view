@@ -121,17 +121,62 @@ function Follower({ id, name, model, color, height }) {
   )
 }
 
-// A rigged fan still waiting to be convinced, turned toward Hinkie. Plays the
-// `watch` clip if given (Sean waves him over); otherwise holds the first walk
-// frame, a neutral stance.
+// A rigged fan still waiting to be convinced. Mills around near their spot
+// (short strolls, pauses, looking about) until Hinkie comes close, then turns
+// to face him and plays their `watch` clip (Sean waves him over). Only the
+// model moves; their collider and talk spot stay put.
+const MILL_RADIUS = 0.8 // m from their spot
+const MILL_SPEED = 0.6 // m/s
+const NOTICE = 7 // m: close enough that they stop and face Hinkie
+
 function Watching({ model, watch, height, color }) {
   const turn = useRef()
-  const anim = useRef(watch ? { name: watch, speed: 1 } : { name: 'walk', speed: 0 })
-  useFrame(() => {
+  const anim = useRef({ name: 'walk', speed: 0 }) // first walk frame, held, is a neutral stance
+  const mill = useRef({ x: 0, z: 0, tx: 0, tz: 0, wait: Math.random() * 3, yaw: Math.random() * 6.28 })
+  useFrame((_, rawDt) => {
     const g = turn.current
     if (!g) return
-    const p = g.getWorldPosition(g.userData.v ??= g.position.clone())
-    g.rotation.y = Math.atan2(player.x - p.x, player.z - p.z)
+    const dt = Math.min(rawDt, 0.05)
+    const m = mill.current
+    const spot = g.parent.getWorldPosition(g.userData.v ??= g.position.clone())
+    const toHinkie = Math.hypot(player.x - spot.x, player.z - spot.z)
+    let face = m.yaw
+
+    if (toHinkie < NOTICE) {
+      // Hinkie's coming: stop and face him
+      anim.current = watch ? { name: watch, speed: 1 } : { name: 'walk', speed: 0 }
+      face = Math.atan2(player.x - (spot.x + m.x), player.z - (spot.z + m.z))
+    } else if (m.wait > 0) {
+      // Standing around, glancing about
+      m.wait -= dt
+      anim.current = { name: 'walk', speed: 0 }
+      if (m.wait <= 0) {
+        const a = Math.random() * Math.PI * 2
+        const r = Math.random() * MILL_RADIUS
+        m.tx = Math.cos(a) * r
+        m.tz = Math.sin(a) * r
+      }
+    } else {
+      // Stroll to the next spot
+      const dx = m.tx - m.x
+      const dz = m.tz - m.z
+      const d = Math.hypot(dx, dz)
+      if (d < 0.05) {
+        m.wait = 1.5 + Math.random() * 3
+        m.yaw += (Math.random() - 0.5) * 2.5
+      } else {
+        const step = Math.min(d, MILL_SPEED * dt)
+        m.x += (dx / d) * step
+        m.z += (dz / d) * step
+        m.yaw = Math.atan2(dx, dz)
+        anim.current = { name: 'walk', speed: 0.55 }
+      }
+      face = m.yaw
+    }
+
+    g.position.set(m.x, 0, m.z)
+    const diff = Math.atan2(Math.sin(face - g.rotation.y), Math.cos(face - g.rotation.y))
+    g.rotation.y += diff * Math.min(1, 6 * dt)
   })
   return (
     <group ref={turn}>
