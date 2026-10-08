@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import World from './game/World.jsx'
 import Objectives from './game/Objectives.jsx'
+import Preload from './game/Preload.jsx'
 import Mob from './game/Mob.jsx'
 import Balls from './game/Balls.jsx'
 import { polar, R_MID } from './game/ring.js'
@@ -27,6 +28,7 @@ export default function App() {
         <color attach="background" args={['#0a0a1a']} />
         <Suspense fallback={null}>
           <Physics>
+            <Preload />
             <World />
             <Objectives />
             <Mob />

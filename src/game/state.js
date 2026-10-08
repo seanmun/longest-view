@@ -6,6 +6,7 @@ const skipIntro = new URLSearchParams(window.location.search).has('at')
 
 let state = {
   intro: !skipIntro, // opening cutscene showing
+  loaded: false, // every model downloaded and the scene is up
   startedAt: skipIntro ? performance.now() : null, // ms, when play began
   finishedAt: null, // ms, when Hinkie walked out the exit doors
   nearby: null, // id of the person in talking range

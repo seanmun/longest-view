@@ -155,6 +155,7 @@ function Member({ m }) {
 }
 
 export default function Mob() {
+  const halfway = useRef(false)
   const mobLeft = useGame((s) => s.mobLeft)
 
   useEffect(() => { setState({ mobLeft: members.filter((m) => m.state !== 'gone').length }) }, [])
@@ -162,7 +163,11 @@ export default function Mob() {
   useFrame(() => {
     const s = getState()
     if (s.mobSeen || s.mobLeft === 0) return
-    if (Math.hypot(player.x - DOOR_FRONT[0], player.z - DOOR_FRONT[2]) < NOTICE_RANGE) {
+    // The doors are right by the start line, so only warn once Hinkie is past
+    // the halfway point and coming around toward them
+    const lap = Math.atan2(player.x, player.z)
+    if (lap > 2.5 || lap < -2.5) halfway.current = true
+    if (halfway.current && Math.hypot(player.x - DOOR_FRONT[0], player.z - DOOR_FRONT[2]) < NOTICE_RANGE) {
       setState({ mobSeen: true })
       toast(`Anti-fans are blocking the exit! ${isTouch ? 'Tap THROW' : 'Click'} to toss ping pong balls.`)
     }
