@@ -1,21 +1,18 @@
 // Stand-in shapes for characters and props. Each matches the real-world size its
 // Meshy model will have, so swapping in a model later changes nothing else.
-import { Billboard, Text } from '@react-three/drei'
-import { useRef } from 'react'
+import { Billboard, Text, useGLTF } from '@react-three/drei'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@react-three/rapier'
+import { COLORS } from './colors.js'
 import { useGame, player } from './state.js'
 import { followers } from './follow.js'
-import Model from './Model.jsx'
+import Model, { modelUrl } from './Model.jsx'
+import { targets } from './targets.js'
+import { throwBall } from './Balls.jsx'
+import { sfx } from './audio.js'
 
-export const COLORS = {
-  sixersBlue: '#006BB6',
-  sixersRed: '#ED174C',
-  navy: '#2A3F6E',
-  gold: '#E8B800',
-  cream: '#F2E8D5',
-  skin: '#E0B48C',
-}
+export { COLORS }
 
 // A body capsule and head, feet at y=0, facing +Z (the glTF convention Meshy models use).
 export function PersonModel({ color = COLORS.sixersBlue, height = 1.8 }) {
@@ -53,6 +50,11 @@ export function HinkieModel() {
 }
 
 const CELEBRATE_MS = 2500 // happy dance when a named fan is won over
+const AIM_RANGE = 15 // m: apostles only throw at an anti-fan this close
+const FAN_THROW = { name: 'throw', start: 0.3, speed: 2.5 } // Hinkie's clip, same timing
+const FAN_RELEASE = 0.18 // s from wind-up to the ball leaving the hand
+const FAN_THROW_SPEED = 12 // m/s
+let shotIds = 0
 
 // A convinced fan walking in Hinkie's line: no collider, so the line never
 // blocks or traps him. Rigged fans play happy / walk / run clips.
@@ -60,10 +62,35 @@ function Follower({ id, name, model, color, height }) {
   const root = useRef()
   const body = useRef()
   const step = useRef(0)
-  const anim = useRef({ name: 'happy', speed: 1 })
+  const anim = useRef({ name: 'happy', speed: 1, shot: null })
+  // Every rig shares Meshy's skeleton, so fans can borrow Hinkie's throw
+  const { animations } = useGLTF(modelUrl('hinkie'))
+  const borrowed = useMemo(() => animations.filter((c) => c.name === 'throw'), [animations])
   useFrame((_, dt) => {
     const f = followers[id]
     if (!f || !root.current) return
+
+    // Join Hinkie's volley: wind up at a nearby anti-fan, release a beat later
+    const now = performance.now() / 1000
+    if (f.throwAt && now >= f.throwAt) {
+      f.throwAt = null
+      const target = targets.nearest(f.x, f.z, AIM_RANGE)
+      if (target) {
+        f.target = target
+        f.aimYaw = Math.atan2(target.x - f.x, target.z - f.z)
+        f.aimUntil = now + 0.7
+        f.releaseAt = now + FAN_RELEASE
+        anim.current.shot = { ...FAN_THROW, id: ++shotIds }
+      }
+    }
+    if (f.releaseAt && now >= f.releaseAt) {
+      f.releaseAt = null
+      const dx = f.target.x - f.x
+      const dz = f.target.z - f.z
+      const d = Math.hypot(dx, dz) || 1
+      sfx.throw()
+      throwBall(f.x + (dx / d) * 0.5, 1.3, f.z + (dz / d) * 0.5, (dx / d) * FAN_THROW_SPEED, 2.5, (dz / d) * FAN_THROW_SPEED)
+    }
     root.current.position.set(f.x, 0, f.z)
     root.current.rotation.y = f.yaw
     if (model) {
@@ -82,7 +109,7 @@ function Follower({ id, name, model, color, height }) {
     <group ref={root}>
       <group ref={body}>
         {model
-          ? <Model name={model} height={height} anim={anim} fallback={<PersonModel color={color} height={height} />} />
+          ? <Model name={model} height={height} anim={anim} extraClips={borrowed} fallback={<PersonModel color={color} height={height} />} />
           : <PersonModel color={color} height={height} />}
       </group>
       <Billboard position={[0, height + 0.35, 0]}>

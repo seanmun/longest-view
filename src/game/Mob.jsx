@@ -11,6 +11,7 @@ import Model from './Model.jsx'
 import { R_OUT, polar } from './ring.js'
 import { MOB, MOB_BARRIER_RADIUS, DOOR } from './level1.js'
 import { addSunglasses } from './accessories.js'
+import { targets } from './targets.js'
 import { getState, setState, useGame, player, toast } from './state.js'
 import { sfx } from './audio.js'
 
@@ -43,6 +44,18 @@ const members = MOB.map((m, i) => {
   }
 })
 
+// Closest mob member still standing their ground, for apostles to aim at
+export function nearestMob(x, z, range) {
+  let best = null
+  let bestD = range
+  for (const m of members) {
+    if (m.state !== 'angry') continue
+    const d = Math.hypot(m.x - x, m.z - z)
+    if (d < bestD) { bestD = d; best = m }
+  }
+  return best
+}
+
 // Called by each ball every frame; true means the ball hit someone and pops.
 export function hitMob(x, y, z) {
   if (y > 1.9) return false
@@ -59,6 +72,9 @@ export function hitMob(x, y, z) {
   }
   return false
 }
+
+targets.hit = hitMob
+targets.nearest = nearestMob
 
 function Member({ m }) {
   const root = useRef()

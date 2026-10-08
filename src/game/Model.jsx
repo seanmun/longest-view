@@ -43,7 +43,7 @@ function upperBodyOnly(clip) {
   return c
 }
 
-function Fitted({ url, height, rotationY, anim, decorate }) {
+function Fitted({ url, height, rotationY, anim, decorate, extraClips }) {
   const { scene: source, animations } = useGLTF(url)
   // Each placement gets its own copy (an object can only sit in one place);
   // geometry and textures stay shared.
@@ -61,7 +61,8 @@ function Fitted({ url, height, rotationY, anim, decorate }) {
   }, [scene, height])
 
   const root = useRef()
-  const clips = useMemo(() => animations.map((c) => (c.name.startsWith('throw') ? upperBodyOnly(c) : inPlace(c.clone()))), [animations])
+  // extraClips: borrowed from another model on the same skeleton (fans use Hinkie's throw)
+  const clips = useMemo(() => [...animations, ...(extraClips ?? [])].map((c) => (c.name.startsWith('throw') ? upperBodyOnly(c) : inPlace(c.clone()))), [animations, extraClips])
   const { actions } = useAnimations(clips, root)
   const playing = useRef(null)
   const lastShot = useRef(null)
@@ -105,10 +106,10 @@ function Fitted({ url, height, rotationY, anim, decorate }) {
 }
 
 // Shows `fallback` (the placeholder) while the model downloads
-export default function Model({ name, height, rotationY = 0, fallback = null, anim, decorate }) {
+export default function Model({ name, height, rotationY = 0, fallback = null, anim, decorate, extraClips }) {
   return (
     <Suspense fallback={fallback}>
-      <Fitted url={modelUrl(name)} height={height} rotationY={rotationY} anim={anim} decorate={decorate} />
+      <Fitted url={modelUrl(name)} height={height} rotationY={rotationY} anim={anim} decorate={decorate} extraClips={extraClips} />
     </Suspense>
   )
 }

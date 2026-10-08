@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Color, Object3D } from 'three'
 import { R_IN, R_OUT, polar } from './ring.js'
 import { PEOPLE } from './level1.js'
-import { hitMob } from './Mob.jsx'
+import { targets } from './targets.js'
 import { sfx } from './audio.js'
 import { isFollowing } from './follow.js'
 
@@ -78,7 +78,7 @@ export default function Balls() {
       }
       const r = Math.hypot(b.x, b.z)
       const hitWall = r < R_IN + 0.1 || r > R_OUT - 0.1 || b.y > 4.4
-      if (hitWall || b.age > LIFETIME || hitMob(b.x, b.y, b.z) || hitsPerson(b)) {
+      if (hitWall || b.age > LIFETIME || targets.hit(b.x, b.y, b.z) || hitsPerson(b)) {
         pop(b.x, Math.max(b.y, 0.3), b.z)
         sfx.pop()
         balls.splice(i, 1)

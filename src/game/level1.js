@@ -1,7 +1,7 @@
 // Level 1 cast: where everyone stands. What they ask lives in questions.js
 // (`q`). Every question is asked once: right answer and the fan (plus their
 // cluster) follows Hinkie; wrong answer and they stay put.
-import { COLORS } from './Placeholders.jsx'
+import { COLORS } from './colors.js'
 
 export const TALK_RANGE = 2.6 // m from Hinkie's center to theirs
 
@@ -21,7 +21,7 @@ export const PEOPLE = [
   // Hinkie's Henchmen: a pack of three, asked the hardest question together
   { id: 'musket', name: 'MUSKET', crew: "HINKIE'S HENCHMEN", model: 'musket', watch: 'wave', angle: 5.5, r: 30, fan: true, q: 'henchmen' },
   { id: 'ian', name: 'IAN', model: 'ian', watch: 'wave', with: 'musket', angle: 5.535, r: 31.1, fan: true },
-  { id: 'truant', name: 'TRUANT', with: 'musket', angle: 5.465, r: 31.1, fan: true, color: COLORS.navy },
+  { id: 'truant', name: 'TRUANT', model: 'truant', with: 'musket', angle: 5.465, r: 31.1, fan: true, color: COLORS.navy },
 ]
 
 export const FAN_COUNT = PEOPLE.filter((p) => p.fan).length

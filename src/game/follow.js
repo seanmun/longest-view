@@ -18,6 +18,8 @@ const ARRIVE = 1.6 // m/s of desired speed per meter from the spot
 const PERSONAL_SPACE = 0.9 // m kept between followers, and from Hinkie
 const TURN = 8 // how fast they turn to face where they're going
 const WALL_MARGIN = 0.7 // m kept from the concourse walls
+const VOLLEY_SHARE = 0.3 // chance each apostle joins in when Hinkie throws
+const VOLLEY_DELAY = [0.12, 0.75] // s, random delay before each one throws
 
 const trail = [] // newest first
 export const order = [] // follower ids, in the order they joined
@@ -53,6 +55,16 @@ function behind(dist) {
     pz = c.z
   }
   return null // trail doesn't reach that far back yet
+}
+
+// Hinkie threw: roughly 30% of the crowd throw too, each a beat apart.
+// Followers pick this up in their own frame loop (Placeholders.jsx).
+export function volley(time) {
+  for (const id of order) {
+    const f = followers[id]
+    if (f.throwAt || Math.random() > VOLLEY_SHARE) continue
+    f.throwAt = time + VOLLEY_DELAY[0] + Math.random() * (VOLLEY_DELAY[1] - VOLLEY_DELAY[0])
+  }
 }
 
 const angleTo = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from))
@@ -114,8 +126,9 @@ export function updateFollowers(rawDt, time) {
     f.z += f.vz * dt
     f.speed = Math.hypot(f.vx, f.vz)
 
-    // Face where they're going; when standing, face Hinkie
-    const face = f.speed > 0.4 ? Math.atan2(f.vx, f.vz) : Math.atan2(player.x - f.x, player.z - f.z)
+    // Face where they're throwing, else where they're going, else Hinkie
+    const face = f.aimUntil > time ? f.aimYaw
+      : f.speed > 0.4 ? Math.atan2(f.vx, f.vz) : Math.atan2(player.x - f.x, player.z - f.z)
     f.yaw += angleTo(f.yaw, face) * Math.min(1, TURN * dt)
 
     // Gait with hysteresis so clips don't flicker at the boundaries

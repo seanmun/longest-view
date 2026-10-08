@@ -8,7 +8,7 @@ import { PEOPLE, TALK_RANGE } from './level1.js'
 import { polar } from './ring.js'
 import { getState, setState, player } from './state.js'
 import { throwBall } from './Balls.jsx'
-import { followers, isFollowing, updateFollowers } from './follow.js'
+import { followers, isFollowing, updateFollowers, volley } from './follow.js'
 import { sfx } from './audio.js'
 
 const WALK_SPEED = 4 // m/s
@@ -120,6 +120,7 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
         pendingThrow.current = null
         sfx.throw()
         throwBall(p.x + t.fx * 0.5, p.y + 0.4, p.z + t.fz * 0.5, t.fx * THROW_SPEED, THROW_LIFT, t.fz * THROW_SPEED)
+        volley(performance.now() / 1000)
       }
     }
     model.current.rotation.y = facing.current
