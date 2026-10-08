@@ -3,7 +3,8 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Color, Object3D } from 'three'
-import { R_IN, R_OUT, polar } from './ring.js'
+import { polar } from './ring.js'
+import { getState } from './state.js'
 import { PEOPLE } from './level1.js'
 import { targets } from './targets.js'
 import { sfx } from './audio.js'
@@ -46,6 +47,7 @@ function pop(x, y, z) {
 }
 
 function hitsPerson(b) {
+  if (getState().level !== 1) return false // the fans stand on the concourse
   // Followers have left their spots; balls pass through the line
   return PEOPLE_XZ.some((p) => !isFollowing(p.id) && b.y < p.h + 0.1 && Math.hypot(b.x - p.x, b.z - p.z) < HIT_RADIUS)
 }
@@ -76,8 +78,7 @@ export default function Balls() {
         if (b.vy < -1) sfx.bounce()
         b.vy = -b.vy * BOUNCE
       }
-      const r = Math.hypot(b.x, b.z)
-      const hitWall = r < R_IN + 0.1 || r > R_OUT - 0.1 || b.y > 4.4
+      const hitWall = targets.wall(b.x, b.y, b.z)
       if (hitWall || b.age > LIFETIME || targets.hit(b.x, b.y, b.z) || hitsPerson(b)) {
         pop(b.x, Math.max(b.y, 0.3), b.z)
         sfx.pop()

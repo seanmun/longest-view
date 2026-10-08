@@ -87,7 +87,19 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     const cos = Math.cos(yaw.current)
     const vx = (mx * cos - my * sin) * WALK_SPEED
     const vz = (-mx * sin - my * cos) * WALK_SPEED
-    b.setLinvel({ x: vx, y: b.linvel().y, z: vz }, true)
+    // A shove from a hit adds to his walk for a moment
+    const now = performance.now()
+    let kx = 0
+    let kz = 0
+    if (player.knock && now < player.knock.until) { kx = player.knock.vx; kz = player.knock.vz }
+    b.setLinvel({ x: vx + kx, y: b.linvel().y, z: vz + kz }, true)
+
+    // Respawn / level change: jump the body to a new spot
+    if (player.teleport) {
+      b.setTranslation({ x: player.teleport.x, y: 1, z: player.teleport.z }, true)
+      b.setLinvel({ x: 0, y: 0, z: 0 }, true)
+      player.teleport = null
+    }
 
     // Turn Hinkie toward where he's walking (or who he's talking to), the short way around
     const p = b.translation()
@@ -124,6 +136,8 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
       }
     }
     model.current.rotation.y = facing.current
+    // Flash while he can't be hit again
+    model.current.visible = !(now < getState().invulnUntil && Math.floor(now / 90) % 2 === 0)
 
     // Idle, walk on a gentle push, run on a full one; clip speed follows the stick
     const push = Math.min(1, len)
@@ -139,7 +153,7 @@ export default function Player({ position = [0, 1, 6], yaw: startYaw = 0 }) {
     // Who's close enough to talk to?
     let nearby = null
     let best = TALK_RANGE
-    for (const person of PEOPLE_XZ) {
+    for (const person of getState().level === 1 ? PEOPLE_XZ : []) {
       if (isFollowing(person.id)) continue // followers walk with him; not someone to walk up to
       const d = Math.hypot(person.x - p.x, person.z - p.z)
       if (d < best) { best = d; nearby = person.id }

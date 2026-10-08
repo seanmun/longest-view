@@ -7,6 +7,7 @@ export const POINTS = {
   hit: -250, // per hit Hinkie takes
   speedMax: 3000, // speed bonus at 0:00, falling...
   speedPerSecond: 10, // ...this much per second (zero at 5:00)
+  boss: 2000, // the Radio Monster
 }
 
 export function scoreParts(s, now = performance.now()) {
@@ -25,6 +26,26 @@ export function scoreParts(s, now = performance.now()) {
 }
 
 export const FANS_TOTAL = FAN_COUNT
+
+// Level 2: parking-lot anti-fans, the Radio Monster, hits, speed
+export function level2Parts(s, now = performance.now()) {
+  const seconds = s.startedAt ? ((s.finishedAt ?? now) - s.startedAt) / 1000 : 0
+  const parts = {
+    antiFans: s.enemiesBeaten, seconds, hits: s.hits,
+    antiFanPoints: s.enemiesBeaten * POINTS.antiFan,
+    bossPoints: s.bossBeaten ? POINTS.boss : 0,
+    hitPoints: s.hits * POINTS.hit,
+    speedPoints: s.finishedAt ? Math.max(0, Math.round(POINTS.speedMax - seconds * POINTS.speedPerSecond)) : 0,
+  }
+  parts.total = Math.max(0, parts.antiFanPoints + parts.bossPoints + parts.hitPoints + parts.speedPoints)
+  return parts
+}
+
+// Running total across levels
+export function totalScore(s, now) {
+  if (s.level === 1) return scoreParts(s, now).total
+  return (s.l1?.total ?? 0) + level2Parts(s, now).total
+}
 
 const BEST_KEY = 'longest-view-best'
 export function readBest() {

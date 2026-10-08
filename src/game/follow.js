@@ -7,6 +7,15 @@
 import { player } from './state.js'
 import { R_IN, R_OUT } from './ring.js'
 
+// Keeps a follower's spot inside the level's walkable area. Each level sets it.
+export const bounds = {
+  clamp: (x, z) => {
+    const r = Math.hypot(x, z)
+    const c = Math.min(R_OUT - 0.7, Math.max(R_IN + 0.7, r))
+    return [x * c / r, z * c / r]
+  },
+}
+
 const CRUMB = 0.25 // m between breadcrumbs
 const MAX_CRUMBS = 400 // ~100 m of trail
 const BACK_MIN = 1.8 // m behind Hinkie for the closest spot
@@ -17,7 +26,6 @@ const ACCEL = 9 // m/s² toward the desired velocity
 const ARRIVE = 1.6 // m/s of desired speed per meter from the spot
 const PERSONAL_SPACE = 0.9 // m kept between followers, and from Hinkie
 const TURN = 8 // how fast they turn to face where they're going
-const WALL_MARGIN = 0.7 // m kept from the concourse walls
 const VOLLEY_SHARE = 0.3 // chance each apostle joins in when Hinkie throws
 const VOLLEY_DELAY = [0.12, 0.75] // s, random delay before each one throws
 
@@ -67,6 +75,19 @@ export function volley(time) {
   }
 }
 
+// Move the whole crowd (new level, or Hinkie respawning): drop them just
+// behind Hinkie and start a fresh trail.
+export function relocate(x, z, backX = 0, backZ = 1) {
+  trail.length = 0
+  order.forEach((id, i) => {
+    const f = followers[id]
+    f.x = x + backX * (1.5 + i * 0.8) + ((i % 3) - 1) * 0.9
+    f.z = z + backZ * (1.5 + i * 0.8)
+    f.vx = 0
+    f.vz = 0
+  })
+}
+
 const angleTo = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from))
 
 export function updateFollowers(rawDt, time) {
@@ -88,10 +109,7 @@ export function updateFollowers(rawDt, time) {
       const side = f.side + Math.sin(time * 0.37 + f.phase * 2) * 0.25
       tx = spot.x - spot.dz * side // perpendicular to the trail
       tz = spot.z + spot.dx * side
-      const r = Math.hypot(tx, tz) // keep the spot inside the concourse
-      const clamped = Math.min(R_OUT - WALL_MARGIN, Math.max(R_IN + WALL_MARGIN, r))
-      tx *= clamped / r
-      tz *= clamped / r
+      ;[tx, tz] = bounds.clamp(tx, tz) // keep the spot inside the level
     }
 
     // Arrive: fast when far, easing in close

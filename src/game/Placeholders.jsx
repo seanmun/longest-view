@@ -2,10 +2,12 @@
 // Meshy model will have, so swapping in a model later changes nothing else.
 import { Billboard, Text, useGLTF } from '@react-three/drei'
 import { useMemo, useRef } from 'react'
+import { Vector3 } from 'three'
 import { useFrame } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider, CuboidCollider, CylinderCollider } from '@react-three/rapier'
 import { COLORS } from './colors.js'
 import { useGame, player } from './state.js'
+import { PEOPLE } from './level1.js'
 import { followers } from './follow.js'
 import Model, { modelUrl } from './Model.jsx'
 import { targets } from './targets.js'
@@ -49,6 +51,44 @@ export function HinkieModel() {
   )
 }
 
+// A name tag that hides when it's right in front of the camera (followers
+// crowd behind Hinkie, between him and the camera, where tags get huge)
+const TAG_HIDE_NEAR = 4.5 // m from the camera
+export function Tag({ position, children, ...text }) {
+  const ref = useRef()
+  const v = useMemo(() => new Vector3(), [])
+  useFrame(({ camera }) => {
+    if (ref.current) ref.current.visible = ref.current.getWorldPosition(v).distanceTo(camera.position) > TAG_HIDE_NEAR
+  })
+  return (
+    <Billboard ref={ref} position={position}>
+      <Text {...text}>{children}</Text>
+    </Billboard>
+  )
+}
+
+// A two-headed monster (Radio Monster, RTRS)
+// Placeholder until Sean's Meshy models arrive: one big body, two heads
+export function TwoHeaded({ color, names, height = 3 }) {
+  const r = height * 0.24
+  return (
+    <group>
+      <mesh position={[0, height * 0.38, 0]}>
+        <capsuleGeometry args={[r, height * 0.45, 6, 16]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+      {[-1, 1].map((s, i) => (
+        <group key={s} position={[s * r * 0.75, height * 0.86, 0]}>
+          <mesh><sphereGeometry args={[r * 0.62, 20, 16]} /><meshStandardMaterial color={COLORS.skin} /></mesh>
+          {/* shouting mouth */}
+          <mesh position={[0, -r * 0.18, r * 0.55]}><boxGeometry args={[r * 0.5, r * 0.28, 0.05]} /><meshBasicMaterial color="#2a0a0a" /></mesh>
+          <Tag position={[0, r * 1, 0]} fontSize={0.28} color="white" outlineWidth={0.03} outlineColor="#000">{names[i]}</Tag>
+        </group>
+      ))}
+    </group>
+  )
+}
+
 const CELEBRATE_MS = 2500 // happy dance when a named fan is won over
 const AIM_RANGE = 15 // m: apostles only throw at an anti-fan this close
 const FAN_THROW = { name: 'throw', start: 0.3, speed: 2.5 } // Hinkie's clip, same timing
@@ -58,7 +98,7 @@ let shotIds = 0
 
 // A convinced fan walking in Hinkie's line: no collider, so the line never
 // blocks or traps him. Rigged fans play happy / walk / run clips.
-function Follower({ id, name, model, color, height }) {
+function Follower({ id, name, model, color, height, body: custom }) {
   const root = useRef()
   const body = useRef()
   const step = useRef(0)
@@ -108,15 +148,13 @@ function Follower({ id, name, model, color, height }) {
   return (
     <group ref={root}>
       <group ref={body}>
-        {model
+        {custom ?? (model
           ? <Model name={model} height={height} anim={anim} extraClips={borrowed} fallback={<PersonModel color={color} height={height} />} />
-          : <PersonModel color={color} height={height} />}
+          : <PersonModel color={color} height={height} />)}
       </group>
-      <Billboard position={[0, height + 0.35, 0]}>
-        <Text fontSize={0.22} color={COLORS.gold} outlineWidth={0.02} outlineColor="black" anchorY="middle">
-          {model ? name : 'BELIEVER'}
-        </Text>
-      </Billboard>
+      <Tag position={[0, height + 0.35, 0]} fontSize={0.22} color={COLORS.gold} outlineWidth={0.02} outlineColor="black" anchorY="middle">
+        {model || custom ? name : 'BELIEVER'}
+      </Tag>
     </group>
   )
 }
@@ -191,7 +229,7 @@ export function Person({ id, name, model, watch, position, color = COLORS.sixers
   const radius = 0.3
   const convinced = useGame((s) => s.flags[id] === true)
   const turnedDown = useGame((s) => s.asked[id] === true && s.flags[id] !== true)
-  if (fan && convinced) return <Follower id={id} name={name} model={model} color={color} height={height} />
+  if (fan && convinced) return null // drawn by <Apostles /> now, in every level
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
@@ -268,5 +306,20 @@ export function Banner({ position, rotation, text, color = COLORS.sixersBlue, te
         {text}
       </Text>
     </group>
+  )
+}
+
+// Everyone following Hinkie, in whatever level he's in
+const RTRS_FOLLOWER = { id: 'rtrs', name: 'RTRS', height: 2.4 }
+export function Apostles() {
+  const flags = useGame((s) => s.flags)
+  const fans = PEOPLE.filter((p) => p.fan && flags[p.id])
+  return (
+    <>
+      {fans.map((p) => <Follower key={p.id} id={p.id} name={p.name} model={p.model} color={p.color ?? COLORS.sixersBlue} height={p.height ?? 1.8} />)}
+      {flags.rtrs && (
+        <Follower {...RTRS_FOLLOWER} body={<TwoHeaded color="#1f8a8a" names={['SPIKE', 'LEVIN']} height={2.4} />} />
+      )}
+    </>
   )
 }

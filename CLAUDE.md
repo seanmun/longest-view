@@ -39,6 +39,18 @@ database URL, which would ship credentials to the browser.
 - One system changed at a time; say the plan before changing feel
   (speeds, sensitivity, camera) and get approval on exact values.
 
+## Levels
+
+- **Level 1, lower concourse** (`World.jsx`, `level1.js`, `questions.js`):
+  five one-shot questions recruit apostles; anti-fans at the glass exit.
+- **Level 2, parking lot** (`Level2.jsx`, `levels.js`): 5 hearts (hit =
+  -250, flashing invulnerability; 0 hearts = back up at the last
+  checkpoint). PJ + Rick brawl at the doors; Badman, Stine, Tea Mike wait
+  by Xfinity Live!. Radio Monster (placeholder, `TwoHeaded`) can't drop
+  below 50% until the RTRS monster arrives (2 hearts left, 5s stuck at
+  the floor, or 25s), then RTRS joins the apostles.
+- Testing: `?level=2&apostles=all`, plus `&z=-42` to spawn at the boss.
+
 ## Level 1 build order
 
 1. Movement sandbox
