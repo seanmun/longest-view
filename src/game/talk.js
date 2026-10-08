@@ -1,37 +1,68 @@
-// Conversation actions. A talk is { id, reply }: reply is null while choosing,
-// or the person's answer once Hinkie has picked a line.
+// Conversation actions. Each question is asked once.
+// A talk is { id, order, picked, page }:
+//   order  - answer indexes in the shuffled order shown
+//   picked - index of Hinkie's answer, or null while choosing
+//   page   - 'ask' | 'reaction' | 'explain' | 'snub'
 import { getState, setState } from './state.js'
 import { PEOPLE, clusterOf } from './level1.js'
+import { QUESTIONS } from './questions.js'
 import { sfx } from './audio.js'
 import { join } from './follow.js'
 import { polar } from './ring.js'
 
 export const personById = (id) => PEOPLE.find((p) => p.id === id)
+export const questionFor = (id) => QUESTIONS[personById(id)?.q]
 
-export function openTalk() {
-  const { nearby, talk, flags } = getState()
-  if (!nearby || talk) return
-  sfx.blip()
-  // Already convinced: skip the question, go straight to their happy line
-  setState({ talk: { id: nearby, reply: flags[nearby] ? personById(nearby).after : null } })
+function shuffled(n) {
+  const a = Array.from({ length: n }, (_, i) => i)
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] }
+  return a
 }
 
-export function choose(index) {
+export function openTalk() {
+  const { nearby, talk, asked } = getState()
+  if (!nearby || talk) return
+  const q = questionFor(nearby)
+  if (!q) return
+  sfx.blip()
+  // Already asked (and not won, or they'd be following): the eye-roll
+  if (asked[nearby]) { setState({ talk: { id: nearby, order: [], picked: null, page: 'snub' } }); return }
+  setState({ talk: { id: nearby, order: shuffled(q.answers.length), picked: null, page: 'ask' } })
+}
+
+export function choose(slot) {
   const { talk } = getState()
-  if (!talk || talk.reply) return
-  const choice = personById(talk.id).choices[index]
-  if (!choice) return
-  if (choice.win) {
+  if (!talk || talk.page !== 'ask') return
+  const index = talk.order[slot]
+  const q = questionFor(talk.id)
+  const answer = q.answers[index]
+  if (!answer) return
+
+  const won = {}
+  if (answer.correct) {
     sfx.good()
     // Win over the fan and everyone standing with them
-    for (const p of clusterOf(talk.id)) if (p.fan) { const [x, , z] = polar(p.r, p.angle); join(p.id, x, z) }
+    for (const p of clusterOf(talk.id)) {
+      won[p.id] = true
+      if (p.fan) { const [x, , z] = polar(p.r, p.angle); join(p.id, x, z) }
+    }
+  } else {
+    sfx.bad()
   }
-  else sfx.bad()
-  const won = choice.win ? Object.fromEntries(clusterOf(talk.id).map((p) => [p.id, true])) : {}
   setState((s) => ({
-    talk: { id: talk.id, reply: choice.reply },
+    talk: { ...talk, picked: index, page: 'reaction' },
     flags: { ...s.flags, ...won },
+    asked: { ...s.asked, ...Object.fromEntries(clusterOf(talk.id).map((p) => [p.id, true])) },
+    analystRight: talk.id === 'analyst' ? !!answer.correct : s.analystRight,
   }))
+}
+
+// OK on a reaction: show the explainer if there is one, otherwise close
+export function advance() {
+  const { talk } = getState()
+  if (!talk) return
+  if (talk.page === 'reaction' && questionFor(talk.id).explain) setState({ talk: { ...talk, page: 'explain' } })
+  else setState({ talk: null })
 }
 
 export function closeTalk() {

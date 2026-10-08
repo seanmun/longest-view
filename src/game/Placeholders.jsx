@@ -118,13 +118,14 @@ function Watching({ model, watch, height, color }) {
 export function Person({ id, name, model, watch, position, color = COLORS.sixersBlue, height = 1.8, fan = false }) {
   const radius = 0.3
   const convinced = useGame((s) => s.flags[id] === true)
+  const turnedDown = useGame((s) => s.asked[id] === true && s.flags[id] !== true)
   if (fan && convinced) return <Follower id={id} name={name} model={model} color={color} height={height} />
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CapsuleCollider args={[height / 2 - radius, radius]} position={[0, height / 2, 0]} />
       {model ? <Watching model={model} watch={watch} height={height} color={color} /> : <PersonModel color={color} height={height} />}
       <Billboard position={[0, height + 0.35, 0]}>
-        <Text fontSize={0.22} color={convinced ? COLORS.gold : 'white'} outlineWidth={0.02} outlineColor="black" anchorY="middle">
+        <Text fontSize={0.22} color={convinced ? COLORS.gold : turnedDown ? '#8a8f99' : 'white'} outlineWidth={0.02} outlineColor="black" anchorY="middle">
           {convinced ? 'BELIEVER' : name}
         </Text>
       </Billboard>

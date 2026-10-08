@@ -1,4 +1,4 @@
-// The "JUST WIN GAMES BRO" mob around the locker-room door, led by Badman, a
+// The "JUST WIN GAMES BRO" mob around the glass exit doors, led by Badman, a
 // giggling weasel. Rigged members stomp mad. A ping pong ball knocks one back (hit clip + dizzy stars); then
 // they run off through the tunnel. The door stays walled off until every
 // member is gone.
@@ -21,7 +21,8 @@ const MOOD_TIME = 5 // s per clip for members with `moods` (e.g. Tea Mike: stomp
 const RUN_SPEED = 5 // m/s
 const SHOUT_TIME = 1.4 // s each; one member shouts at a time so it stays readable
 const NOTICE_RANGE = 12 // m from the door when the mob hint first shows
-const [TUNNEL_X, , TUNNEL_Z] = polar(R_OUT - 0.4, 0.03)
+// Beaten members flee out the glass exit doors
+const [TUNNEL_X, , TUNNEL_Z] = polar(R_OUT - 0.4, DOOR.angle)
 const DOOR_FRONT = polar(R_OUT - 0.8, DOOR.angle)
 const isTouch = window.matchMedia('(pointer: coarse)').matches
 
@@ -163,7 +164,7 @@ export default function Mob() {
     if (s.mobSeen || s.mobLeft === 0) return
     if (Math.hypot(player.x - DOOR_FRONT[0], player.z - DOOR_FRONT[2]) < NOTICE_RANGE) {
       setState({ mobSeen: true })
-      toast(`A mob is blocking the locker room! ${isTouch ? 'Tap THROW' : 'Click'} to toss ping pong balls.`)
+      toast(`Anti-fans are blocking the exit! ${isTouch ? 'Tap THROW' : 'Click'} to toss ping pong balls.`)
     }
   })
 

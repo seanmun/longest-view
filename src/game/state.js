@@ -7,14 +7,16 @@ const skipIntro = new URLSearchParams(window.location.search).has('at')
 let state = {
   intro: !skipIntro, // opening cutscene showing
   startedAt: skipIntro ? performance.now() : null, // ms, when play began
-  finishedAt: null, // ms, when Hinkie walked into the locker room
+  finishedAt: null, // ms, when Hinkie walked out the exit doors
   nearby: null, // id of the person in talking range
-  talk: null, // { id, reply } while a conversation is open
+  talk: null, // see talk.js, while a conversation is open
   flags: {}, // id -> true once that person is convinced
-  pages: {}, // binder page id -> true once picked up
-  nearDoor: false, // standing at the locker-room door
+  asked: {}, // id -> true once their one question has been answered
+  analystRight: false,
+  hits: 0, // times Hinkie got hit (costs points)
+  nearDoor: false, // standing at the exit doors
   doorOpen: false,
-  complete: false, // walked through the open door
+  complete: false, // walked out the open doors
   mobLeft: 5, // mob members still at the door
   mobSeen: false, // the "mob blocks the door" hint has shown
   toast: null, // { text, key } short message; key changes on every new toast

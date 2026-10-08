@@ -43,8 +43,8 @@ database URL, which would ship credentials to the browser.
 
 1. Movement sandbox
 2. Concourse layout (ring around the bowl, START / FINISH at the tunnel)
-3. Dialogue system (convince 6 fans; cast and lines in `src/game/level1.js`)
-4. Binder puzzle (3 pages unlock the locker-room door; walking in completes the level)
+3. Dialogue: one-shot questions, copy in `src/game/questions.js`; cast and clusters in `src/game/level1.js`; scoring in `src/game/score.js`
+4. ~~Binder puzzle~~ (cut). Level ends at glass exit doors once the anti-fans are gone
 5. Fan mob encounter (5 fans wall off the door; ping pong balls pop into confetti, dizzy stars, they flee into the tunnel)
 6. Intro + end card (`src/ui/Intro.jsx`, `EndCard` in `src/ui/Hud.jsx`)
 7. Meshy models

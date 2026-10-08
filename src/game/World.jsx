@@ -1,7 +1,7 @@
 // Level 1: the Wells Fargo Center concourse, a full ring around the arena bowl.
 // Angles are measured around the ring from +Z toward +X (three.js cylinder
 // convention). The lap starts at angle 0 (START / FINISH) and runs toward
-// increasing angle, ending at the locker-room door just behind the start.
+// increasing angle, ending at the glass exit doors just behind the start.
 import { BackSide, DoubleSide } from 'three'
 import { Text } from '@react-three/drei'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
@@ -157,7 +157,7 @@ function StartFinish() {
         outlineWidth={0.02} outlineColor="black">
         {'←  THIS WAY'}
       </Text>
-      {/* Locker-room door lives in Objectives.jsx */}
+      {/* Glass exit doors live in Objectives.jsx */}
     </group>
   )
 }
