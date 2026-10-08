@@ -68,7 +68,6 @@ function EndCard() {
         <div className={`w-full max-w-md rounded-2xl bg-white/5 px-5 py-3 text-left text-lg ${SHORT}py-2 ${SHORT}text-base`}>
           <Row label="Apostles" detail={`${parts.fans} / ${FAN_COUNT}`} points={parts.fanPoints} />
           <Row label="Anti-fans beaten" detail={`${parts.antiFans}`} points={parts.antiFanPoints} />
-          {parts.analystPoints > 0 && <Row label="Front-office call" detail="" points={parts.analystPoints} />}
           <Row label="Speed" detail={formatTime(parts.seconds)} points={parts.speedPoints} />
           {parts.hits > 0 && <Row label="Hits taken" detail={`${parts.hits}`} points={parts.hitPoints} />}
           <div className="mt-1 flex items-baseline justify-between border-t border-white/20 pt-1 text-xl font-bold">
@@ -111,7 +110,6 @@ export default function Hud() {
   const flags = useGame((s) => s.flags)
   const mobLeft = useGame((s) => s.mobLeft)
   const hits = useGame((s) => s.hits)
-  const analystRight = useGame((s) => s.analystRight)
   const nearDoor = useGame((s) => s.nearDoor)
   const doorOpen = useGame((s) => s.doorOpen)
   const complete = useGame((s) => s.complete)
@@ -119,7 +117,7 @@ export default function Hud() {
   if (complete) return <EndCard />
 
   const convinced = PEOPLE.filter((p) => p.fan && flags[p.id]).length
-  const live = scoreParts({ flags, mobLeft, hits, analystRight, startedAt: null, finishedAt: null })
+  const live = scoreParts({ flags, mobLeft, hits, startedAt: null, finishedAt: null })
 
   return (
     <>

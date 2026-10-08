@@ -53,7 +53,6 @@ export function choose(slot) {
     talk: { ...talk, picked: index, page: 'reaction' },
     flags: { ...s.flags, ...won },
     asked: { ...s.asked, ...Object.fromEntries(clusterOf(talk.id).map((p) => [p.id, true])) },
-    analystRight: talk.id === 'analyst' ? !!answer.correct : s.analystRight,
   }))
 }
 

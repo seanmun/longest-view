@@ -87,9 +87,7 @@ export default function Talk({ isTouch }) {
             {talk.page === 'reaction' && (
               <>
                 <div className={`mb-2 inline-block rounded-md px-2 py-0.5 text-base font-bold ${picked.correct ? 'bg-[#E8B800] text-black' : 'bg-white/15 text-white/80'}`}>
-                  {picked.correct
-                    ? (person.fan ? 'CONVINCED' : 'RIGHT CALL')
-                    : (person.fan ? 'NOT CONVINCED' : 'WRONG CALL')}
+                  {picked.correct ? 'CONVINCED' : 'NOT CONVINCED'}
                 </div>
                 <p className={`mb-3 text-xl leading-snug ${SHORT}text-lg`}>{picked.reaction}</p>
               </>

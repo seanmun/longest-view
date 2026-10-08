@@ -13,7 +13,6 @@ let state = {
   talk: null, // see talk.js, while a conversation is open
   flags: {}, // id -> true once that person is convinced
   asked: {}, // id -> true once their one question has been answered
-  analystRight: false,
   hits: 0, // times Hinkie got hit (costs points)
   nearDoor: false, // standing at the exit doors
   doorOpen: false,

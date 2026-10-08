@@ -72,15 +72,4 @@ export const QUESTIONS = {
     ],
     snub: "The Henchmen have spoken. You're not one of us.", // PLACEHOLDER
   },
-
-  // Bonus: the front-office analyst (not a fan; nobody follows)
-  analyst: {
-    ask: 'Sam! The owner wants to sign a 32-year-old point guard. $18 million a year. He can still play!',
-    answers: [
-      { text: 'Sign him. The fans will love it.', reaction: "Great. We'll win 31 games. Again." },
-      { text: 'Sign him to a one-year deal, just to be safe.', reaction: "So we're paying $18M to be the 9th seed." }, // PLACEHOLDER
-      { text: 'Pass. We need the cap space in three years.', correct: true, reaction: 'Daryl Morey just texted you a thumbs-up.' },
-    ],
-    snub: 'I keep re-running your numbers. They keep being wrong.', // PLACEHOLDER
-  },
 }
