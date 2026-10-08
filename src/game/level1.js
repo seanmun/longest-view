@@ -18,7 +18,7 @@ export const PEOPLE = [
   { id: 'pudd', name: 'PUDD', model: 'pudd', with: 'woods', angle: 1.15, r: 34.2, fan: true },
   { id: 'analyst', name: 'ANALYST', angle: 1.9, r: 30, color: COLORS.cream, q: 'analyst' },
   { id: 'steve', name: 'STEVE', model: 'steve', watch: 'discuss', angle: 2.8, r: 32, fan: true, q: 'steve' },
-  { id: 'kirby', name: 'KIRBY', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true, q: 'kirby' },
+  { id: 'kirby', name: 'KIRBY', model: 'kirby', watch: 'wave', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true, q: 'kirby' },
   // Hinkie's Henchmen: a pack of three, asked the hardest question together
   { id: 'musket', name: 'MUSKET', crew: "HINKIE'S HENCHMEN", model: 'musket', watch: 'wave', angle: 5.5, r: 30, fan: true, q: 'henchmen' },
   { id: 'ian', name: 'IAN', model: 'ian', watch: 'wave', with: 'musket', angle: 5.535, r: 31.1, fan: true },
