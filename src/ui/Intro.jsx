@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useProgress } from '@react-three/drei'
 import { setState, useGame } from '../game/state.js'
 import { unlockAudio } from '../game/audio.js'
+import { TopScoresButton } from './Leaderboard.jsx'
 
 const LINES = [
   'Philadelphia, 2013.',
@@ -66,6 +67,7 @@ export default function Intro({ isTouch }) {
           )}
         </div>
       )}
+      <TopScoresButton />
       {!done && (
         <button className="absolute right-4 top-4 min-h-12 rounded-xl border border-white/40 px-5 text-lg text-white/80" onClick={skip}>
           Skip

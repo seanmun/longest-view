@@ -5,6 +5,8 @@ import { useGame, getState } from '../game/state.js'
 import { FAN_COUNT, PEOPLE } from '../game/level1.js'
 import { scoreParts, level2Parts, totalScore, readBest, saveBest } from '../game/score.js'
 import { startLevel2 } from '../game/levels.js'
+import { SubmitScore } from './Leaderboard.jsx'
+import { PEOPLE as CAST } from '../game/level1.js'
 
 const TOAST_MS = 2800
 const SHORT = '[@media(max-height:500px)]:'
@@ -105,6 +107,12 @@ function EndCard({ level }) {
           </button>
         ) : (
           <>
+            <SubmitScore run={{
+              score: total,
+              level: 2,
+              apostles: CAST.filter((p) => p.fan && state.flags[p.id]).length,
+              seconds: Math.round((l1?.seconds ?? 0) + l2.seconds),
+            }} />
             <p className={`title text-sm leading-relaxed text-white/80 ${SHORT}text-xs`}>TO BE CONTINUED… NEXT: THE COLANGELOS</p>
             <div className={`rounded-2xl border-2 border-[#E8B800] bg-[#0f1830] px-6 py-3 ${SHORT}py-2`}>
               <p className={`text-lg ${SHORT}text-base`}>While Hinkie rebuilds Philly, rebuild your fantasy roster.</p>

@@ -11,9 +11,11 @@ direction, not law.
 ## Stack
 
 Vite + React 19, React Three Fiber, drei, Rapier physics, Tailwind for UI
-overlays. No backend yet. A leaderboard, when it comes, goes through a
-server-side `/api` function using `DATABASE_URL` — never a `VITE_*`
-database URL, which would ship credentials to the browser.
+overlays. Leaderboard: `api/scores.js` (Vercel function) reads
+`DATABASE_URL` server-side, table `longest_view_scores` (`db/*.sql`, run by
+Sean in Neon). Never a `VITE_*` database URL, which would ship credentials
+to the browser. The legacy `leaderboard` table is the old 2D game's: don't
+touch it. `npm run dev` can't serve `/api`; use `vercel dev`.
 
 ## Layout
 
