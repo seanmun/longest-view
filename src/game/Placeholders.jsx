@@ -312,7 +312,7 @@ export function Banner({ position, rotation, text, color = COLORS.sixersBlue, te
 }
 
 // Everyone following Hinkie, in whatever level he's in
-const RTRS_FOLLOWER = { id: 'rtrs', name: 'RTRS', height: 2.4 }
+const RTRS_FOLLOWER = { id: 'rtrs', name: 'SPIKE + LEVIN', model: 'rtrs', height: 2.4 }
 export function Apostles() {
   const flags = useGame((s) => s.flags)
   const fans = PEOPLE.filter((p) => p.fan && flags[p.id])
@@ -320,7 +320,7 @@ export function Apostles() {
     <>
       {fans.map((p) => <Follower key={p.id} id={p.id} name={p.name} model={p.model} color={p.color ?? COLORS.sixersBlue} height={p.height ?? 1.8} />)}
       {flags.rtrs && (
-        <Follower {...RTRS_FOLLOWER} body={<TwoHeaded color="#1f8a8a" names={['SPIKE', 'LEVIN']} height={2.4} />} />
+        <Follower {...RTRS_FOLLOWER} />
       )}
     </>
   )

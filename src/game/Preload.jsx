@@ -8,7 +8,7 @@ import { PEOPLE, MOB } from './level1.js'
 import { setState } from './state.js'
 
 const MODELS = [...new Set([
-  'hinkie', 'trash-can', 'hot-dog-cart', 'duo',
+  'hinkie', 'trash-can', 'hot-dog-cart', 'duo', 'rtrs',
   ...PEOPLE.map((p) => p.model),
   ...MOB.map((m) => m.model),
 ].filter(Boolean))]

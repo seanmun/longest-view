@@ -89,14 +89,16 @@ function Fitted({ url, height, rotationY, anim, decorate, extraClips }) {
       if (!a.isRunning()) a.fadingOut = false
     }
 
-    const next = actions[name]
+    // Missing clip (e.g. no 'happy' dance): hold the first walk frame, a neutral stance
+    const key = actions[name] ? name : actions.idle ? 'idle' : 'walk'
+    const next = actions[key]
     if (!next) return
-    if (playing.current !== name) {
+    if (playing.current !== key) {
       actions[playing.current]?.fadeOut(FADE)
       next.reset().fadeIn(FADE).play()
-      playing.current = name
+      playing.current = key
     }
-    next.timeScale = speed
+    next.timeScale = key === name ? speed : key === 'walk' ? 0 : 1
   })
 
   return (

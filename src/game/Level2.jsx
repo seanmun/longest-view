@@ -458,9 +458,10 @@ function Boss() {
       // Rescue: low on hearts, stuck at the floor, or just taking too long
       if (!s.rescued && (s.hearts <= 2 || BOSS.floorTime > 5 || BOSS.fightTime > RESCUE_AFTER)) {
         setState({ rescued: true })
+        // They come in from outside the lot on the left, a little ahead of Hinkie
         RTRS.state = 'arriving'
-        RTRS.x = player.x + 6
-        RTRS.z = player.z + 12
+        RTRS.z = Math.min(FENCE.z0 - 1, Math.max(FENCE.z1 + 1, player.z - 3))
+        RTRS.x = FENCE.x - 7
         toast('Spike Eskin and Michael Levin to the rescue!')
         sfx.page()
       }
@@ -488,40 +489,92 @@ function Boss() {
   )
 }
 
-// RTRS arrives behind Hinkie, stands off his shoulder, and blasts the boss
+// The Two Process Guys (Spike Eskin + Michael Levin) run in from outside the
+// lot, hop the barrier on the left, take up a spot at Hinkie's 10 o'clock
+// (ahead and to his left, facing the boss), and blast it.
+const FENCE = { x: LOT.minX + 3, z0: -32, z1: -70 } // runs along z from z0 to z1
+const HOP_TIME = 1.21 // s, the hop clip's length
+const HOP_DISTANCE = 3 // m carried over the barrier during the hop
+const TEN_OCLOCK = { left: 3.9, ahead: 2.3 } // m from Hinkie (60 degrees left of straight at the boss)
+
+function Barrier() {
+  const len = FENCE.z0 - FENCE.z1
+  return (
+    <group position={[FENCE.x, 0, (FENCE.z0 + FENCE.z1) / 2]}>
+      {/* concrete jersey barriers */}
+      <mesh position={[0, 0.45, 0]}><boxGeometry args={[0.6, 0.9, len]} /><meshStandardMaterial color="#b8b4aa" /></mesh>
+      <mesh position={[0, 0.95, 0]}><boxGeometry args={[0.3, 0.1, len]} /><meshStandardMaterial color="#e8c547" /></mesh>
+      <RigidBody type="fixed" colliders={false}>
+        <CuboidCollider args={[0.3, 0.6, len / 2]} position={[0, 0.6, 0]} />
+      </RigidBody>
+    </group>
+  )
+}
+
 function Rescuers() {
   const root = useRef()
+  const anim = useRef({ name: 'run', speed: 1.2 })
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.05)
     const g = root.current
-    if (RTRS.state === 'arriving' || RTRS.state === 'helping') {
-      // a spot a few meters to Hinkie's side, facing the boss
-      const tx = player.x + (player.x > BOSS.x ? 3.5 : -3.5)
-      const tz = player.z + 2
+    const goTo = (tx, tz, speed) => {
       const dx = tx - RTRS.x
       const dz = tz - RTRS.z
       const d = Math.hypot(dx, dz)
-      if (d > 0.2) {
-        const step = Math.min(d, (RTRS.state === 'arriving' ? 8 : 4.5) * dt)
+      if (d > 0.05) {
+        const step = Math.min(d, speed * dt)
         RTRS.x += (dx / d) * step
         RTRS.z += (dz / d) * step
+        g.rotation.y = Math.atan2(dx, dz)
       }
-      if (RTRS.state === 'arriving' && d < 1.5) RTRS.state = 'helping'
-      if (RTRS.state === 'helping' && BOSS.state === 'fight') {
-        RTRS.fireIn -= dt
-        if (RTRS.fireIn <= 0) {
-          RTRS.fireIn = RTRS_FIRE_EVERY
-          fireWave(RTRS.x, RTRS.z, BOSS.x, BOSS.z, 'rtrs')
-        }
-      }
-      g.position.set(RTRS.x, 0, RTRS.z)
-      g.rotation.y = Math.atan2(BOSS.x - RTRS.x, BOSS.z - RTRS.z)
+      return d
     }
-    g.visible = RTRS.state === 'arriving' || RTRS.state === 'helping'
+
+    if (RTRS.state === 'arriving') {
+      // sprint to the barrier
+      anim.current = { name: 'run', speed: 1.2 }
+      if (goTo(FENCE.x - 1.2, RTRS.z, 7) < 0.1) { RTRS.state = 'hopping'; RTRS.t = 0; RTRS.hopFrom = RTRS.x }
+    } else if (RTRS.state === 'hopping') {
+      // over the top: the clip does the jump, we carry them across
+      RTRS.t += dt
+      anim.current = { name: 'hop', speed: 1 }
+      RTRS.x = RTRS.hopFrom + HOP_DISTANCE * Math.min(1, RTRS.t / HOP_TIME)
+      g.rotation.y = Math.PI / 2
+      if (RTRS.t >= HOP_TIME) RTRS.state = 'joining'
+    } else if (RTRS.state === 'joining' || RTRS.state === 'helping') {
+      // Hinkie's 10 o'clock, measured against the line from him to the boss
+      const fx = BOSS.x - player.x
+      const fz = BOSS.z - player.z
+      const fd = Math.hypot(fx, fz) || 1
+      const ux = fx / fd
+      const uz = fz / fd
+      // left of facing (ux, uz) is (uz, -ux) for a camera looking down -z
+      const tx = Math.max(FENCE.x + 1.2, player.x + uz * TEN_OCLOCK.left + ux * TEN_OCLOCK.ahead)
+      const tz = player.z - ux * TEN_OCLOCK.left + uz * TEN_OCLOCK.ahead
+      const d = goTo(tx, tz, RTRS.state === 'joining' ? 7 : 4.5)
+      if (RTRS.state === 'joining' && d < 0.6) { RTRS.state = 'helping'; RTRS.fireIn = 0.4 }
+      if (RTRS.state === 'helping') {
+        if (d > 0.4) anim.current = { name: 'run', speed: 1 }
+        else {
+          anim.current = { name: 'cast', speed: 1.4 }
+          g.rotation.y = Math.atan2(BOSS.x - RTRS.x, BOSS.z - RTRS.z)
+        }
+        if (BOSS.state === 'fight') {
+          RTRS.fireIn -= dt
+          if (RTRS.fireIn <= 0) {
+            RTRS.fireIn = RTRS_FIRE_EVERY
+            fireWave(RTRS.x, RTRS.z, BOSS.x, BOSS.z, 'rtrs')
+          }
+        }
+      } else anim.current = { name: 'run', speed: 1.2 }
+    }
+    g.position.set(RTRS.x, 0, RTRS.z)
+    g.visible = ['arriving', 'hopping', 'joining', 'helping'].includes(RTRS.state)
   })
   return (
     <group ref={root} visible={false}>
-      <TwoHeaded color="#1f8a8a" names={['SPIKE', 'LEVIN']} height={2.4} />
+      <Model name="rtrs" height={2.4} anim={anim} fallback={<TwoHeaded color="#1f8a8a" names={['SPIKE', 'LEVIN']} height={2.4} />} />
+      <Tag position={[0, 2.75, 0]} fontSize={0.26} color={COLORS.gold} outlineWidth={0.03} outlineColor="#000">SPIKE + LEVIN</Tag>
     </group>
   )
 }
@@ -648,6 +701,7 @@ export default function Level2() {
       <Lot />
       {enemies.map((e) => <Enemy key={e.id} e={e} />)}
       <Boss />
+      <Barrier />
       <Rescuers />
       <Waves />
       <WaveLogic />
