@@ -17,7 +17,7 @@ import { getState, setState, useGame, player, toast } from './state.js'
 import { targets } from './targets.js'
 import { bounds, join } from './follow.js'
 import { LOT, hurt } from './levels.js'
-import { sfx, stopMusic } from './audio.js'
+import { sfx, stopMusic, setMusicMood } from './audio.js'
 
 const params = new URLSearchParams(window.location.search)
 
@@ -604,6 +604,9 @@ function Logic() {
 
   useFrame(() => {
     const s = getState()
+    // Battle music while anyone is coming at Hinkie or the Radio Monster is on
+    const fighting = BOSS.state === 'fight' || enemies.some((e) => e.state === 'chase' || e.state === 'stun')
+    setMusicMood(fighting && !s.complete ? 'battle' : 'calm')
     if (s.complete) return
     const done = s.bossBeaten && s.enemiesBeaten >= ENEMIES.length
     const atDoor = player.z < LOT.goalZ + 1.5 && Math.abs(player.x) < 5

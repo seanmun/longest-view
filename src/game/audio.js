@@ -59,7 +59,11 @@ function tone({ freq, to = freq, type = 'square', dur = 0.1, vol = 1, at = 0, bu
   osc.stop(t + dur + 0.02)
 }
 
-function noise({ dur = 0.15, vol = 1, freq = 3000, at = 0 }) {
+function noise(opts) {
+  noiseOn(sfxBus, opts)
+}
+
+function noiseOn(bus, { dur = 0.15, vol = 1, freq = 3000, at = 0 }) {
   if (!ctx) return
   const t = ctx.currentTime + at
   const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate)
@@ -73,7 +77,7 @@ function noise({ dur = 0.15, vol = 1, freq = 3000, at = 0 }) {
   const gain = ctx.createGain()
   gain.gain.setValueAtTime(vol, t)
   gain.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-  src.connect(filter).connect(gain).connect(sfxBus)
+  src.connect(filter).connect(gain).connect(bus)
   src.start(t)
 }
 
@@ -99,38 +103,74 @@ export const sfx = {
   },
 }
 
-// Looping arena chiptune: Am - F - C - G, bass on eighths, arpeggio on sixteenths
-const BPM = 124
-const SIXTEENTH = 60 / BPM / 4
-const CHORDS = [
-  [110, 220, 262, 330], // Am
-  [87, 175, 220, 262], // F
-  [131, 262, 330, 392], // C
-  [98, 196, 247, 294], // G
-]
-const ARP = [1, 2, 3, 2, 1, 3, 2, 3]
+// Two looping chiptunes. 'calm' while exploring; 'battle' when a fight is on
+// (anti-fans at the door, parking-lot brawls, the Radio Monster). Switching
+// waits for the next bar so the change lands on the beat.
+const TRACKS = {
+  calm: {
+    bpm: 124,
+    // Am - F - C - G
+    chords: [[110, 220, 262, 330], [87, 175, 220, 262], [131, 262, 330, 392], [98, 196, 247, 294]],
+    arp: [1, 2, 3, 2, 1, 3, 2, 3],
+    lead: 'square',
+    drums: false,
+  },
+  battle: {
+    bpm: 156,
+    // Dm - Bb - Gm - A: darker, with the A major pulling back to Dm
+    chords: [[73, 147, 175, 220], [58, 117, 147, 175], [98, 196, 233, 294], [110, 220, 277, 330]],
+    arp: [3, 2, 1, 2, 3, 1, 2, 1],
+    lead: 'sawtooth',
+    drums: true,
+  },
+}
 let musicTimer = null
 let nextNoteTime = 0
 let step = 0
+let track = TRACKS.calm
+let wanted = 'calm'
+
+function kick(at) {
+  if (!ctx) return
+  tone({ freq: 150, to: 45, type: 'sine', dur: 0.14, vol: 1.6, at, bus: musicBus })
+}
+function snare(at) {
+  noiseOn(musicBus, { dur: 0.1, vol: 0.9, freq: 1800, at })
+}
 
 function scheduleMusic() {
   while (nextNoteTime < ctx.currentTime + 0.25) {
-    const chord = CHORDS[Math.floor(step / 16) % CHORDS.length]
+    // change tracks at the top of a bar so it lands on the beat
+    if (track !== TRACKS[wanted] && step % 16 === 0) { track = TRACKS[wanted]; step = 0 }
+    const sixteenth = 60 / track.bpm / 4
+    const chord = track.chords[Math.floor(step / 16) % track.chords.length]
     const at = nextNoteTime - ctx.currentTime
     if (step % 2 === 0) {
       const octave = step % 4 === 0 ? 1 : 2
-      tone({ freq: chord[0] * octave, type: 'triangle', dur: SIXTEENTH * 1.8, vol: 0.9, at, bus: musicBus })
+      tone({ freq: chord[0] * octave, type: 'triangle', dur: sixteenth * 1.8, vol: 0.9, at, bus: musicBus })
     }
-    tone({ freq: chord[ARP[step % ARP.length]] * 2, type: 'square', dur: SIXTEENTH * 0.8, vol: 0.25, at, bus: musicBus })
-    nextNoteTime += SIXTEENTH
+    tone({ freq: chord[track.arp[step % track.arp.length]] * 2, type: track.lead, dur: sixteenth * 0.8, vol: track.drums ? 0.18 : 0.25, at, bus: musicBus })
+    if (track.drums) {
+      if (step % 4 === 0) kick(at)
+      if (step % 8 === 4) snare(at)
+      // brass-ish stab on each new chord
+      if (step % 16 === 0) chord.slice(1).forEach((f) => tone({ freq: f * 2, type: 'sawtooth', dur: sixteenth * 3, vol: 0.12, at, bus: musicBus }))
+    }
+    nextNoteTime += sixteenth
     step++
   }
+}
+
+// 'calm' or 'battle'
+export function setMusicMood(mood) {
+  wanted = mood
 }
 
 export function startMusic() {
   if (!ctx || musicTimer) return
   nextNoteTime = ctx.currentTime + 0.1
   step = 0
+  track = TRACKS[wanted]
   musicTimer = setInterval(scheduleMusic, 50)
 }
 

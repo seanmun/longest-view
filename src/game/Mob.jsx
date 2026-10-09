@@ -12,7 +12,7 @@ import { R_OUT, polar } from './ring.js'
 import { MOB, MOB_BARRIER_RADIUS, DOOR } from './level1.js'
 import { targets } from './targets.js'
 import { getState, setState, useGame, player, toast } from './state.js'
-import { sfx } from './audio.js'
+import { sfx, setMusicMood } from './audio.js'
 
 const HIT_RADIUS = 0.5 // m, ball center to member center
 const GIGGLE_EVERY = 3.5 // s, Badman giggles while Hinkie is near
@@ -21,6 +21,7 @@ const MOOD_TIME = 5 // s per clip for members with `moods` (e.g. Tea Mike: stomp
 const RUN_SPEED = 5 // m/s
 const SHOUT_TIME = 1.4 // s each; one member shouts at a time so it stays readable
 const NOTICE_RANGE = 12 // m from the door when the mob hint first shows
+const BATTLE_RANGE = 16 // m from the door when the battle music kicks in
 // Beaten members flee out the glass exit doors
 const [TUNNEL_X, , TUNNEL_Z] = polar(R_OUT - 0.4, DOOR.angle)
 const DOOR_FRONT = polar(R_OUT - 0.8, DOOR.angle)
@@ -173,12 +174,14 @@ export default function Mob() {
 
   useFrame(() => {
     const s = getState()
-    if (s.mobSeen || s.mobLeft === 0) return
-    // The doors are right by the start line, so only warn once Hinkie is past
+    // The doors are right by the start line, so only react once Hinkie is past
     // the halfway point and coming around toward them
     const lap = Math.atan2(player.x, player.z)
     if (lap > 2.5 || lap < -2.5) halfway.current = true
-    if (halfway.current && Math.hypot(player.x - DOOR_FRONT[0], player.z - DOOR_FRONT[2]) < NOTICE_RANGE) {
+    const toDoor = Math.hypot(player.x - DOOR_FRONT[0], player.z - DOOR_FRONT[2])
+    setMusicMood(halfway.current && s.mobLeft > 0 && toDoor < BATTLE_RANGE && !s.complete ? 'battle' : 'calm')
+    if (s.mobSeen || s.mobLeft === 0) return
+    if (halfway.current && toDoor < NOTICE_RANGE) {
       setState({ mobSeen: true })
       toast(`Anti-fans are blocking the exit! ${isTouch ? 'Tap THROW' : 'Click'} to toss ping pong balls.`)
     }
