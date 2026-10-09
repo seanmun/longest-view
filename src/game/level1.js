@@ -18,7 +18,9 @@ export const PEOPLE = [
   { id: 'pudd', name: 'PUDD', model: 'pudd', with: 'woods', angle: 1.15, r: 34.2, fan: true },
   { id: 'steve', name: 'STEVE', model: 'steve', watch: 'discuss', angle: 2.8, r: 32, fan: true, q: 'steve' },
   { id: 'chav', name: 'CHAV', model: 'chav', watch: 'happy', with: 'steve', angle: 2.835, r: 32.9, fan: true },
-  { id: 'kirby', name: 'KIRBY', model: 'kirby', watch: 'wave', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true, q: 'kirby' },
+  // Kirbiak: Kirby and Osciak are partners. Always side by side, waiting and following.
+  { id: 'kirby', name: 'KIRBY', crew: 'KIRBIAK', model: 'kirby', watch: 'wave', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true, q: 'kirby' },
+  { id: 'osciak', name: 'OSCIAK', model: 'osciak', watch: 'happy', with: 'kirby', pair: true, angle: 3.728, r: 29, fan: true },
   // Hinkie's Henchmen: a pack of three, asked the hardest question together
   { id: 'musket', name: 'MUSKET', crew: "HINKIE'S HENCHMEN", model: 'musket', watch: 'wave', angle: 5.5, r: 30, fan: true, q: 'henchmen' },
   // Ian stands with the Henchmen, but whatever Hinkie answers, he loses his

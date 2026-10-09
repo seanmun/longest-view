@@ -35,10 +35,22 @@ export const followers = {} // id -> state, see join()
 
 export const isFollowing = (id) => id in followers
 
-export function join(id, x, z) {
+// partner: id of someone already following; this one walks right beside them
+export function join(id, x, z, partner) {
   if (isFollowing(id)) return
   const n = order.length
   order.push(id)
+  const mate = partner && followers[partner]
+  if (mate) {
+    followers[id] = {
+      x, z, vx: 0, vz: 0, yaw: 0, speed: 0, gait: 'idle',
+      joinedAt: performance.now(),
+      back: mate.back + 0.15,
+      side: mate.side + (mate.side < 0 ? 1 : -1) * 0.95, // shoulder to shoulder, toward the middle
+      phase: mate.phase, // drift in step with them
+    }
+    return
+  }
   followers[id] = {
     x, z, vx: 0, vz: 0, yaw: 0, speed: 0, gait: 'idle',
     joinedAt: performance.now(),

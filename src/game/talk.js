@@ -44,7 +44,7 @@ export function choose(slot) {
     // Win over the fan and everyone standing with them
     for (const p of clusterOf(talk.id)) {
       won[p.id] = true
-      if (p.fan) { const [x, , z] = polar(p.r, p.angle); join(p.id, x, z) }
+      if (p.fan) { const [x, , z] = polar(p.r, p.angle); join(p.id, x, z, p.pair ? p.with : undefined) }
     }
   } else {
     sfx.bad()
