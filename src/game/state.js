@@ -23,12 +23,15 @@ let state = {
   doorOpen: false,
   complete: false, // walked out the open doors
   mobLeft: 5, // mob members still at the door
+  mobBeaten: 0, // mob members sent packing
+  defected: {}, // id -> true once a fan has turned anti-fan (Ian)
   mobSeen: false, // the "mob blocks the door" hint has shown
   toast: null, // { text, key } short message; key changes on every new toast
   // Level 2
   hearts: 5,
   invulnUntil: 0, // ms: flashing after a hit, can't be hit again
   enemiesBeaten: 0, // parking-lot anti-fans sent packing
+  enemiesTotal: 6, // parking-lot anti-fans in play this run
   bossHp: null, // 0..1 while the Radio Monster fight is on screen
   bossBeaten: false,
   rescued: false, // RTRS showed up

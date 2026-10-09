@@ -124,7 +124,7 @@ function Stadium({ position, radius, height, label }) {
 }
 
 function Lot() {
-  const goalOpen = useGame((s) => s.bossBeaten && s.enemiesBeaten >= ENEMIES.length)
+  const goalOpen = useGame((s) => s.bossBeaten && s.enemiesBeaten >= s.enemiesTotal)
   return (
     <>
       <color attach="background" args={['#070b22']} />
@@ -213,6 +213,8 @@ const ENEMIES = [
   { id: 'badman', name: 'BADMAN', model: 'badman', idle: 'stomp', x: 0, z: -104, height: 1.9, ahead: true },
   { id: 'stine', name: 'STINE', model: 'stine', idle: 'taunt', x: -4, z: -101, ahead: true },
   { id: 'teamike', name: 'TEA MIKE', model: 'teamike', idle: 'stomp', x: 4, z: -102, ahead: true },
+  // only if he lost his faith in Level 1
+  { id: 'ian', name: 'IAN', model: 'ian', idle: 'happy', hitClip: 'wave', x: -7, z: -99, ahead: true, defector: true },
 ]
 const enemies = ENEMIES.map((e) => ({
   ...e, hp: ENEMY_HP, t: 0, rest: 0,
@@ -293,7 +295,7 @@ function Enemy({ e }) {
         if (d < REACH && hurt(e.px, e.pz)) { e.rest = ATTACK_REST; sfx.bad() }
       }
     } else if (e.state === 'stun') {
-      anim.current = { name: 'hit', speed: 1.4 }
+      anim.current = { name: e.hitClip ?? 'hit', speed: 1.4 }
       if (e.t > STUN) { e.state = 'chase'; e.rest = 0.3 }
     } else if (e.state === 'flee') {
       anim.current = { name: 'run', speed: 1.3 }
@@ -591,7 +593,11 @@ function Logic() {
     targets.wall = (x, y, z) => x < LOT.minX || x > LOT.maxX || z > 1.5 || z < LOT.minZ || y > 14 || (y < CAR.h && !!inCar(x, z))
     bounds.clamp = (x, z) => [Math.min(LOT.maxX - 1, Math.max(LOT.minX + 1, x)), Math.min(-1, Math.max(LOT.goalZ, z))]
 
-    toast('Three of them ran for Xfinity Live! Deal with these two first.')
+    // A defector only shows up if he actually turned in Level 1
+    for (const e of enemies) if (e.defector && !getState().defected[e.id]) e.state = 'gone'
+    setState({ enemiesTotal: enemies.filter((e) => e.state !== 'gone').length })
+    const ahead = enemies.filter((e) => e.ahead && e.state !== 'gone').length
+    toast(`${ahead === 4 ? 'Four' : 'Three'} of them ran for Xfinity Live! Deal with these two first.`)
 
     // Testing: ?level=2&apostles=all brings the whole crowd
     if (params.get('apostles') === 'all' && !Object.keys(getState().flags).length) {
@@ -608,7 +614,7 @@ function Logic() {
     const fighting = BOSS.state === 'fight' || enemies.some((e) => e.state === 'chase' || e.state === 'stun')
     setMusicMood(fighting && !s.complete ? 'battle' : 'calm')
     if (s.complete) return
-    const done = s.bossBeaten && s.enemiesBeaten >= ENEMIES.length
+    const done = s.bossBeaten && s.enemiesBeaten >= s.enemiesTotal
     const atDoor = player.z < LOT.goalZ + 1.5 && Math.abs(player.x) < 5
     if (atDoor && done) {
       setState({ complete: true, finishedAt: performance.now() })

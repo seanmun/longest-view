@@ -229,6 +229,8 @@ export function Person({ id, name, model, watch, position, color = COLORS.sixers
   const radius = 0.3
   const convinced = useGame((s) => s.flags[id] === true)
   const turnedDown = useGame((s) => s.asked[id] === true && s.flags[id] !== true)
+  const gone = useGame((s) => s.defected[id] === true)
+  if (gone) return null // ran off to join the anti-fans (Mob.jsx draws him now)
   if (fan && convinced) return null // drawn by <Apostles /> now, in every level
   return (
     <RigidBody type="fixed" position={position} colliders={false}>

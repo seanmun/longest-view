@@ -21,7 +21,9 @@ export const PEOPLE = [
   { id: 'kirby', name: 'KIRBY', model: 'kirby', watch: 'wave', angle: 3.7, r: 29, color: COLORS.sixersRed, fan: true, q: 'kirby' },
   // Hinkie's Henchmen: a pack of three, asked the hardest question together
   { id: 'musket', name: 'MUSKET', crew: "HINKIE'S HENCHMEN", model: 'musket', watch: 'wave', angle: 5.5, r: 30, fan: true, q: 'henchmen' },
-  { id: 'ian', name: 'IAN', model: 'ian', watch: 'wave', with: 'musket', angle: 5.535, r: 31.1, fan: true },
+  // Ian stands with the Henchmen, but whatever Hinkie answers, he loses his
+  // faith and runs off to join the anti-fans at the exit (see `defects`)
+  { id: 'ian', name: 'IAN', model: 'ian', watch: 'wave', with: 'musket', angle: 5.535, r: 31.1, defects: true },
   { id: 'truant', name: 'TRUANT', model: 'truant', with: 'musket', angle: 5.465, r: 31.1, fan: true, color: COLORS.navy },
 ]
 
@@ -56,6 +58,12 @@ export const MOB = [
   {
     id: 'rick', name: 'RICK', model: 'rick', r: 34.8, da: 0.075, hitTime: 2,
     moods: ['stomp', 'tantrum'], shouts: ['ANTI-FAN FOR LIFE!', 'SELL THE TEAM!'],
+  },
+  {
+    // The defector: absent until Ian loses his faith after the Henchmen's question.
+    // His model has no stomp/hit clips, so he uses his idle and wave.
+    id: 'ian', name: 'IAN', model: 'ian', defector: true, r: 32.2, da: -0.1, hitTime: 1.5,
+    stomp: 'happy', hitClip: 'wave', shouts: ['I LOST MY FAITH!', 'NO MORE PROCESS!'],
   },
 ].map((m) => ({ ...m, angle: DOOR.angle + m.da }))
 export const MOB_BARRIER_RADIUS = 2.5 // m around the door, solid until the mob is gone

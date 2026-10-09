@@ -3,7 +3,7 @@
 //   order  - answer indexes in the shuffled order shown
 //   picked - index of Hinkie's answer, or null while choosing
 //   page   - 'ask' | 'reaction' | 'explain' | 'snub'
-import { getState, setState } from './state.js'
+import { getState, setState, toast } from './state.js'
 import { PEOPLE, clusterOf } from './level1.js'
 import { QUESTIONS } from './questions.js'
 import { sfx } from './audio.js'
@@ -61,7 +61,16 @@ export function advance() {
   const { talk } = getState()
   if (!talk) return
   if (talk.page === 'reaction' && questionFor(talk.id).explain) setState({ talk: { ...talk, page: 'explain' } })
-  else setState({ talk: null })
+  else { setState({ talk: null }); defectAfter(talk.id) }
+}
+
+// Anyone in this cluster marked `defects` turns anti-fan once the talk is over
+function defectAfter(id) {
+  const turned = clusterOf(id).filter((p) => p.defects && !getState().defected[p.id])
+  if (!turned.length) return
+  setState((s) => ({ defected: { ...s.defected, ...Object.fromEntries(turned.map((p) => [p.id, true])) } }))
+  sfx.bad()
+  toast(`${turned[0].name}: "I... I've lost my faith, Sam. I'm out!"`)
 }
 
 export function closeTalk() {

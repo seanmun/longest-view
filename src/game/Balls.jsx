@@ -49,7 +49,8 @@ function pop(x, y, z) {
 function hitsPerson(b) {
   if (getState().level !== 1) return false // the fans stand on the concourse
   // Followers have left their spots; balls pass through the line
-  return PEOPLE_XZ.some((p) => !isFollowing(p.id) && b.y < p.h + 0.1 && Math.hypot(b.x - p.x, b.z - p.z) < HIT_RADIUS)
+  const turned = getState().defected
+  return PEOPLE_XZ.some((p) => !isFollowing(p.id) && !turned[p.id] && b.y < p.h + 0.1 && Math.hypot(b.x - p.x, b.z - p.z) < HIT_RADIUS)
 }
 
 export default function Balls() {

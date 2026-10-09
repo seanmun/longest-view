@@ -9,7 +9,7 @@ import { RigidBody, CylinderCollider } from '@react-three/rapier'
 import { PersonModel, COLORS } from './Placeholders.jsx'
 import Model from './Model.jsx'
 import { R_OUT, polar } from './ring.js'
-import { MOB, MOB_BARRIER_RADIUS, DOOR } from './level1.js'
+import { MOB, MOB_BARRIER_RADIUS, DOOR, PEOPLE } from './level1.js'
 import { targets } from './targets.js'
 import { getState, setState, useGame, player, toast } from './state.js'
 import { sfx, setMusicMood } from './audio.js'
@@ -31,7 +31,8 @@ const isTouch = window.matchMedia('(pointer: coarse)').matches
 const members = MOB.map((m, i) => {
   const [x, , z] = polar(m.r, m.angle)
   return {
-    ...m, x, z, state: 'angry', t: 0, giggleAt: 0,
+    ...m, x, z, state: m.defector ? 'absent' : 'angry', t: 0, giggleAt: 0,
+    slotX: x, slotZ: z,
     height: m.height ?? 1.8,
     hitTime: m.hitTime ?? 1.5,
     stomp: m.stomp ?? 'stomp',
@@ -86,6 +87,32 @@ function Member({ m }) {
     m.t += dt
     const time = clock.elapsedTime
 
+    // The defector: hidden until he turns, then sprints from his old spot to the door
+    if (m.state === 'absent') {
+      if (getState().defected[m.id]) {
+        const fan = PEOPLE.find((p) => p.id === m.id)
+        ;[m.x, , m.z] = polar(fan.r, fan.angle)
+        m.state = 'joining'
+        setState((s) => ({ mobLeft: s.mobLeft + 1 }))
+      } else {
+        g.visible = false
+        return
+      }
+    }
+    if (m.state === 'joining') {
+      const dx = m.slotX - m.x
+      const dz = m.slotZ - m.z
+      const d = Math.hypot(dx, dz)
+      if (d < 0.3) m.state = 'angry'
+      else {
+        const step = Math.min(d, 6.5 * dt)
+        m.x += (dx / d) * step
+        m.z += (dz / d) * step
+        body.current.rotation.y = Math.atan2(dx, dz)
+        anim.current = { name: 'run', speed: 1.3 }
+      }
+    }
+
     if (m.state === 'dizzy' && m.t > m.hitTime) {
       m.state = 'fleeing'
       m.t = 0
@@ -101,7 +128,7 @@ function Member({ m }) {
       const d = Math.hypot(dx, dz)
       if (d < 0.4) {
         m.state = 'gone'
-        setState((s) => ({ mobLeft: s.mobLeft - 1 }))
+        setState((s) => ({ mobLeft: s.mobLeft - 1, mobBeaten: s.mobBeaten + 1 }))
       } else {
         const speed = m.fleeSpeed ?? RUN_SPEED
         m.x += (dx / d) * speed * dt
@@ -124,7 +151,7 @@ function Member({ m }) {
       body.current.rotation.y = Math.atan2(player.x - m.x, player.z - m.z) // glare at Hinkie
       if (!m.model) body.current.position.y = Math.abs(Math.sin(time * 6 + m.x)) * 0.15 // placeholder hops mad
     } else if (m.state === 'dizzy') {
-      anim.current = { name: 'hit', speed: 1 }
+      anim.current = { name: m.hitClip ?? 'hit', speed: 1 }
       body.current.position.y = 0
       stars.current.rotation.y = m.t * 5
     } else if (m.state === 'fleeing') {
@@ -170,7 +197,7 @@ export default function Mob() {
   const halfway = useRef(false)
   const mobLeft = useGame((s) => s.mobLeft)
 
-  useEffect(() => { setState({ mobLeft: members.filter((m) => m.state !== 'gone').length }) }, [])
+  useEffect(() => { setState({ mobLeft: members.filter((m) => m.state !== 'gone' && m.state !== 'absent').length }) }, [])
 
   useFrame(() => {
     const s = getState()

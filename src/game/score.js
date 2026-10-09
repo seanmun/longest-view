@@ -1,5 +1,5 @@
 // Scoring. Everything is computed from game state, so it's always consistent.
-import { FAN_COUNT, PEOPLE, MOB } from './level1.js'
+import { FAN_COUNT, PEOPLE } from './level1.js'
 
 export const POINTS = {
   fan: 1000, // per person won over
@@ -12,7 +12,7 @@ export const POINTS = {
 
 export function scoreParts(s, now = performance.now()) {
   const fans = PEOPLE.filter((p) => p.fan && s.flags[p.id]).length
-  const antiFans = MOB.length - s.mobLeft
+  const antiFans = s.mobBeaten
   const seconds = s.startedAt ? ((s.finishedAt ?? now) - s.startedAt) / 1000 : 0
   const parts = {
     fans, antiFans, seconds, hits: s.hits,
