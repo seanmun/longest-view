@@ -46,8 +46,8 @@ touch it. `npm run dev` can't serve `/api`; use `vercel dev`.
   -250, flashing invulnerability; 0 hearts = back up at the last
   checkpoint). PJ + Rick brawl at the doors; Badman, Stine, Tea Mike wait
   by Xfinity Live!. The Fanatic Duo (Eskin + Angelo, `duo.glb`) can't drop
-  below 50% until the RTRS monster arrives (2 hearts left, 5s stuck at
-  the floor, or 25s), then RTRS joins the apostles.
+  below 50% until the Two Process Guys arrive (3 hearts left, 2s stuck at
+  the floor, or 10s), then RTRS joins the apostles.
 - Testing: `?level=2&apostles=all`, plus `&z=-42` to spawn at the boss.
 
 ## Level 1 build order

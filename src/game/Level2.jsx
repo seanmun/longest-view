@@ -393,7 +393,7 @@ const RTRS_DAMAGE = 0.08
 const SOLO_FLOOR = 0.5 // can't push it below half on his own
 const RTRS = { x: 0, z: 0, state: 'hidden', fireIn: 1 }
 const RTRS_FIRE_EVERY = 1.6
-const RESCUE_AFTER = 25 // s into the fight, if nothing else triggered it
+const RESCUE_AFTER = 10 // s into the fight, if nothing else triggered it
 
 function hitBoss(x, y, z) {
   if (BOSS.state !== 'fight' || y > 3.6) return false
@@ -456,7 +456,7 @@ function Boss() {
         sfx.bad()
       }
       // Rescue: low on hearts, stuck at the floor, or just taking too long
-      if (!s.rescued && (s.hearts <= 2 || BOSS.floorTime > 5 || BOSS.fightTime > RESCUE_AFTER)) {
+      if (!s.rescued && (s.hearts <= 3 || BOSS.floorTime > 2 || BOSS.fightTime > RESCUE_AFTER)) {
         setState({ rescued: true })
         // They come in from outside the lot on the left, a little ahead of Hinkie
         RTRS.state = 'arriving'
