@@ -10,7 +10,7 @@ import { Billboard, Text } from '@react-three/drei'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
 import { AdditiveBlending, Color, DoubleSide, Object3D, RingGeometry } from 'three'
 import Model from './Model.jsx'
-import { PersonModel, TwoHeaded } from './Placeholders.jsx'
+import { PersonModel, TwoHeaded, Tag } from './Placeholders.jsx'
 import { COLORS } from './colors.js'
 import { PEOPLE } from './level1.js'
 import { getState, setState, useGame, player, toast } from './state.js'
@@ -399,7 +399,15 @@ function hitBoss(x, y, z) {
   if (BOSS.state !== 'fight' || y > 3.6) return false
   if (Math.hypot(x - BOSS.x, z - BOSS.z) > BOSS_HIT_RADIUS) return false
   damageBoss(BALL_DAMAGE)
+  react('hit', 0.45)
   return true
+}
+
+// A short reaction clip over the fight loop (flinch, electrocuted)
+function react(clip, seconds) {
+  if (BOSS.state !== 'fight' || (BOSS.reactUntil > performance.now() && BOSS.react === 'zapped')) return
+  BOSS.react = clip
+  BOSS.reactUntil = performance.now() + seconds * 1000
 }
 
 function damageBoss(amount) {
@@ -411,7 +419,7 @@ function damageBoss(amount) {
     BOSS.state = 'beaten'
     BOSS.t = 0
     sfx.door()
-    toast('The Radio Monster is off the air!')
+    toast('The Fanatic Duo is off the air!')
     // RTRS joins the apostles for the rest of the game
     setState((s) => ({ bossBeaten: true, flags: { ...s.flags, rtrs: true } }))
     join('rtrs', RTRS.x, RTRS.z)
@@ -419,19 +427,24 @@ function damageBoss(amount) {
   }
 }
 
+// The Fanatic Duo: Howard Eskin and Angelo Cataldi on one body (Sean's Meshy
+// model; clips walk, run, cast, hit, zapped, defeat)
+const BOSS_HEIGHT = 3.4
+
 function Boss() {
   const root = useRef()
-  const sway = useRef()
+  const anim = useRef({ name: 'walk', speed: 0 })
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.05)
     const s = getState()
     if (s.complete) return
     const g = root.current
     const d = Math.hypot(player.x - BOSS.x, player.z - BOSS.z)
+    const now = performance.now()
 
     if (BOSS.state === 'waiting' && player.z < LOT.fightZ) {
       BOSS.state = 'fight'
-      toast('The Two-Headed Radio Monster! Dodge the sound waves!')
+      toast('The Fanatic Duo! Dodge the sound waves!')
     }
     if (BOSS.state === 'fight') {
       BOSS.fightTime += dt
@@ -453,13 +466,14 @@ function Boss() {
       }
       const shown = Math.round(BOSS.hp * 100) / 100
       if (s.bossHp !== shown) setState({ bossHp: shown })
-      sway.current.rotation.z = Math.sin(BOSS.fightTime * 3) * 0.06
+      anim.current = BOSS.reactUntil > now ? { name: BOSS.react, speed: 1.2 } : { name: 'cast', speed: 1.1 }
       g.rotation.y = Math.atan2(player.x - BOSS.x, player.z - BOSS.z)
     }
     if (BOSS.state === 'beaten') {
-      // shrinks off the air, then gone
+      // falls backward, then fades off the air
       BOSS.t += dt
-      const k = Math.max(0, 1 - BOSS.t / 1.2)
+      anim.current = { name: 'defeat', speed: 1.3 }
+      const k = BOSS.t < 1.8 ? 1 : Math.max(0, 1 - (BOSS.t - 1.8) / 0.8)
       g.scale.setScalar(k)
       if (k === 0) { BOSS.state = 'gone'; setState({ bossHp: null }) }
     }
@@ -467,9 +481,9 @@ function Boss() {
   })
   return (
     <group ref={root} position={[BOSS.x, 0, BOSS.z]}>
-      <group ref={sway}>
-        <TwoHeaded color="#6b3fa0" names={['ESKIN', 'ANGELO']} height={3.4} />
-      </group>
+      <Model name="duo" height={BOSS_HEIGHT} anim={anim} fallback={<TwoHeaded color="#6b3fa0" names={['ESKIN', 'ANGELO']} height={BOSS_HEIGHT} />} />
+      <Tag position={[-0.55, BOSS_HEIGHT + 0.3, 0]} fontSize={0.3} color="white" outlineWidth={0.03} outlineColor="#000">ESKIN</Tag>
+      <Tag position={[0.55, BOSS_HEIGHT + 0.3, 0]} fontSize={0.3} color="white" outlineWidth={0.03} outlineColor="#000">ANGELO</Tag>
     </group>
   )
 }
@@ -528,7 +542,7 @@ function WaveLogic() {
       }
       if (w.owner === 'rtrs' && !w.hit && BOSS.state === 'fight') {
         const d = Math.hypot(BOSS.x - w.x, BOSS.z - w.z)
-        if (w.r >= d - 0.8) { w.hit = true; damageBoss(RTRS_DAMAGE); waves.splice(i, 1); continue }
+        if (w.r >= d - 0.8) { w.hit = true; damageBoss(RTRS_DAMAGE); react('zapped', 0.9); waves.splice(i, 1); continue }
       }
       if (w.r > WAVE_RANGE) waves.splice(i, 1)
     }
@@ -622,7 +636,7 @@ function Logic() {
       sfx.complete()
     } else if (atDoor && performance.now() - warned.current > 4000) {
       warned.current = performance.now()
-      toast(s.bossBeaten ? 'Finish off the anti-fans first!' : 'The Radio Monster is still on the air!')
+      toast(s.bossBeaten ? 'Finish off the anti-fans first!' : 'The Fanatic Duo is still on the air!')
     }
   })
   return null

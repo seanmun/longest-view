@@ -26,15 +26,12 @@ touch it. `npm run dev` can't serve `/api`; use `vercel dev`.
 
 - **Placeholders are real-scale.** Every stand-in shape matches its final
   Meshy model's size and position; swapping in a GLB changes nothing else.
-- **Meshy flow:** Sean generates (bobblehead style) and drops the raw GLB
-  into `models-raw/` (gitignored; Meshy exports run ~40 MB). Claude shrinks
-  it to `public/models/<name>.glb` with gltf-transform — `weld`, then
-  `simplify` to ~20k triangles, `resize` textures to 1024, `webp` — and
-  wires it in via `Model.jsx` (fits height, feet at y=0, placeholder as
-  the loading fallback). Rigged characters: Meshy exports one zip per
-  animation, each with the full model; merge the clips onto one copy
-  (same skeleton, channels matched by bone name) named `idle`/`walk`/`run`,
-  and pass `anim` to `Model` to crossfade them.
+- **Meshy flow:** Sean drops raw Meshy exports (zip or folder) into
+  `models-raw/` (gitignored). Process with
+  `node tools/process-model.mjs <name> models-raw/<zip> walk=Walking run=Running happy=Hip_Hop ...`
+  (merges clips by bone name, simplifies to ~24k triangles, 1024px WebP).
+  Load via `Model.jsx` (fits height, feet at y=0) and add to `Preload.jsx`.
+  Real people are prompted as caricatures by description, never photos.
 - **Units are meters.** People ~1.8m, eye height ~1.6m, walk 4 m/s.
 - **Phone is first-class.** Every feature works with the touch controls.
   Large readable text (18px base), no dead ends.
@@ -48,7 +45,7 @@ touch it. `npm run dev` can't serve `/api`; use `vercel dev`.
 - **Level 2, parking lot** (`Level2.jsx`, `levels.js`): 5 hearts (hit =
   -250, flashing invulnerability; 0 hearts = back up at the last
   checkpoint). PJ + Rick brawl at the doors; Badman, Stine, Tea Mike wait
-  by Xfinity Live!. Radio Monster (placeholder, `TwoHeaded`) can't drop
+  by Xfinity Live!. The Fanatic Duo (Eskin + Angelo, `duo.glb`) can't drop
   below 50% until the RTRS monster arrives (2 hearts left, 5s stuck at
   the floor, or 25s), then RTRS joins the apostles.
 - Testing: `?level=2&apostles=all`, plus `&z=-42` to spawn at the boss.

@@ -66,7 +66,7 @@ function EndCard({ level }) {
       <div className={`flex min-h-full flex-col items-center justify-center gap-4 p-6 ${SHORT}gap-2 ${SHORT}p-3`}>
         <h1 className={`title text-lg leading-relaxed text-[#E8B800] ${SHORT}text-sm`}>LEVEL {level} COMPLETE</h1>
         <p className={`text-2xl ${SHORT}text-lg`}>
-          {level === 2 ? 'The Radio Monster is off the air. Xfinity Live! awaits.'
+          {level === 2 ? 'The Fanatic Duo is off the air. Xfinity Live! awaits.'
             : l1.fans === 0 ? "Nobody believes yet. That's the Process."
             : l1.fans === FAN_COUNT ? 'Every apostle is with you. Philadelphia is ready.'
             : `${l1.fans} apostles are with you.`}
@@ -84,7 +84,7 @@ function EndCard({ level }) {
             <>
               <Row label="Level 1" detail="" points={l1?.total ?? 0} />
               <Row label="Anti-fans beaten" detail={`${l2.antiFans}`} points={l2.antiFanPoints} />
-              <Row label="Radio Monster" detail="" points={l2.bossPoints} />
+              <Row label="Fanatic Duo" detail="" points={l2.bossPoints} />
               <Row label="Speed" detail={formatTime(l2.seconds)} points={l2.speedPoints} />
               {l2.hits > 0 && <Row label="Hits taken" detail={`${l2.hits}`} points={l2.hitPoints} />}
             </>
@@ -176,7 +176,7 @@ export default function Hud() {
       {bossHp != null && (
         <div className={`pointer-events-none fixed inset-x-0 top-3 z-10 flex justify-center ${SHORT}top-auto ${SHORT}bottom-3`}>
           <div className="w-[min(70vw,24rem)] rounded-lg bg-black/70 px-3 py-1.5">
-            <div className="mb-1 text-center text-base font-bold tracking-wide text-[#ff7a5a]">TWO-HEADED RADIO MONSTER</div>
+            <div className="mb-1 text-center text-base font-bold tracking-wide text-[#ff7a5a]">THE FANATIC DUO</div>
             <div className="h-3 overflow-hidden rounded-full bg-white/15">
               <div className="h-full rounded-full bg-[#ff5a2a] transition-[width]" style={{ width: `${bossHp * 100}%` }} />
             </div>
