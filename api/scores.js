@@ -50,6 +50,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (e) {
     console.error(e)
-    return res.status(500).json({ error: 'Leaderboard is unavailable right now.' })
+    // A coarse reason (never the message itself) so setup problems are diagnosable
+    const reason = /DATABASE_URL is not set/.test(e.message) ? 'no-database-url'
+      : e.code === '42P01' || /does not exist/.test(e.message) ? 'no-table'
+      : /password|auth|connect|ENOTFOUND|fetch failed/i.test(e.message) ? 'connection'
+      : 'db-error'
+    return res.status(500).json({ error: 'Leaderboard is unavailable right now.', reason })
   }
 }
